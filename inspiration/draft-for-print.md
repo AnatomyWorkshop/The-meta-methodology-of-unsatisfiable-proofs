@@ -6,6 +6,16 @@
 
 ---
 
+In 1985, Alexander Razborov proved that no polynomial-size monotone circuit can solve the CLIQUE problem. The proof did not construct a better circuit. It did not find a counterexample. Instead, it demonstrated something more fundamental: within the monotone constraint space, a perfect solution is mathematically impossible. The global error rate is bounded away from zero by a positive constant, no matter how clever the circuit design.
+
+A decade later, Razborov himself — together with Rudich — showed why this proof cannot be generalized to arbitrary circuits. The discriminating property that made the monotone lower bound work was *self-referentially safe*: monotone circuits lacked the power to simulate the very test used against them. But once negation gates are permitted, circuits become powerful enough to impersonate objects that pass any polynomial-time test. The proof tool is consumed by the object it was meant to constrain.
+
+This paper is about that structural pattern. It proposes a unified four-step framework for understanding why certain impossibility results succeed, and why their generalizations fail. The central concept is *self-referential safety*: a discriminating property used to establish a lower bound must not be decidable within the very computational model it seeks to constrain. When this condition holds, the proof goes through. When it fails, the self-referential trap detonates, and the proof collapses into the Natural Proofs barrier.
+
+The framework re-expresses the AC⁰ lower bound, the monotone circuit lower bound, and Gödel's first incompleteness theorem as instances of a single structural pattern. It diagnoses why the first two succeed, why the third is universal, and why P vs. NP has resisted all "natural" attacks. And it predicts that any successful resolution must use a discriminating property that lies outside the computational model it constrains — the direction that Geometric Complexity Theory is attempting, and the reason it must take that form.
+
+---
+
 ## Research Plan
 
 ### Core Thesis
@@ -94,6 +104,16 @@ Condition 3 is the first appearance of the self-referential safety condition; §
 - Proposition (to be verified): Every successful lower-bound proof has a discriminating property that is self-referentially safe
 - Proposition (to be verified): Every failed generalization corresponds to a point where self-referential safety breaks down
 - **Counterexample subsection:** Diagnose a known failed proof strategy (e.g., propositional proof complexity approaches) using the four-step framework — demonstrating the framework's predictive power, not merely its retrospective descriptive power
+- **Self-reflexivity check subsection:** Turn the framework on itself. The four-step analysis applied to the framework's own claims:
+
+| Framework component | Mapped to the framework itself |
+|---------------------|-------------------------------|
+| Constraint set C | The framework claims to provide a unified structure for unsatisfiability proofs |
+| Search space S | All possible meta-methodologies for lower bounds (including natural proofs, GCT, this framework) |
+| Hidden trap T | If the framework's discriminating property (self-referential safety) were itself fully formalizable within the target class, it would trigger its own self-referential trap |
+| Best approximation A* | The framework can diagnose structure and predict failure modes; it cannot generate new lower-bound proofs |
+
+This yields a meta-proposition: *A meta-methodology that successfully diagnoses lower-bound proof strategies must use a discriminating criterion that is not fully decidable within the proof class it analyzes. Otherwise, the meta-methodology falls into the very trap it diagnoses.* This is why the framework is a conceptual map, not an algorithm — and this limitation is principled, not accidental.
 
 #### Chapter 7 — P vs. NP Revisited
 
