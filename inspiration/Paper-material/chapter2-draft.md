@@ -100,7 +100,7 @@ Three deliberate omissions:
 
 2. **No claim of necessity.** We show that all known successful lower bounds use self-referentially safe discriminating properties. Whether this is *necessary* — whether an unsafe $P$ can ever yield a provable lower bound — is an open question (§6.7.5).
 
-3. **No full formalization.** Definition 2.4 is semi-formal: precise enough to verify against concrete cases, but not yet a fully axiomatized mathematical object. The extensional–intensional tension (the same definition operates differently on circuits and formal systems) is acknowledged in §6.4 and left as an open problem in §6.7.2.
+3. **No full formalization.** Definition 2.4 is semi-formal: precise enough to verify against concrete cases, but not yet a fully axiomatized mathematical object. The extensional–intensional tension (the same definition operates differently on circuits and formal systems) is addressed in §6.4 — where the structural pattern is shown to hold despite the mechanistic difference — and left as a partially open problem in §6.7.2.
 
 These omissions are deliberate. The framework's value lies in its diagnostic and predictive power across known cases, not in premature claims of completeness.
 
