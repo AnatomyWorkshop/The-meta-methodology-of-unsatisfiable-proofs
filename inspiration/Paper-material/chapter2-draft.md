@@ -54,6 +54,8 @@ That is, no candidate within the model can determine whether a given candidate s
 
 A discriminating property $P$ is *self-referentially unsafe* if such an $\mathcal{A}$ exists.
 
+**Remark (Quantifier sensitivity).** The property $P$ must be understood as a *global* predicate over the search space — typically involving an existential or universal quantifier over candidates. A local syntactic check on a single instance (e.g., "this proof has width $< w$") may be decidable within $M$, but the corresponding global property ("there exists a proof of width $< w$ and size $< s$") typically requires exponential search and is not decidable within $M$. The self-referential safety condition applies to the global form of $P$.
+
 **Definition 2.5 (Unsatisfiability certificate).** An *unsatisfiability certificate* for the pair $(M, f)$ is a triple $(M, f, P)$ where $P$ is a discriminating property that is self-referentially safe with respect to $M$.
 
 ---
@@ -73,6 +75,8 @@ and the triple $(M, f, P)$ constitutes an unsatisfiability certificate.
 - If $P$ is self-referentially unsafe (decidable within $M$), then in many natural settings, the *existence* of such a $P$ is blocked by structural barriers. In circuit complexity, the Razborov–Rudich Natural Proofs theorem (1994) shows that, under cryptographic assumptions, no polynomial-time decidable $P$ can serve as a useful discriminating property against P/poly. In logic, a decidable provability predicate would allow a system to prove its own consistency, contradicting Gödel's second theorem.
 
 - Self-referential safety is therefore not a precondition for the *truth* of the lower bound, but a precondition for the *provability* of the lower bound. It explains why certain proof strategies succeed and others fail.
+
+**Remark (Scope).** The framework characterizes the structure of *discriminating-property-based* lower-bound proofs. It does not claim to subsume all proof methods. In particular, algorithmic lower bounds that proceed by self-reduction rather than by identifying a discriminating property (e.g., Williams 2014) fall outside the framework's scope. This is a limitation of coverage, not a contradiction.
 
 ---
 

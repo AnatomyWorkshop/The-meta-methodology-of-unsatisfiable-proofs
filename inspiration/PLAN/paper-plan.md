@@ -141,15 +141,26 @@
 | 第三章：AC⁰ 案例 | ✅ 初稿完成 | 中文 | 四步框架重写哈斯塔德证明，含错误率公式 |
 | 第四章：单调电路案例 | ✅ 初稿完成 | 中文 | Razborov 近似方法，§4.5 推广失败诊断 |
 | 第五章：哥德尔案例 | ✅ 初稿完成 | 英文 | §5.4 非数值 A* 讨论，§5.8 双向咬合第六章 |
-| 第六章：统一分析 | ✅ 二稿完成 | 英文 | 核心理论贡献，含三定律、三障碍形式化、对应表、自反性检查、七个开放问题 |
-| 第七章：结论 | ✅ 初稿完成 | 英文 | 贡献重述、局限、开放问题、P vs NP 简述 |
+| 第六章：统一分析 | ✅ 三稿完成 | 英文 | 核心理论贡献，含三定律、三障碍形式化、对应表、自反性检查、七个开放问题；Phase 0 后新增：适用范围声明（Scope Remark）、量词敏感性条款（Quantifier Sensitivity Remark）、§6.7.7 扩展（三个新验证案例 + Williams 边界标记 + PHP 量词陷阱） |
+| 第七章：结论 | ✅ 初稿完成 | 英文 | 贡献重述、局限、开放问题、第三定律完整陈述 |
 
 > 原计划第七章（P vs NP 重新表述）已移出正文，留作独立后续短文。
 
 ### 实际写作顺序
 
 1. ✅ 第三章 → 第四章 → 第六章 → 第五章 → 第二章 → 第一章 → 第七章（结论）
-2. ⏳ 下一步：统一语言（中文章节翻译为英文）、通读修订、寄给老师
+2. ✅ Phase 0 反向验证 → 论文修正（适用范围 + 量词敏感性）
+3. ⏳ 下一步：统一语言（中文章节翻译为英文）、通读修订、寄给老师
+
+### Phase 0 反向验证结果（2026-4-27）
+
+| 验证项 | 结果 | 对框架的影响 |
+|--------|------|-------------|
+| Razborov-Smolensky AC⁰[p] | 安全 ✅ | 归纳基础加强 |
+| Gupta et al. 代数深度-3 | 安全 ✅ | 跨域泛化验证（布尔 → 代数） |
+| Razborov DISJ 通信复杂度 | 安全 ✅ | 填补 §6.7.7 空白 |
+| Williams ACC⁰ (2014) | 框架不适用 ⚠️ | 需要适用范围声明（已加入 §6.2） |
+| PHP 扩展 Frege | 量词陷阱 ⚠️ | 需要量词敏感性条款（已加入 Def 6.4 Remark） |
 
 ---
 
@@ -158,6 +169,14 @@
 - `Associations-beyond-the-paper/four-cases-evaluation.md`：物理案例（WIMP、SUSY、弦论、认知失调）评估——结论：作为类比有启发性，但缺乏形式化，不入正文
 - `Associations-beyond-the-paper/llm-self-reference-cases.md`：LLM 自指案例（幻觉、对齐欺骗、状态污染等）——结论：工程原则有价值，但不属于本论文范畴
 - `response/2026-4-25-Deepseek-Efficient-use.md`：用框架诊断 Forbes et al. (2021) 和 Chen et al. (2025)——前者自指安全（受限模型内工作），后者是障碍证明本身（为框架提供新实例）
+- `Associations-beyond-the-paper/srs-spectrum-and-paper-diagnosis.md`：SRS 分层体系（Level 0–3）、贝肯斯坦类比、当代论文诊断
+- `Associations-beyond-the-paper/oracle-architecture-and-nonhuman-proof.md`：神经符号系统三层架构、非人类证明验证协议、GCT 对应、最小可行实验设计
+
+### 关联项目
+
+- `neural-symbolic-system/illusion/`：分层自指安全原型系统（Illusion），Phase 0 验证完成，Phase 1 待实现
+- `neural-symbolic-system/illusion/PLAN.md`：原型系统的分阶段实现计划
+- `neural-symbolic-system/illusion/phase0-verification.md`：Phase 0 反向验证报告
 
 ---
 

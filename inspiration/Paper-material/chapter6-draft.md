@@ -56,6 +56,8 @@ That is, no candidate within the model can determine whether a given candidate s
 
 A discriminating property $P$ is *self-referentially unsafe* if such an $\mathcal{A}$ exists.
 
+**Remark (Quantifier sensitivity).** The property $P$ in Definition 6.4 must be understood as a *global* predicate over the search space $S$ — typically involving an existential or universal quantifier over candidates. A local syntactic check on a single candidate (e.g., "this proof has width $< w$") may be decidable within $M$, but the corresponding global property ("there exists a proof of width $< w$ and size $< s$") typically requires exponential search and is not decidable within $M$. The self-referential safety condition applies to the global form of $P$, not to local syntactic checks on individual instances.
+
 **Theorem 6.5 (Unsatisfiability certificate — restated from §2).** If there exists a discriminating property $P$ that is self-referentially safe with respect to $M$, then:
 
 $$A^* = \inf_{\mathcal{A} \in M} f(\mathcal{A}) < v^*,$$
@@ -63,6 +65,8 @@ $$A^* = \inf_{\mathcal{A} \in M} f(\mathcal{A}) < v^*,$$
 and the triple $(M, f, P)$ constitutes an *unsatisfiability certificate*.
 
 **Remark.** The role of self-referential safety in the theorem is subtle. Conditions 1 and 2 of Definition 6.3 already suffice to prove $A^* < v^*$ — logically, self-referential safety is not needed for the conclusion. Its role is *methodological*: it explains why the proof *can be carried out*. If $P$ were self-referentially unsafe (decidable within $M$), then in many natural settings, the existence of such a $P$ would contradict cryptographic or logical assumptions (cf. the Natural Proofs barrier). Self-referential safety is not a logical precondition for the lower bound, but a structural precondition for the *provability* of the lower bound.
+
+**Remark (Scope).** The framework characterizes the structure of *discriminating-property-based* lower-bound proofs. It does not claim to subsume all proof methods. In particular, algorithmic lower bounds that proceed by self-reduction rather than by identifying a discriminating property (e.g., Williams 2014, where an ACC⁰ lower bound is derived from a SAT algorithm speedup) fall outside the framework's scope. This is a limitation of coverage, not a contradiction: such proofs establish lower bounds through a fundamentally different mechanism — showing that the model's computational power, if assumed sufficient, would yield an algorithmic consequence that contradicts known complexity separations.
 
 ### The Three Laws of Self-Referential Safety
 
@@ -337,6 +341,14 @@ Each filled cell strengthens the framework; each cell shown to be unfillable nar
 ### 6.7.7 False-Negative Search
 
 The framework's credibility depends on the continued absence of false negatives (§6.5.3). A systematic survey of all known lower bounds — including those in communication complexity, algebraic complexity, and parameterized complexity — would either strengthen the framework's empirical base or identify its boundaries.
+
+Preliminary pressure testing (beyond the three core case studies) has examined the following additional cases: the Razborov–Smolensky AC⁰[p] lower bound (safe — the discriminating property requires modular counting outside AC⁰[p]); the Gupta–Kamath–Kayal–Saptharishi depth-3 algebraic circuit lower bound (safe — the shifted partial derivatives measure is not computable by depth-3 circuits); and the Razborov communication complexity lower bound for DISJOINTNESS (safe — matrix rank exceeds shallow protocol capacity). No false negatives have been found.
+
+Two boundary cases deserve explicit mention:
+
+1. **Algorithmic lower bounds (Williams 2014).** The ACC⁰ lower bound derived from SAT algorithm speedup does not use an explicit discriminating property in the sense of Definition 6.3. This proof falls outside the framework's scope (see Scope Remark in §6.2) and is not a false negative but a boundary marker.
+
+2. **Quantifier sensitivity in proof complexity.** In size-width lower bounds for proof systems (e.g., the pigeonhole principle in Extended Frege), the discriminating property must be formulated as a *global* existential statement ("there exists a short, narrow proof") rather than a *local* syntactic check ("this proof has width $< w$"). The local form is decidable within the proof system; the global form is not. This distinction — noted in the Quantifier Sensitivity Remark following Definition 6.4 — is essential for correctly applying the framework to proof complexity settings. Whether this quantifier sensitivity requires a more formal treatment is itself an open question.
 
 ---
 
