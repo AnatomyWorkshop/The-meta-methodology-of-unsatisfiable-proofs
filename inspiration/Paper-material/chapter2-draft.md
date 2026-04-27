@@ -76,7 +76,7 @@ and the triple $(M, f, P)$ constitutes an unsatisfiability certificate.
 
 - Self-referential safety is therefore not a precondition for the *truth* of the lower bound, but a precondition for the *provability* of the lower bound. It explains why certain proof strategies succeed and others fail.
 
-**Remark (Scope).** The framework characterizes the structure of *discriminating-property-based* lower-bound proofs. It does not claim to subsume all proof methods. In particular, algorithmic lower bounds that proceed by self-reduction rather than by identifying a discriminating property (e.g., Williams 2014) fall outside the framework's scope. This is a limitation of coverage, not a contradiction.
+**Remark (Scope and implicit discriminating properties).** Not all lower-bound proofs explicitly name a discriminating property. Some proofs — such as Williams's ACC⁰ lower bound (2014) — embed the discriminating property implicitly in the proof's global architecture: the implicit $P$ is "computing $f$ in ACC⁰ yields a SAT algorithm violating the time hierarchy," which satisfies Definitions 2.3–2.4. The framework applies to both explicit and implicit discriminating properties; its scope is bounded by whether the proof's logical structure admits the four-component decomposition, not by whether the author named $P$ explicitly.
 
 ---
 

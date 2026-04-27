@@ -159,7 +159,7 @@
 | Razborov-Smolensky AC⁰[p] | 安全 ✅ | 归纳基础加强 |
 | Gupta et al. 代数深度-3 | 安全 ✅ | 跨域泛化验证（布尔 → 代数） |
 | Razborov DISJ 通信复杂度 | 安全 ✅ | 填补 §6.7.7 空白 |
-| Williams ACC⁰ (2014) | 框架不适用 ⚠️ | 需要适用范围声明（已加入 §6.2） |
+| Williams ACC⁰ (2014) | 隐式安全 ✅ | 隐式判别性质（SAT 加速违反时间分层），框架覆盖范围扩大 |
 | PHP 扩展 Frege | 量词陷阱 ⚠️ | 需要量词敏感性条款（已加入 Def 6.4 Remark） |
 
 ---
