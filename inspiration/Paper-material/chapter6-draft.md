@@ -230,18 +230,15 @@ If Extended Frege can efficiently find short proofs whenever they exist, then th
 
 This is the most speculative prediction, but also the most generative. It suggests a concrete research program: translate logical self-reference escape techniques into the circuit complexity setting and check whether they yield new proof strategies. If such translations consistently produce viable approaches, the framework's structural correspondence is validated.
 
+**Retrospective prediction (Kumar–Saraf 2016).** The framework also makes *retrospective* predictions about why certain proof programs stall. Kumar and Saraf (2016) proved strong lower bounds for homogeneous $\Sigma\Pi\Sigma\Pi(r)$ circuits (bounded top fan-in) against the permanent, using shifted partial derivatives. However, they explicitly acknowledged inability to extend the result to general $\Sigma\Pi\Sigma\Pi$ circuits. Their stated reason: "the value of $k$ and $\ell$ could be different for the different parts, and we don't know how to combine these different values into one single progress measure." In the framework's language: the discriminating property $P$ *fragments* when the model constraint is relaxed — it cannot be unified into a single global predicate. The framework predicts this is not a technical inconvenience but a structural obstruction: when $P$ cannot be stated as a single global property, the unsatisfiability certificate $(M, f, P)$ cannot be assembled. This diagnosis was not available to the original authors but is a direct consequence of Definition 6.3.
+
 ### 6.5.3 False-Negative Check
 
 A framework's credibility depends not only on what it predicts but on what it *fails to predict*. If the framework incorrectly diagnoses a successful proof as "self-referentially unsafe," it is falsified.
 
-**Test.** We have examined every major circuit lower bound known to us:
-- Håstad's AC⁰ lower bound (Chapter 3) — safe ✓
-- Razborov's monotone lower bound (Chapter 4) — safe ✓
-- Razborov–Smolensky AC⁰[p] lower bound — safe ✓ (the discriminating property involves modular counting, which is not computable in AC⁰[p])
-- Raz–McKenzie monotone lower bound for st-connectivity — safe ✓
-- Gödel's incompleteness theorem (Chapter 5) — safe ✓
+**Test.** Beyond the three core case studies (Chapters 3–5), we have examined eleven additional lower bounds spanning five domains: Boolean circuits (AC⁰[p], ACC⁰, time-space), algebraic circuits (depth-3, depth-4, algebraic proof complexity), communication complexity (set disjointness), proof complexity (Resolution, Cutting Planes, Nullstellensatz/PC, supercritical trade-offs), and mathematical logic. The survey includes results from 1985 to 2025. All fourteen cases satisfy self-referential safety — including two cases of *implicit* safety (Williams 2014, McKay–Williams 2019) absorbed by the Scope Remark (§6.2), and several proof complexity cases requiring the Quantifier Sensitivity Remark (Definition 6.4). Details are recorded in the accompanying verification report.
 
-**Current false-negative count: zero.**
+**Current false-negative count: zero out of fourteen.**
 
 This does not prove the framework is correct. It means the framework has not yet been falsified by any known result — the minimum standard for a scientific claim.
 
@@ -346,13 +343,11 @@ Each filled cell strengthens the framework; each cell shown to be unfillable nar
 
 The framework's credibility depends on the continued absence of false negatives (§6.5.3). A systematic survey of all known lower bounds — including those in communication complexity, algebraic complexity, and parameterized complexity — would either strengthen the framework's empirical base or identify its boundaries.
 
-Preliminary pressure testing (beyond the three core case studies) has examined the following additional cases: the Razborov–Smolensky AC⁰[p] lower bound (safe — the discriminating property requires modular counting outside AC⁰[p]); the Gupta–Kamath–Kayal–Saptharishi depth-3 algebraic circuit lower bound (safe — the shifted partial derivatives measure is not computable by depth-3 circuits); and the Razborov communication complexity lower bound for DISJOINTNESS (safe — matrix rank exceeds shallow protocol capacity). No false negatives have been found.
+Beyond the three core case studies, we have examined eleven additional lower bounds spanning algebraic circuits (depth-3, depth-4, algebraic proof complexity), communication complexity (set disjointness), proof complexity (Resolution, Cutting Planes, Nullstellensatz, Polynomial Calculus, supercritical trade-offs), and algorithmic lower bounds (ACC⁰, time-space). All satisfy self-referential safety. No false negatives have been found. Two structural observations emerged from this survey:
 
-Two boundary cases deserve explicit mention:
+1. **Implicit discriminating properties.** Some proofs — notably Williams's ACC⁰ lower bound (2014) — do not name a discriminating property explicitly, but their logical structure contains one implicitly (see Scope Remark in §6.2). The framework applies to both explicit and implicit discriminating properties; its boundary is not proof style but decomposability into the four components of Definitions 6.2–6.4.
 
-1. **Algorithmic lower bounds (Williams 2014).** The ACC⁰ lower bound derived from SAT algorithm speedup does not use an explicit discriminating property in the sense of Definition 6.3, but contains an *implicit* one: "computing $f$ in ACC⁰ yields a SAT algorithm violating the time hierarchy." This implicit $P$ satisfies Definitions 6.3–6.4 (see Scope Remark in §6.2). Williams is not a false negative but a case of implicit self-referential safety — the framework's outer reach.
-
-2. **Quantifier sensitivity in proof complexity.** In size-width lower bounds for proof systems (e.g., the pigeonhole principle in Extended Frege), the discriminating property must be formulated as a *global* existential statement ("there exists a short, narrow proof") rather than a *local* syntactic check ("this proof has width $< w$"). The local form is decidable within the proof system; the global form is not. This distinction — noted in the Quantifier Sensitivity Remark following Definition 6.4 — is essential for correctly applying the framework to proof complexity settings. Whether this quantifier sensitivity requires a more formal treatment is itself an open question.
+2. **Quantifier sensitivity.** In proof complexity settings, the discriminating property must be formulated as a *global* existential statement rather than a *local* syntactic check. The local form is typically decidable within the proof system; the global form is not (see Quantifier Sensitivity Remark following Definition 6.4). Whether this distinction requires a more formal treatment is itself an open question.
 
 ---
 
@@ -364,7 +359,7 @@ This chapter has accomplished six things:
 
 2. **Provided a semi-formal definition** of self-referential safety (Definition 6.4) and verified it against all cases, including the failure case of general circuits (§6.3).
 
-3. **Demonstrated predictive power** at three levels: retrospective diagnosis of all three known barriers (relativization, natural proofs, algebrization) as instances of self-referential unsafety; five falsifiable prospective predictions; and a false-negative audit with zero counterexamples (§6.5).
+3. **Demonstrated predictive power** at three levels: retrospective diagnosis of all three known barriers (relativization, natural proofs, algebrization) as instances of self-referential unsafety; five falsifiable prospective predictions plus a retrospective prediction confirmed by Kumar–Saraf (2016); and a false-negative audit of fourteen cases across five domains with zero counterexamples (§6.5).
 
 4. **Constructed a logic–computation correspondence table** that maps structural elements between Gödel's setting and circuit complexity, identifying both known correspondences and predicted-but-unverified entries — the framework's "blank squares" (§6.4.1).
 

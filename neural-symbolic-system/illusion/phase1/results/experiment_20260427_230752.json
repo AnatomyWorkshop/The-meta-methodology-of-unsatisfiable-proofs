@@ -1,0 +1,48 @@
+{
+  "timestamp": "20260427_230752",
+  "params": {
+    "n": 6,
+    "depth": 2,
+    "n_circuits": 50,
+    "n_samples": 2000
+  },
+  "candidates": [
+    {
+      "name": "random_restriction",
+      "avg_error": 0.5052,
+      "parity_affected": false
+    },
+    {
+      "name": "input_permutation",
+      "avg_error": 0.50211,
+      "parity_affected": false
+    },
+    {
+      "name": "random_restriction",
+      "avg_error": 0.49845999999999996,
+      "parity_affected": false
+    },
+    {
+      "name": "random_restriction",
+      "avg_error": 0.49311,
+      "parity_affected": false
+    }
+  ],
+  "rejected": [
+    {
+      "name": "gate_substitution",
+      "avg_error": 0.50152,
+      "parity_affected": true
+    },
+    {
+      "name": "depth_reduction",
+      "avg_error": 0.49969,
+      "parity_affected": true
+    },
+    {
+      "name": "gate_substitution",
+      "avg_error": 0.49900999999999995,
+      "parity_affected": true
+    }
+  ]
+}
