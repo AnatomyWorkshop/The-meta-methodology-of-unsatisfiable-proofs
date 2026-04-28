@@ -1,115 +1,115 @@
-# 第三章草稿：案例一——AC⁰ 电路下界
+# Chapter 3: Case Study I — AC⁰ Circuit Lower Bounds
 
-> 状态：第一稿，待数学细节核对
-> 对应框架要素：结构化约束 / 搜索空间 / 隐藏陷阱 / 最优近似
-
----
-
-## 3.1 开篇命题
-
-哈斯塔德开关引理的证明，可以被视为一个不可满足性证明的典范。它不构造任何算法，不寻找任何反例，而是证明：在一个受限的计算模型内，完美计算某个目标函数的能力，被一个严格大于零的错误率下界永久封死。
-
-这是本文框架的第一个具体实例。
+> Status: First draft (translated from Chinese)
+> Framework components: Structured constraints / Search space / Hidden trap / Best approximation
 
 ---
 
-## 3.2 背景：AC⁰ 电路与奇偶函数
+## 3.1 Opening Proposition
 
-**定义（AC⁰ 电路）**：AC⁰ 是由常数深度 $d$、无界扇入的 AND/OR 门构成的布尔电路族，电路规模（门的数量）为输入长度 $n$ 的多项式。
+Håstad's Switching Lemma proof can be read as a paradigm case of an unsatisfiability proof. It constructs no algorithm, finds no counterexample. Instead, it demonstrates that within a restricted computational model, the ability to compute a target function perfectly is permanently foreclosed by a strictly positive error rate lower bound.
 
-**目标函数**：奇偶函数 $\mathrm{PARITY}_n$，定义为 $n$ 个输入比特的异或（XOR）。即：当输入中 1 的个数为奇数时输出 1，否则输出 0。
+This is the first concrete instance of the paper's framework.
 
-**已知结论（哈斯塔德，1986）**：不存在多项式规模的 AC⁰ 电路族能计算 $\mathrm{PARITY}_n$。更强地，任何深度为 $d$、规模为 $s$ 的 AC⁰ 电路，在计算 $\mathrm{PARITY}_n$ 时的错误率至少为
+---
+
+## 3.2 Background: AC⁰ Circuits and the Parity Function
+
+**Definition (AC⁰ circuits).** AC⁰ is the class of Boolean circuit families of constant depth $d$ with unbounded fan-in AND/OR gates, where the circuit size (number of gates) is polynomial in the input length $n$.
+
+**Target function.** The parity function $\mathrm{PARITY}_n$, defined as the XOR of $n$ input bits: the output is 1 if and only if the number of 1s among the inputs is odd.
+
+**Known result (Håstad, 1986).** No polynomial-size AC⁰ circuit family can compute $\mathrm{PARITY}_n$. More precisely, any AC⁰ circuit of depth $d$ and size $s$ computing $\mathrm{PARITY}_n$ has error rate at least
 
 $$\mathrm{Err} \geq \frac{1}{2} - \frac{1}{2} \cdot \exp\!\left(-\Omega\!\left(\frac{\log s}{d-1}\right)^{1/(d-1)}\right).$$
 
-当 $s = \mathrm{poly}(n)$、$d$ 为常数时，上式右侧趋近于 $\frac{1}{2}$——即电路的表现几乎等同于随机猜测。
+When $s = \mathrm{poly}(n)$ and $d$ is a fixed constant, the right-hand side approaches $\frac{1}{2}$ — the circuit's performance degrades to random guessing.
 
 ---
 
-## 3.3 用四步框架重写
+## 3.3 The Four-Step Framework Applied
 
-### 步骤一：结构化约束集 C
+### Step 1: Structured Constraint Set $C$
 
-约束集由三条规则构成：
+The constraint set consists of three rules:
 
-- **C1（深度约束）**：电路深度不超过常数 $d$。
-- **C2（门类型约束）**：仅允许无界扇入的 AND 门与 OR 门，不允许 NOT 门（或等价地，NOT 门只出现在输入层）。
-- **C3（规模约束）**：电路门数不超过 $\mathrm{poly}(n)$。
+- **C1 (Depth constraint).** Circuit depth does not exceed a fixed constant $d$.
+- **C2 (Gate type constraint).** Only unbounded fan-in AND and OR gates are permitted; NOT gates appear only at the input layer (or equivalently, are absent).
+- **C3 (Size constraint).** The number of gates does not exceed $\mathrm{poly}(n)$.
 
-这三条约束合称"AC⁰ 约束"，它们共同定义了搜索空间的边界。
+These three constraints together define the AC⁰ constraint, which determines the boundary of the search space.
 
-### 步骤二：搜索空间 S
+### Step 2: Search Space $S$
 
-$$S = \{ C = \{C_n\}_{n=1}^\infty \mid C_n \text{ 满足约束 C1、C2、C3} \}$$
+$$S = \{ C = \{C_n\}_{n=1}^\infty \mid C_n \text{ satisfies constraints C1, C2, C3} \}.$$
 
-即所有满足 AC⁰ 约束的电路族。我们在这个空间里寻找能完美计算 $\mathrm{PARITY}$ 的候选解。
+This is the set of all AC⁰ circuit families. We search within this space for a candidate that computes $\mathrm{PARITY}$ perfectly.
 
-**目标函数**：定义电路族 $C$ 的全局错误率为
+**Objective function.** Define the global error rate of a circuit family $C$ as
 
 $$\mathrm{Err}(C) = \limsup_{n \to \infty} \Pr_{x \in \{0,1\}^n}\!\left[C_n(x) \neq \mathrm{PARITY}_n(x)\right].$$
 
-优化问题：在 $S$ 内最小化 $\mathrm{Err}(C)$。若最优值为 0，则 $\mathrm{PARITY} \in \mathrm{AC}^0$；若最优值严格大于 0，则不可满足性得证。
+The optimization problem: minimize $\mathrm{Err}(C)$ over $S$. If the optimum is 0, then $\mathrm{PARITY} \in \mathrm{AC}^0$; if the optimum is strictly positive, unsatisfiability is established.
 
-### 步骤三：隐藏陷阱 T
+### Step 3: The Hidden Trap $T$
 
-陷阱藏在约束 C1（深度约束）与 $\mathrm{PARITY}$ 函数的内在复杂性之间的冲突里。
+The trap lies in the conflict between constraint C1 (depth) and the intrinsic complexity of $\mathrm{PARITY}$.
 
-**直觉**：$\mathrm{PARITY}$ 函数对输入的每一个比特都极度敏感——翻转任意一个输入比特，输出必然改变。这种"全局敏感性"要求电路在计算时必须"看到"所有输入之间的相互关系。而深度为 $d$ 的电路，每个输出门最多能"看到"深度 $d$ 层内的信息，在规模受限时，它无法捕捉所有输入的全局奇偶关系。
+**Intuition.** The parity function is maximally sensitive to every input bit: flipping any single input bit always flips the output. This global sensitivity requires the circuit to "see" the relationship among all inputs simultaneously. A circuit of depth $d$ can only "see" information within $d$ layers from the output gate; under size constraints, it cannot capture the global parity relationship across all inputs.
 
-**形式化陷阱（开关引理的核心）**：对 AC⁰ 电路施加一个**随机限制**（random restriction）$\rho$：随机选取 $n$ 个输入变量中的 $(1-p)$ 比例，将其固定为随机值，剩余 $pn$ 个变量保持自由。
+**Formal trap (the core of the Switching Lemma).** Apply a *random restriction* $\rho$ to an AC⁰ circuit: randomly select a $(1-p)$ fraction of the $n$ input variables and fix them to random values, leaving the remaining $pn$ variables free.
 
-- **电路在随机限制下的行为**：哈斯塔德开关引理证明，在随机限制 $\rho$ 下，一个深度为 $d$、规模为 $s$ 的 AC⁰ 电路，以极高概率（$1 - \exp(-\Omega(n))$）坍塌成一个深度至多为 $d-1$ 的更简单电路，甚至最终坍塌成一棵深度很浅的决策树。
+- **Circuit behavior under random restriction.** Håstad's Switching Lemma shows that under a random restriction $\rho$, a depth-$d$, size-$s$ AC⁰ circuit collapses with high probability ($1 - \exp(-\Omega(n))$) to a circuit of depth at most $d-1$, and ultimately to a shallow decision tree.
 
-- **$\mathrm{PARITY}$ 在随机限制下的行为**：$\mathrm{PARITY}$ 函数在任何随机限制下，仍然等于剩余自由变量的奇偶函数——它的复杂性不随限制而降低。
+- **$\mathrm{PARITY}$ behavior under random restriction.** Under any random restriction, $\mathrm{PARITY}$ remains equal to the parity of the surviving free variables — its complexity does not decrease.
 
-这就是陷阱：**电路在随机限制下坍塌，但目标函数不坍塌**。这个不对称性，就是约束集内部的隐性冲突。
+This is the trap: **the circuit collapses under random restriction, but the target function does not.** This asymmetry is the hidden conflict within the constraint set.
 
-### 步骤四：最优近似 A*
+### Step 4: Best Approximation $A^*$
 
-通过对随机限制过程的归纳（对深度 $d$ 做归纳），可以证明：
+By induction on depth $d$ over the random restriction process, one can show:
 
-对任意满足 AC⁰ 约束的电路族 $C$，存在绝对正常数 $\epsilon > 0$（依赖于 $d$），使得
+For any circuit family $C$ satisfying the AC⁰ constraints, there exists an absolute positive constant $\epsilon > 0$ (depending on $d$) such that
 
 $$\mathrm{Err}(C) \geq \epsilon.$$
 
-具体地，当深度 $d$ 固定、规模 $s = \mathrm{poly}(n)$ 时，错误率下界趋近于 $\frac{1}{2}$，即电路的表现退化为随机猜测。
+Specifically, when depth $d$ is fixed and size $s = \mathrm{poly}(n)$, the error rate lower bound approaches $\frac{1}{2}$ — the circuit degrades to random guessing.
 
-**结论**：在 AC⁰ 约束下，使 $\mathrm{PARITY}$ 计算错误率趋于 0 的优化目标**不可满足**。最优近似 $A^* \geq \epsilon > 0$，且这个下界是紧的（存在电路族使错误率恰好趋近于 $\frac{1}{2}$）。
-
----
-
-## 3.4 自指安全性分析
-
-这个证明为什么能成功？关键在于判别性质 P 的选取：
-
-**判别性质 P**：电路 $C_n$ 在随机限制 $\rho$ 下，以高概率坍塌成深度小于 $d$ 的决策树。
-
-**自指安全性**：性质 P 的判定依赖于对随机限制过程的分析，这个分析本身需要超出 AC⁰ 能力的计算（具体地，需要对指数多个随机限制求期望）。因此，**不存在 AC⁰ 电路能判定"给定电路是否满足性质 P"**。
-
-这意味着：性质 P 对 AC⁰ 模型是自指安全的。证明工具（随机限制分析）不落入被约束类（AC⁰），因此不会触发自指陷阱。
-
-这正是第六章将要提炼的核心结构：**成功的下界证明，其判别性质总是自指安全的**。
+**Conclusion.** Under the AC⁰ constraints, the optimization goal of driving $\mathrm{PARITY}$'s error rate to zero is **unsatisfiable**. The best approximation satisfies $A^* \geq \epsilon > 0$, and this bound is tight (there exist circuit families whose error rate approaches $\frac{1}{2}$).
 
 ---
 
-## 3.5 小结
+## 3.4 Self-Referential Safety Analysis
 
-| 框架要素 | AC⁰ 案例中的对应物 |
+Why does this proof succeed? The key lies in the choice of discriminating property $P$.
+
+**Discriminating property $P$.** Circuit $C_n$ collapses with high probability to a decision tree of depth less than $d$ under a random restriction $\rho$.
+
+**Self-referential safety.** Deciding property $P$ requires computing the expected collapse behavior of a circuit over exponentially many random restrictions — specifically, estimating the probability that a random $\rho$ reduces the circuit to a decision tree of depth $< d$. This expectation ranges over $\binom{n}{\lfloor pn \rfloor} \cdot 2^{(1-p)n}$ possible restrictions, a quantity that grows faster than any polynomial in $n$. No AC⁰ circuit can perform this computation: the required resources are at least quasi-polynomial, far exceeding the polynomial-size constraint C3. Therefore, **no AC⁰ circuit can decide "whether a given circuit satisfies property $P$."**
+
+Property $P$ is self-referentially safe with respect to the AC⁰ model. The proof tool (random restriction analysis) does not fall within the constrained class (AC⁰), and therefore does not trigger the self-referential trap.
+
+This is precisely the core structure that Chapter 6 will distill: *every successful lower-bound proof uses a discriminating property that is self-referentially safe.*
+
+---
+
+## 3.5 Summary
+
+| Framework component | AC⁰ case |
 |---|---|
-| 结构化约束集 C | 常数深度 + 无界扇入 AND/OR + 多项式规模 |
-| 搜索空间 S | 所有满足 AC⁰ 约束的电路族 |
-| 隐藏陷阱 T | 随机限制下电路坍塌，但 PARITY 不坍塌 |
-| 最优近似 A* | 错误率 ≥ ε > 0，趋近于 1/2 |
-| 判别性质 P | 随机限制下的坍塌行为 |
-| 自指安全？ | 是——P 的判定超出 AC⁰ 能力 |
+| Structured constraint set $C$ | Constant depth + unbounded fan-in AND/OR + polynomial size |
+| Search space $S$ | All AC⁰ circuit families |
+| Hidden trap $T$ | Circuit collapses under random restriction; PARITY does not |
+| Best approximation $A^*$ | Error rate $\geq \epsilon > 0$, approaching $1/2$ |
+| Discriminating property $P$ | Collapse behavior under random restriction |
+| Self-referentially safe? | Yes — deciding $P$ exceeds AC⁰ capability |
 
-这个案例建立了框架的第一个具体实例。下一章将转向单调电路下界，那里的隐藏陷阱有不同的形态，但自指安全性的逻辑完全相同——直到我们试图把证明推广到全电路，自指陷阱才会爆发。
+This case establishes the first concrete instance of the framework. The next chapter turns to the monotone circuit lower bound, where the hidden trap takes a different form but the logic of self-referential safety is identical — until we attempt to generalize the proof to unrestricted circuits, at which point the self-referential trap detonates.
 
 ---
 
-## 注释与参考
+## Notes and References
 
-- 哈斯塔德开关引理的完整证明：Håstad (1986)，博士论文；或 Arora & Barak《Computational Complexity》第14章，定理14.20。
-- 本章的错误率下界公式来自 Arora & Barak，推论14.25。
-- 随机限制方法的更早版本：Furst, Saxe & Sipser (1984)，首次证明 PARITY ∉ AC⁰，但界不如哈斯塔德紧。
+- Complete proof of Håstad's Switching Lemma: Håstad (1986), doctoral dissertation; or Arora & Barak, *Computational Complexity*, Chapter 14, Theorem 14.20.
+- The error rate lower bound formula in §3.2 follows Arora & Barak, Corollary 14.25.
+- An earlier version of the random restriction method: Furst, Saxe & Sipser (1984), who first proved $\mathrm{PARITY} \notin \mathrm{AC}^0$, with a weaker bound than Håstad's.

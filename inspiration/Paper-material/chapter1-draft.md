@@ -24,7 +24,7 @@ The observation, stated informally:
 
 > A lower-bound proof succeeds when its discriminating property — the structural feature used to certify that no candidate in the model achieves the ideal — is not decidable within the model itself. When this condition holds, the proof goes through. When it fails, the model can simulate the proof's own diagnostic tool, and the proof collapses.
 
-This condition is not new in any single case. It is implicit in Håstad's switching lemma (1986), in Razborov's approximation method (1985), and in Gödel's diagonalization (1931). What is new is the recognition that these are instances of a single pattern, and that this pattern has predictive power: it explains not only why certain proofs succeed, but why certain proof strategies — relativization, natural proofs, algebrization — are structurally doomed.
+This condition is not new in any single case. It is implicit in Håstad's switching lemma (1986), in Razborov's approximation method (1985), and in Gödel's diagonalization (1931). What is new is the unified language that makes the pattern explicit and its consequences falsifiable: a structured vocabulary for asking why impossibility proofs work, why they fail to generalize, and what conditions any future breakthrough must satisfy. This language explains not only why certain proofs succeed, but why certain proof strategies — relativization, natural proofs, algebrization — are structurally doomed, and generates concrete predictions that can be checked against future results.
 
 ---
 
@@ -88,7 +88,6 @@ The framework's closest precursor is the Natural Proofs barrier (Razborov & Rudi
 
 The Geometric Complexity Theory program (Mulmuley & Sohoni, 2001) is a specific technical approach to P vs. NP via algebraic geometry and representation theory. The present framework operates at a different level of abstraction: it explains *why* GCT must take the form it does (its discriminating properties must be self-referentially safe), but does not contribute to GCT's technical machinery.
 
-The philosophical dimension of this work — the claim that proving unsatisfiability is an undervalued epistemic tool — connects to Lakatos's theory of proofs and refutations (1976) and Kitcher's epistemology of mathematical knowledge (1984). This connection is beyond the scope of the present paper and will be developed separately.
 
 ---
 

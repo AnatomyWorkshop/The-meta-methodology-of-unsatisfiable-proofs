@@ -138,10 +138,10 @@
 |---|---|---|---|
 | 第一章：引言 | ✅ 初稿完成 | 英文 | 热启动（Razborov 1985），四件事：hook、贡献、案例、局限 |
 | 第二章：框架定义 | ✅ 初稿完成 | 英文 | 从 §6.2 反推精简版，含 Def 2.1–2.5、Theorem 2.6、三定律预览 |
-| 第三章：AC⁰ 案例 | ✅ 初稿完成 | 中文 | 四步框架重写哈斯塔德证明，含错误率公式 |
-| 第四章：单调电路案例 | ✅ 初稿完成 | 中文 | Razborov 近似方法，§4.5 推广失败诊断 |
+| 第三章：AC⁰ 案例 | ✅ 英文版完成 | 英文 | 四步框架重写哈斯塔德证明，含错误率公式（由中文稿翻译） |
+| 第四章：单调电路案例 | ✅ 英文版完成 | 英文 | Razborov 近似方法，§4.5 推广失败诊断（由中文稿翻译） |
 | 第五章：哥德尔案例 | ✅ 初稿完成 | 英文 | §5.4 非数值 A* 讨论，§5.8 双向咬合第六章 |
-| 第六章：统一分析 | ✅ 三稿完成 | 英文 | 核心理论贡献，含三定律、三障碍形式化、对应表、自反性检查、七个开放问题；Phase 0 后新增：适用范围声明（Scope Remark）、量词敏感性条款（Quantifier Sensitivity Remark）、§6.7.7 扩展（三个新验证案例 + Williams 边界标记 + PHP 量词陷阱） |
+| 第六章：统一分析 | ✅ 三稿完成 | 英文 | 核心理论贡献，含三定律、三障碍形式化、对应表、自反性检查、七个开放问题；Phase 0 后新增：Scope Remark、Quantifier Sensitivity Remark、§6.5.2 Kumar-Saraf 预测能力、§6.5.3 精简为 14 案例概括、§6.7.7 精简为抽象概括 |
 | 第七章：结论 | ✅ 初稿完成 | 英文 | 贡献重述、局限、开放问题、第三定律完整陈述 |
 
 > 原计划第七章（P vs NP 重新表述）已移出正文，留作独立后续短文。
@@ -150,9 +150,16 @@
 
 1. ✅ 第三章 → 第四章 → 第六章 → 第五章 → 第二章 → 第一章 → 第七章（结论）
 2. ✅ Phase 0 反向验证 → 论文修正（适用范围 + 量词敏感性）
-3. ⏳ 下一步：统一语言（中文章节翻译为英文）、通读修订、寄给老师
+3. ✅ Phase 0 扩展验证（14 案例）→ 论文修正（§6.5.2 Kumar-Saraf、§6.5.3 精简、§6.7.7 精简）
+4. ✅ 第三章、第四章翻译为英文（chapter3-draft.md、chapter4-draft.md）
+5. ⏳ 下一步候选（按优先级）：
+   - **A（建议）**：§6.5.2 增加 Prediction 6（P vs NP 独立性猜想，推测性，标注 highly speculative）
+   - **B（建议）**：§6.7.3 补充 SRS 代数化方向（张量秩比）作为候选形式化
+   - **C（建议）**：§6.4.1 翻译表末尾加一句意象扩张方向（§6.7.2 候选路径）
+   - **D（建议）**：第七章增加"三障碍统一"子节——三障碍 = SRS ≤ 1 在三种增强模型下的投影
+   - **E（必要）**：通读全稿，检查跨章节一致性，寄给老师
 
-### Phase 0 反向验证结果（2026-4-27）
+### Phase 0 反向验证结果（最终：14 案例，0 反例）
 
 | 验证项 | 结果 | 对框架的影响 |
 |--------|------|-------------|
@@ -160,7 +167,13 @@
 | Gupta et al. 代数深度-3 | 安全 ✅ | 跨域泛化验证（布尔 → 代数） |
 | Razborov DISJ 通信复杂度 | 安全 ✅ | 填补 §6.7.7 空白 |
 | Williams ACC⁰ (2014) | 隐式安全 ✅ | 隐式判别性质（SAT 加速违反时间分层），框架覆盖范围扩大 |
-| PHP 扩展 Frege | 量词陷阱 ⚠️ | 需要量词敏感性条款（已加入 Def 6.4 Remark） |
+| PHP 扩展 Frege | 安全 ✅ | 量词敏感性条款（已加入 Def 6.4 Remark） |
+| McKay-Williams 时间-空间 (2019) | 隐式安全 ✅ | 印证 Scope Remark |
+| Forbes et al. 代数证明复杂度 (2021) | 安全 ✅ | 量词敏感性验证 |
+| Kumar-Saraf 深度-4 (2016) | 安全 ✅ | 框架预测能力展示（§6.5.2） |
+| Haken/Pudlák/NS-PC 证明复杂度 | 安全 ✅ | 量词敏感性通用性 |
+| Grigoriev Tseitin-NS (1998) | 安全 ✅ | 时新性验证 |
+| de Rezende et al. 超临界权衡 (2025) | 安全 ✅ | 前沿时新性验证（STOC'25） |
 
 ---
 
@@ -174,9 +187,9 @@
 
 ### 关联项目
 
-- `neural-symbolic-system/illusion/`：分层自指安全原型系统（Illusion），Phase 0 验证完成，Phase 1 待实现
-- `neural-symbolic-system/illusion/PLAN.md`：原型系统的分阶段实现计划
-- `neural-symbolic-system/illusion/phase0-verification.md`：Phase 0 反向验证报告
+- `neural-symbolic-system/illusion/`：分层自指安全原型系统（Illusion），Phase 0 验证完成，Phase 1 骨架已实现（`phase1/` 目录，5 个 Python 文件，smoke test 通过）
+- `neural-symbolic-system/illusion/PLAN.md`：原型系统的分阶段实现计划（Phase 0 ✅，Phase 1 🔄）
+- `neural-symbolic-system/illusion/phase0-verification.md`：Phase 0 反向验证报告（14 案例，0 反例）
 
 ---
 
