@@ -181,6 +181,47 @@ class DepthReduction(Transform):
         return True
 
 
+class ExhaustiveConstantCheck(Transform):
+    """
+    Pressure-test transform: replace the circuit with a constant function
+    determined by brute-force evaluation over all 2^n inputs.
+
+    This is a deliberately adversarial entry in the registry. It will:
+    - Produce very high collapse score (circuit becomes constant)
+    - Not affect PARITY (PARITY is not constant)
+    - BUT: the decision algorithm requires 2^n evaluations
+
+    Expected L3 behavior: UNKNOWN (no rule matches "exhaustive_constant"),
+    then human review should mark UNSAFE — not because the decision is cheap,
+    but because this transform does not reveal structural weakness in AC^0;
+    it brute-forces the circuit rather than exploiting its architecture.
+
+    This tests whether L3 can distinguish "requires exponential resources to
+    decide" from "is a meaningful self-referentially safe property".
+    If L3 passes this as SAFE, it has a blind spot: exponential enumeration
+    alone is not sufficient for self-referential safety.
+    """
+
+    name = "exhaustive_constant_check"
+
+    def apply(self, circuit: AC0Circuit) -> AC0Circuit:
+        import itertools
+        n = circuit.n_inputs
+        # Evaluate on all 2^n inputs to determine majority output
+        outputs = []
+        for bits in itertools.product([False, True], repeat=n):
+            outputs.append(circuit.evaluate(bits))
+        majority = sum(outputs) > len(outputs) / 2
+        # Return a constant circuit
+        const_gate = Gate(GateType.AND, list(range(n)), negated=not majority)
+        return AC0Circuit(n, 1, [const_gate])
+
+    def affects_parity(self, n: int) -> bool:
+        # PARITY is not constant, so this transform does affect it
+        # (it replaces PARITY with a constant, which is wrong)
+        return True  # correctly rejected by L2 on parity_affected criterion
+
+
 # Registry of all transforms for L2 to search over
 TRANSFORM_REGISTRY = [
     RandomRestriction(survival_prob=0.5),
@@ -190,4 +231,5 @@ TRANSFORM_REGISTRY = [
     GateSubstitution(GateType.OR, GateType.AND),
     InputPermutation(),
     DepthReduction(),
+    ExhaustiveConstantCheck(),  # adversarial pressure-test entry
 ]

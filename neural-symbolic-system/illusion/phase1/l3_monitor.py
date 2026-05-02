@@ -31,11 +31,17 @@ import re
 # ---------------------------------------------------------------------------
 
 _UNSAFE_PATTERNS: list[tuple[str, str]] = [
-    # Symmetry / invariance properties — decidable by exhaustive check over
-    # a polynomial-size group (S_n has n! elements but the *decision* can be
-    # done in poly time via canonical form or orbit enumeration for small n).
-    (r"permut", "permutation invariance is decidable in polynomial time "
-                "(check all n! input permutations; for fixed n this is O(1))"),
+    # Symmetry / invariance properties — the *induced discriminating property*
+    # (that a function is invariant under the transform) is decidable in
+    # polynomial time asymptotically: check all n! permutations of any input.
+    # More precisely: the property "f is permutation-invariant" has a poly-time
+    # decision algorithm, so it is in P ⊂ P/poly. For fixed n it is in AC^0
+    # (finite lookup). Either way, it does not exceed AC^0 in the relevant sense.
+    # Note: the transform itself may cause high collapse, but that is a separate
+    # question from whether the *induced property* is self-referentially safe.
+    (r"permut", "the induced property (permutation invariance of f) is decidable "
+                "in polynomial time — check all n! input permutations; "
+                "this does not exceed AC^0 capability in the relevant asymptotic sense"),
     (r"symmetr", "symmetry under a group action is decidable in polynomial time "
                  "for groups of polynomial size"),
     (r"invariant", "invariance under a fixed transformation is decidable in "
