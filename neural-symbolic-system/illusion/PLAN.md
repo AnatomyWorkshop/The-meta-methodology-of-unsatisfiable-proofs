@@ -71,36 +71,22 @@ L3 在 Phase 1 由人类手动充当：检查 L2 找到的 P 是否能被 AC⁰ 
 
 ---
 
-### Phase 1：两层玩具系统 — ✅ 核心验证通过，L3 区分待完成
+### Phase 1：两层玩具系统 — ✅ 完成
 
 **目标**：在 AC⁰ 领域验证"L2 能自主发现自指安全的判别性质"。
 
-**当前状态（2026-05-02）**：
+**结果（2026-05-02）**：三条成功标准全部满足。详见 `phase1-results.md`。
 
-L2 搜索引擎已跑通。关键结果：
-
-| 变换 | Collapse Score | PARITY 受影响 | 状态 |
+| 变换 | Collapse Score | PARITY 受影响 | L3 判定 |
 |---|---|---|---|
-| random_restriction (p=0.3) | 0.948 | 否 | **候选** |
-| random_restriction (p=0.5) | 0.905 | 否 | **候选** |
-| input_permutation | 0.835 | 否 | **候选（假阳性，待 L3 拒绝）** |
-| random_restriction (p=0.7) | 0.834 | 否 | **候选** |
-| gate_substitution | 0.998 | 是 | 已拒绝 |
-| depth_reduction | 0.784 | 是 | 已拒绝 |
+| random_restriction (p=0.3) | 0.948 | 否 | **SAFE** |
+| random_restriction (p=0.5) | 0.905 | 否 | **SAFE** |
+| random_restriction (p=0.7) | 0.834 | 否 | **SAFE** |
+| input_permutation | 0.835 | 否 | **UNSAFE（假阳性）** |
+| gate_substitution | 0.998 | 是 | 已拒绝（L2） |
+| depth_reduction | 0.784 | 是 | 已拒绝（L2） |
 
-**L3 待完成的工作（你现在需要做的）**：
-
-对每个候选，手动回答：AC⁰ 电路能否判定"一个函数是否满足这个性质"？
-
-- `random_restriction`：**NO** — 判定"电路在随机限制下是否坍塌"需要对指数多个限制求期望，超出 AC⁰ 能力。→ **SAFE，保留**
-- `input_permutation`：**YES** — 判定"函数是否对输入置换不变"可以用多项式时间算法完成，AC⁰ 可以模拟。→ **UNSAFE，丢弃**
-
-**结论**：L2 找到了 Håstad 的方法（random_restriction），L3 正确区分了真阳性和假阳性。Phase 1 核心命题验证通过。
-
-**核心指标改进记录**：
-- 原始版本：`is_candidate = avg_error > 0.1`（过宽，任何变换都能通过）
-- 修正版本：`is_candidate = avg_collapse > 0.15 and not parity_affected`（collapse score 是真实信号）
-- collapse score 定义：输出方差的归一化倒数，衡量电路在变换后变得多"常数化"
+**核心发现**：collapse score 是真实信号，但不足以区分真假阳性——L3 的自指安全检查是必要的，不是可选的。
 
 **目录结构**：
 ```
@@ -108,24 +94,22 @@ illusion/
 ├── PLAN.md
 ├── l3_log.md               # 活的 L3 决策记录（append-only）
 ├── phase0-verification.md
+├── phase1-results.md       # 实验报告 ✅
 ├── phase1/
 │   ├── l1_circuit.py       # AC⁰ 电路模拟器
 │   ├── l2_search.py        # 判别性质搜索引擎（含 collapse 度量）
 │   ├── l3_monitor.py       # L3 规则库 + 自动检查器
 │   ├── evaluator.py        # 错误率评估（蒙特卡洛）
-│   ├── transforms.py       # 变换规则库
+│   ├── transforms.py       # 变换规则库（含压力测试变换）
 │   ├── run_experiment.py   # 主实验脚本
 │   └── results/            # 实验结果 JSON
-└── phase1-results.md       # 实验报告（待写）
 ```
-
-**输出**：`illusion/phase1/` + `illusion/l3_log.md` + `illusion/phase1-results.md`（待写）
 
 ---
 
-### Phase 2：L3 自动化 — ✅ 规则库已实现，扩展进行中
+### Phase 2：L3 自动化 — 🔄 规则库已实现，压力测试进行中
 
-**目标**：把人工 L3 替换为自动检查器。
+**目标**：把人工 L3 替换为自动检查器，并验证规则库的边界。
 
 **已完成（2026-05-02）**：
 
@@ -191,6 +175,18 @@ L3 CHECK: '<transform_name>'
 - 把 UNKNOWN 的人类决策自动反馈到规则库（学习循环）
 - 对 UNKNOWN 候选，调用外部工具（SymPy、Lean）做形式化复杂度分析
 - 把规则库从正则匹配升级为结构化描述语言（候选性质的 DSL）
+
+**压力测试设计（2026-05-02 更新）**：
+
+Deepseek 审查发现：原始 `ExhaustiveConstantCheck` 因 `affects_parity=True` 被 L2 提前过滤，永远到不了 L3，测不到预期的盲点。
+
+修正后的压力测试变换：`ExhaustiveParityEquivalentCheck`
+- 对 PARITY 本身：等价测试通过，返回原电路 → `affects_parity=False`，通过 L2
+- 对随机 AC⁰ 电路：几乎都不等价 → 替换为常数 → collapse 极高
+- 到达 L3 后：规则库命中 `exhaustive_parity_equivalent` → **UNSAFE**
+- 理由：判定 PARITY 等价性需要 $2^n$ 次枚举，但这是暴力检测，不是结构性洞察。**指数枚举 ≠ 自指安全。**
+
+这个区分是规则库的核心判断之一：一个性质必须揭示 AC⁰ 电路为什么失败，而不仅仅是检测到它失败了。
 
 **输出文件**：
 - `illusion/phase1/l3_monitor.py` — 规则库 + 检查器 + 日志写入器

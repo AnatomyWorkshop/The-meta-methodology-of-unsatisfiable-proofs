@@ -126,3 +126,20 @@ Then paste the output here and add the **Human decision** line.
 ---
 
 *Entries below this line are from Phase 2 and later.*
+
+---
+
+## Phase 2 Pressure Tests
+
+## 2026-05-02 | exhaustive_parity_equivalent_check
+
+- **Verdict**: UNSAFE (high confidence)
+- **Reason**: deciding PARITY-equivalence requires enumerating all 2^n inputs, but this is brute-force detection, not structural insight; exponential enumeration alone is not sufficient for self-referential safety
+- **Reference**: —
+- **Design intent**: This transform was designed to reach L3 (unlike the earlier ExhaustiveConstantCheck which was filtered by L2). It tests whether L3 conflates "requires exponential resources" with "self-referentially safe".
+- **Expected behavior**: L2 passes it (affects_parity=False, high collapse). L3 should mark UNSAFE.
+- **Human decision**: UNSAFE — confirmed. The key distinction: a self-referentially safe property must reveal WHY AC^0 circuits fail structurally, not merely detect that they fail. Exhaustive PARITY-equivalence checking is brute-force detection. It has no structural content.
+- **What this test proves**: The rule "exponential enumeration → SAFE" is wrong. L3's rule library correctly encodes the stronger condition: the property must be structurally revealing, not just computationally expensive to decide.
+
+---
+

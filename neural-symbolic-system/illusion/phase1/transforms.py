@@ -181,45 +181,53 @@ class DepthReduction(Transform):
         return True
 
 
-class ExhaustiveConstantCheck(Transform):
+class ExhaustiveParityEquivalentCheck(Transform):
     """
-    Pressure-test transform: replace the circuit with a constant function
-    determined by brute-force evaluation over all 2^n inputs.
+    Pressure-test transform designed to reach L3 (not be filtered by L2).
 
-    This is a deliberately adversarial entry in the registry. It will:
-    - Produce very high collapse score (circuit becomes constant)
-    - Not affect PARITY (PARITY is not constant)
-    - BUT: the decision algorithm requires 2^n evaluations
+    Behavior:
+    - If circuit is equivalent to PARITY: return circuit unchanged (collapse low)
+    - If circuit is NOT equivalent to PARITY: replace with constant 0 (collapse high)
 
-    Expected L3 behavior: UNKNOWN (no rule matches "exhaustive_constant"),
-    then human review should mark UNSAFE — not because the decision is cheap,
-    but because this transform does not reveal structural weakness in AC^0;
-    it brute-forces the circuit rather than exploiting its architecture.
+    This satisfies L2's filter:
+    - affects_parity = False: PARITY itself passes the equivalence test, stays unchanged
+    - avg_collapse will be high: almost all random AC^0 circuits are not PARITY-equivalent
 
-    This tests whether L3 can distinguish "requires exponential resources to
-    decide" from "is a meaningful self-referentially safe property".
-    If L3 passes this as SAFE, it has a blind spot: exponential enumeration
-    alone is not sufficient for self-referential safety.
+    The L3 question this forces: is "deciding whether a circuit is PARITY-equivalent"
+    self-referentially safe?
+
+    The answer is subtle:
+    - Deciding equivalence requires enumerating all 2^n inputs: O(2^n) work
+    - For fixed n this is O(1), so technically in AC^0 (finite lookup)
+    - But asymptotically, this is exponential — it does NOT fit in AC^0
+
+    However: this transform does NOT reveal structural weakness in AC^0.
+    It brute-forces equivalence rather than exploiting architectural fragility.
+    A correct L3 should mark this UNKNOWN, then human review should mark UNSAFE:
+    "exponential enumeration alone is not sufficient for self-referential safety —
+    the property must reveal why AC^0 circuits fail, not just detect that they do."
+
+    If L3 incorrectly marks this SAFE (because "exponential enumeration → safe"),
+    it has the blind spot: exponential cost ≠ self-referential safety.
     """
 
-    name = "exhaustive_constant_check"
+    name = "exhaustive_parity_equivalent_check"
 
     def apply(self, circuit: AC0Circuit) -> AC0Circuit:
         import itertools
         n = circuit.n_inputs
-        # Evaluate on all 2^n inputs to determine majority output
-        outputs = []
         for bits in itertools.product([False, True], repeat=n):
-            outputs.append(circuit.evaluate(bits))
-        majority = sum(outputs) > len(outputs) / 2
-        # Return a constant circuit
-        const_gate = Gate(GateType.AND, list(range(n)), negated=not majority)
-        return AC0Circuit(n, 1, [const_gate])
+            parity_val = sum(bits) % 2 == 1
+            if circuit.evaluate(bits) != parity_val:
+                # Not PARITY-equivalent: collapse to constant 0
+                const_gate = Gate(GateType.AND, list(range(n)), negated=True)
+                return AC0Circuit(n, 1, [const_gate])
+        # PARITY-equivalent: return unchanged
+        return circuit
 
     def affects_parity(self, n: int) -> bool:
-        # PARITY is not constant, so this transform does affect it
-        # (it replaces PARITY with a constant, which is wrong)
-        return True  # correctly rejected by L2 on parity_affected criterion
+        # PARITY itself is PARITY-equivalent, so it passes unchanged
+        return False
 
 
 # Registry of all transforms for L2 to search over
@@ -231,5 +239,5 @@ TRANSFORM_REGISTRY = [
     GateSubstitution(GateType.OR, GateType.AND),
     InputPermutation(),
     DepthReduction(),
-    ExhaustiveConstantCheck(),  # adversarial pressure-test entry
+    ExhaustiveParityEquivalentCheck(),  # adversarial pressure-test: reaches L3, tests "exponential ≠ safe" blind spot
 ]

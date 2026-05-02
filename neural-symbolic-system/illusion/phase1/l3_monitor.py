@@ -77,6 +77,24 @@ _UNSAFE_PATTERNS: list[tuple[str, str]] = [
                      "deciding whether a circuit has depth ≤ d is decidable in AC^0"),
     (r"gate_substit", "gate substitution is a local rewrite; deciding whether "
                       "a circuit admits a gate substitution is decidable in AC^0"),
+
+    # Exhaustive equivalence checks — these require 2^n evaluations, which is
+    # exponential, but they do NOT reveal structural weakness in AC^0.
+    # They brute-force a decision rather than exploiting architectural fragility.
+    # Key distinction: exponential enumeration alone is NOT sufficient for
+    # self-referential safety. A property must reveal WHY AC^0 circuits fail,
+    # not merely detect that they do.
+    # These are marked UNSAFE because the induced property (e.g., "circuit is
+    # PARITY-equivalent") is decidable by exhaustive evaluation — the exponential
+    # cost is a computational fact, not a structural insight.
+    (r"exhaustive_parity_equivalent", "deciding PARITY-equivalence requires "
+                                      "enumerating all 2^n inputs, but this is "
+                                      "brute-force detection, not structural insight; "
+                                      "exponential enumeration alone is not sufficient "
+                                      "for self-referential safety"),
+    (r"exhaustive_constant", "deciding whether a circuit is constant requires "
+                             "2^n evaluations, but this is brute-force detection; "
+                             "exponential cost ≠ self-referential safety"),
 ]
 
 
