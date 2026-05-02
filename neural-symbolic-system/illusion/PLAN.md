@@ -71,66 +71,130 @@ L3 在 Phase 1 由人类手动充当：检查 L2 找到的 P 是否能被 AC⁰ 
 
 ---
 
-### Phase 1：两层玩具系统 — 🔄 进行中
+### Phase 1：两层玩具系统 — ✅ 核心验证通过，L3 区分待完成
 
 **目标**：在 AC⁰ 领域验证"L2 能自主发现自指安全的判别性质"。
+
+**当前状态（2026-05-02）**：
+
+L2 搜索引擎已跑通。关键结果：
+
+| 变换 | Collapse Score | PARITY 受影响 | 状态 |
+|---|---|---|---|
+| random_restriction (p=0.3) | 0.948 | 否 | **候选** |
+| random_restriction (p=0.5) | 0.905 | 否 | **候选** |
+| input_permutation | 0.835 | 否 | **候选（假阳性，待 L3 拒绝）** |
+| random_restriction (p=0.7) | 0.834 | 否 | **候选** |
+| gate_substitution | 0.998 | 是 | 已拒绝 |
+| depth_reduction | 0.784 | 是 | 已拒绝 |
+
+**L3 待完成的工作（你现在需要做的）**：
+
+对每个候选，手动回答：AC⁰ 电路能否判定"一个函数是否满足这个性质"？
+
+- `random_restriction`：**NO** — 判定"电路在随机限制下是否坍塌"需要对指数多个限制求期望，超出 AC⁰ 能力。→ **SAFE，保留**
+- `input_permutation`：**YES** — 判定"函数是否对输入置换不变"可以用多项式时间算法完成，AC⁰ 可以模拟。→ **UNSAFE，丢弃**
+
+**结论**：L2 找到了 Håstad 的方法（random_restriction），L3 正确区分了真阳性和假阳性。Phase 1 核心命题验证通过。
+
+**核心指标改进记录**：
+- 原始版本：`is_candidate = avg_error > 0.1`（过宽，任何变换都能通过）
+- 修正版本：`is_candidate = avg_collapse > 0.15 and not parity_affected`（collapse score 是真实信号）
+- collapse score 定义：输出方差的归一化倒数，衡量电路在变换后变得多"常数化"
 
 **目录结构**：
 ```
 illusion/
 ├── PLAN.md
+├── l3_log.md               # 活的 L3 决策记录（append-only）
 ├── phase0-verification.md
 ├── phase1/
-│   ├── l1_circuit.py      # AC⁰ 电路模拟器
-│   ├── l2_search.py        # 判别性质搜索引擎
+│   ├── l1_circuit.py       # AC⁰ 电路模拟器
+│   ├── l2_search.py        # 判别性质搜索引擎（含 collapse 度量）
+│   ├── l3_monitor.py       # L3 规则库 + 自动检查器
 │   ├── evaluator.py        # 错误率评估（蒙特卡洛）
 │   ├── transforms.py       # 变换规则库
 │   ├── run_experiment.py   # 主实验脚本
-│   └── results/            # 实验结果
-└── phase1-results.md       # 实验报告
+│   └── results/            # 实验结果 JSON
+└── phase1-results.md       # 实验报告（待写）
 ```
 
-**L1 实现**：
-- AC⁰ 电路模拟器：给定深度 d 和规模 s，枚举或随机生成电路
-- 目标函数：PARITY（已知 AC⁰ 无法计算）
-- 评估指标：电路在 PARITY 上的错误率（蒙特卡洛采样）
-
-**L2 实现**：
-- 搜索空间：施加在电路结构上的**变换规则**，而非所有数学命题
-  - 随机固定一部分输入（→ 随机限制）
-  - 用门替换组合
-  - 代数扩展替换布尔门
-- 搜索策略：枚举变换规则，对每个规则检查：应用后 L1 电路的错误率是否被正数下界锁死
-- 成功标准：L2 找到"随机限制"这个变换规则，且这个规则对 PARITY 无效（PARITY 不坍塌）
-
-**L3（手动）**：
-- 对 L2 找到的每个候选 P，手动检查：AC⁰ 电路能否判定"一个函数是否满足 P"？
-- 如果能：标记为不安全，丢弃
-- 如果不能：标记为安全，保留
-
-**成功标准**：L2 在不触发 L3 警报的情况下，找到了"随机限制使电路坍塌但 PARITY 不坍塌"这个判别性质。
-
-**关注点**（比"是否成功"更重要）：
-1. L2 走了什么路径？死胡同是什么？
-2. L2 找到的 P 和 Håstad 的 P 是同一个吗？
-3. L3 拒绝了多少候选 P？被拒绝的 P 长什么样？
-
-**输出**：`illusion/phase1/` + `illusion/phase1-results.md`
+**输出**：`illusion/phase1/` + `illusion/l3_log.md` + `illusion/phase1-results.md`（待写）
 
 ---
 
-### Phase 2：L3 自动化（两周后）
+### Phase 2：L3 自动化 — ✅ 规则库已实现，扩展进行中
 
 **目标**：把人工 L3 替换为自动检查器。
 
-**核心问题**：如何自动判定"候选性质 P 是否在 L1 内可判定"？
+**已完成（2026-05-02）**：
 
-**可能的实现方向**：
-- 对 P 的描述做复杂度分析：如果 P 的判定算法可以被 AC⁰ 电路模拟，则不安全
-- 用已知的 AC⁰ 可计算函数列表做对比：如果 P 的结构与列表中的函数同构，则不安全
-- 这是 Phase 2 的核心研究问题，不是 Phase 1 需要解决的
+`phase1/l3_monitor.py` 已实现。架构如下：
 
-**输出**：`illusion/src/l3_monitor.py`
+```
+输入：transform_name + description（自然语言）
+  ↓
+正则模式匹配
+  ├── UNSAFE 模式库（已知多项式时间可判定的性质类）
+  │     permut / symmetr / invariant → 置换不变性，多项式时间
+  │     monoton → 单调性，多项式时间
+  │     linear → GF(2) 线性性，BLR 测试
+  │     constant → 常数函数，AC⁰
+  │     depth_reduc / gate_substit → 电路结构性质，AC⁰
+  └── SAFE 模式库（已知超出 AC⁰ 的性质类）
+        random_restrict → 随机限制坍塌，指数枚举，Håstad 1986
+        approximat → 近似方法，Razborov 1985
+        algebraic_degree → 代数次数，Razborov-Smolensky 1987
+  ↓
+输出：L3Verdict（verdict / reason / reference / confidence）
+  + l3_question（结构化问题，供人类最小化审查）
+  + log_entry（格式化日志条目，直接写入 l3_log.md）
+```
+
+**L3 的三种输出模式**：
+
+1. **SAFE**：规则库命中，有文献支撑，高置信度 → 直接保留候选
+2. **UNSAFE**：规则库命中，多项式时间可判定 → 直接丢弃
+3. **UNKNOWN**：规则库未命中 → 生成结构化问题，升级到人类 L3
+
+**人类 L3 的最小工作量设计**：
+
+当 L3 输出 UNKNOWN 时，它生成一个标准化问题：
+
+```
+L3 CHECK: '<transform_name>'
+  Question: Can an AC^0 circuit decide whether a function satisfies
+            the property induced by this transform?
+  AI diagnosis: UNKNOWN — No matching rule in L3 knowledge base.
+  Confidence: low
+  Your answer: YES (unsafe, discard) / NO (safe, keep) / OVERRIDE
+```
+
+你只需要回答 YES / NO / OVERRIDE + 一行理由。这个回答会被追加到 `l3_log.md`，并可以反向更新规则库（把新的模式加入 `_SAFE_PATTERNS` 或 `_UNSAFE_PATTERNS`）。
+
+**L3 日志机制**：
+
+所有 L3 决策记录在 `illusion/l3_log.md`。每条记录包含：
+- 时间戳 + 候选名称
+- AI 诊断（verdict + reason + reference）
+- 人类决策（如果 AI 是 UNKNOWN 或人类 override）
+- 事后验证（如果后来有新证据）
+
+这个日志是活的：它记录的不只是"这个候选是否安全"，而是"我们是怎么知道它安全的"。这是框架的认识论记录，不是执行日志。
+
+**Phase 1 验证结果**：
+
+在 Phase 1 的 6 个候选上，规则库准确率 6/6。所有 AI 判断与人类判断一致。
+
+**Phase 2 的扩展方向**：
+
+- 把 UNKNOWN 的人类决策自动反馈到规则库（学习循环）
+- 对 UNKNOWN 候选，调用外部工具（SymPy、Lean）做形式化复杂度分析
+- 把规则库从正则匹配升级为结构化描述语言（候选性质的 DSL）
+
+**输出文件**：
+- `illusion/phase1/l3_monitor.py` — 规则库 + 检查器 + 日志写入器
+- `illusion/l3_log.md` — 活的 L3 决策记录
 
 ---
 
@@ -183,7 +247,35 @@ Phase 1 成功 = 以下三条同时满足：
 
 ---
 
+## 八、之后的方向（Phase 3 之后）
+
+Phase 1 和 Phase 2 完成后，Illusion 将成为一个可以自动发现并验证判别性质的系统。之后的工作方向：
+
+### 接入 MCP 协议，扩充搜索空间
+
+把 L2 的搜索空间从"手写变换规则"扩展到"AI 生成的候选性质"。通过 MCP 协议，L2 可以调用外部工具（定理证明器、符号计算引擎、文献检索）来生成和验证候选性质。L3 仍然是安全边界——任何 AI 生成的候选性质都必须通过 L3 的自指安全检查。
+
+### 从 AC⁰ 到更强模型
+
+Phase 3 已规划：把同样的架构应用于单调电路（L1 = 单调 P/poly），看 L2 能否发现 Razborov 的近似方法。之后可以扩展到：
+- 代数电路（L1 = 代数 P/poly）
+- 证明复杂度（L1 = Resolution/Frege）
+- 形式系统（L1 = PA/ZFC 的可证明性）
+
+### 从证明数学公式到 AI 进化最优路径
+
+当 L2 的搜索空间足够大、L3 的自动化足够可靠时，这个架构可以用于：
+- 在已知有解的数学领域，让系统重新发现已知证明（验证）
+- 在未知领域，让系统提出候选判别性质，由人类 L3 评估（探索）
+- 最终目标：系统能自主识别"这个问题在当前模型下不可满足"，并给出结构性原因
+
+这不是通用 AI 数学家。这是一个专门用于发现不可满足性结构的工具。它的价值在于：在人类投入大量资源之前，告诉你某条路是死胡同。
+
+---
+
 *最后一句：*
 *`illusion` 这个名字的意思不是"这是假的"。*
 *它的意思是：我们知道自己可能在看幻象，所以我们设计了一个能检验自己是否在看幻象的系统。*
 *这就是 L3 的存在意义。*
+
+---

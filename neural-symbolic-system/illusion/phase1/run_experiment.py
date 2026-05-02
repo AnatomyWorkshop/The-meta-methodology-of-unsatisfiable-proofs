@@ -48,7 +48,8 @@ def run_experiment(
     else:
         for i, c in enumerate(candidates):
             print(f"\nCandidate {i+1}: {c.transform.name}")
-            print(f"  Average error rate: {c.avg_error:.3f}")
+            print(f"  Collapse score: {c.avg_collapse:.3f} (threshold: 0.15)")
+            print(f"  Average error rate: {c.avg_error:.3f} (lift: {c.error_lift:+.3f})")
             print(f"  PARITY affected: {c.parity_affected}")
             print(f"  L3 question: Can an AC^0 circuit decide whether")
             print(f"    a function satisfies the property induced by '{c.transform.name}'?")
@@ -59,7 +60,7 @@ def run_experiment(
     print("DEAD ENDS (rejected transforms)")
     print("=" * 60)
     for r in rejected:
-        reason = "PARITY affected" if r.parity_affected else f"low error ({r.avg_error:.3f})"
+        reason = "PARITY affected" if r.parity_affected else f"low collapse ({r.avg_collapse:.3f})"
         print(f"  x {r.transform.name}: {reason}")
 
     # Save results
@@ -72,11 +73,13 @@ def run_experiment(
         "params": {"n": n, "depth": depth, "n_circuits": n_circuits, "n_samples": n_samples},
         "candidates": [
             {"name": r.transform.name, "avg_error": r.avg_error,
+             "avg_collapse": r.avg_collapse, "error_lift": r.error_lift,
              "parity_affected": r.parity_affected}
             for r in candidates
         ],
         "rejected": [
             {"name": r.transform.name, "avg_error": r.avg_error,
+             "avg_collapse": r.avg_collapse,
              "parity_affected": r.parity_affected}
             for r in rejected
         ],

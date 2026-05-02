@@ -1,0 +1,59 @@
+{
+  "timestamp": "20260502_144956",
+  "params": {
+    "n": 8,
+    "depth": 3,
+    "n_circuits": 50,
+    "n_samples": 2000
+  },
+  "candidates": [
+    {
+      "name": "random_restriction",
+      "avg_error": 0.498,
+      "avg_collapse": 0.9476359999999999,
+      "error_lift": -0.0012099999999999889,
+      "parity_affected": false
+    },
+    {
+      "name": "random_restriction",
+      "avg_error": 0.5046499999999999,
+      "avg_collapse": 0.904992,
+      "error_lift": 0.005439999999999945,
+      "parity_affected": false
+    },
+    {
+      "name": "input_permutation",
+      "avg_error": 0.49979999999999997,
+      "avg_collapse": 0.8348359999999999,
+      "error_lift": 0.0005899999999999794,
+      "parity_affected": false
+    },
+    {
+      "name": "random_restriction",
+      "avg_error": 0.50108,
+      "avg_collapse": 0.834494,
+      "error_lift": 0.0018699999999999828,
+      "parity_affected": false
+    }
+  ],
+  "rejected": [
+    {
+      "name": "gate_substitution",
+      "avg_error": 0.49888,
+      "avg_collapse": 0.998416,
+      "parity_affected": true
+    },
+    {
+      "name": "gate_substitution",
+      "avg_error": 0.49955,
+      "avg_collapse": 0.99762,
+      "parity_affected": true
+    },
+    {
+      "name": "depth_reduction",
+      "avg_error": 0.49765,
+      "avg_collapse": 0.783922,
+      "parity_affected": true
+    }
+  ]
+}
