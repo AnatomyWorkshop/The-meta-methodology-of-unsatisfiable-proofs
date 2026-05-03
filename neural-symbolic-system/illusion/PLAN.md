@@ -166,31 +166,32 @@ L3 CHECK: '<transform_name>'
 
 这个日志是活的：它记录的不只是"这个候选是否安全"，而是"我们是怎么知道它安全的"。这是框架的认识论记录，不是执行日志。
 
-**Phase 1 验证结果**：
+**Phase 2 验证结果（2026-05-03）**：
 
-在 Phase 1 的 6 个候选上，规则库准确率 6/6。所有 AI 判断与人类判断一致。
+压力测试实验已运行（n=8/seed=42，n=12/seed=7）。结果：
 
-**Phase 2 的扩展方向**：
+| 实验 | exhaustive collapse | random_restriction collapse | L3 自动判定 |
+|---|---|---|---|
+| n=8, seed=42 | **1.000** | 0.879–0.969 | UNSAFE（正确） |
+| n=12, seed=7 | **1.000** | 0.887–0.957 | UNSAFE（正确） |
 
-- 把 UNKNOWN 的人类决策自动反馈到规则库（学习循环）
-- 对 UNKNOWN 候选，调用外部工具（SymPy、Lean）做形式化复杂度分析
-- 把规则库从正则匹配升级为结构化描述语言（候选性质的 DSL）
+关键观察：
+- `exhaustive_parity_equivalent_check` 在两次实验中都以 collapse=1.000 排第一，成功通过 L2
+- L3 规则库在两次实验中都正确将其标记为 UNSAFE（0 UNKNOWN）
+- 模式在 n=8 → n=12 之间完全稳定
+- `gate_substitution` 在 n=12 时 collapse=1.000 但 parity_affected=True，被 L2 正确过滤
 
-**压力测试设计（2026-05-02 更新）**：
+**Phase 2 当前状态**：压力测试通过。L3 自动化在已知变换上准确率 100%。
 
-Deepseek 审查发现：原始 `ExhaustiveConstantCheck` 因 `affects_parity=True` 被 L2 提前过滤，永远到不了 L3，测不到预期的盲点。
-
-修正后的压力测试变换：`ExhaustiveParityEquivalentCheck`
-- 对 PARITY 本身：等价测试通过，返回原电路 → `affects_parity=False`，通过 L2
-- 对随机 AC⁰ 电路：几乎都不等价 → 替换为常数 → collapse 极高
-- 到达 L3 后：规则库命中 `exhaustive_parity_equivalent` → **UNSAFE**
-- 理由：判定 PARITY 等价性需要 $2^n$ 次枚举，但这是暴力检测，不是结构性洞察。**指数枚举 ≠ 自指安全。**
-
-这个区分是规则库的核心判断之一：一个性质必须揭示 AC⁰ 电路为什么失败，而不仅仅是检测到它失败了。
+**Phase 2 下一步**：
+1. 扩展变换注册表（加入更多控制变换：identity、input_negation）
+2. 设计 UNKNOWN 候选的学习循环（人类判断 → 规则库更新）
+3. 开始 Phase 3 设计：单调电路 L1 + k-CLIQUE 目标函数
 
 **输出文件**：
 - `illusion/phase1/l3_monitor.py` — 规则库 + 检查器 + 日志写入器
 - `illusion/l3_log.md` — 活的 L3 决策记录
+- `illusion/phase1/results/` — 实验 JSON（含 seed，可复现）
 
 ---
 

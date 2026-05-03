@@ -3,10 +3,19 @@ Phase 1 main experiment script.
 
 Runs the L2 search engine, collects results, and outputs a report
 for L3 (human) review.
+
+Usage:
+    python run_experiment.py [n] [depth] [n_circuits] [n_samples] [seed]
+
+Examples:
+    python run_experiment.py 8 3
+    python run_experiment.py 12 3 50 2000
+    python run_experiment.py 8 3 50 2000 42   # reproducible run
 """
 
 import json
 import os
+import random
 import sys
 from datetime import datetime
 
@@ -20,11 +29,15 @@ def run_experiment(
     depth: int = 3,
     n_circuits: int = 50,
     n_samples: int = 2000,
+    seed: int = None,
 ):
+    if seed is not None:
+        random.seed(seed)
+
     print("=" * 60)
     print("ILLUSION Phase 1 Experiment")
     print(f"Date: {datetime.now().isoformat()}")
-    print(f"Parameters: n={n}, depth={depth}, circuits={n_circuits}, samples={n_samples}")
+    print(f"Parameters: n={n}, depth={depth}, circuits={n_circuits}, samples={n_samples}, seed={seed}")
     print("=" * 60)
 
     # Run L2 search
@@ -70,7 +83,7 @@ def run_experiment(
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     report = {
         "timestamp": timestamp,
-        "params": {"n": n, "depth": depth, "n_circuits": n_circuits, "n_samples": n_samples},
+        "params": {"n": n, "depth": depth, "n_circuits": n_circuits, "n_samples": n_samples, "seed": seed},
         "candidates": [
             {"name": r.transform.name, "avg_error": r.avg_error,
              "avg_collapse": r.avg_collapse, "error_lift": r.error_lift,
@@ -105,6 +118,10 @@ def run_experiment(
 
 
 if __name__ == "__main__":
-    n = int(sys.argv[1]) if len(sys.argv) > 1 else 8
-    depth = int(sys.argv[2]) if len(sys.argv) > 2 else 3
-    run_experiment(n=n, depth=depth)
+    n          = int(sys.argv[1]) if len(sys.argv) > 1 else 8
+    depth      = int(sys.argv[2]) if len(sys.argv) > 2 else 3
+    n_circuits = int(sys.argv[3]) if len(sys.argv) > 3 else 50
+    n_samples  = int(sys.argv[4]) if len(sys.argv) > 4 else 2000
+    seed       = int(sys.argv[5]) if len(sys.argv) > 5 else None
+    run_experiment(n=n, depth=depth, n_circuits=n_circuits, n_samples=n_samples, seed=seed)
+

@@ -16,6 +16,7 @@ while PARITY does not collapse.
 """
 
 from typing import List, Dict, Any
+import random
 from l1_circuit import AC0Circuit, parity, random_ac0_circuit
 from evaluator import monte_carlo_error_rate
 from transforms import Transform, RestrictedCircuit, TRANSFORM_REGISTRY
@@ -28,11 +29,10 @@ def measure_collapse(circuit, n_samples: int = 500) -> float:
     has low variance. A hard circuit has variance near 0.25 (Bernoulli(0.5)).
     Returns a collapse score in [0, 1]: 1 = fully collapsed, 0 = no collapse.
     """
-    import random as _random
     n = circuit.n_inputs
     outputs = []
     for _ in range(n_samples):
-        x = tuple(_random.choice([True, False]) for _ in range(n))
+        x = tuple(random.choice([True, False]) for _ in range(n))
         outputs.append(1 if circuit.evaluate(x) else 0)
     if not outputs:
         return 0.0

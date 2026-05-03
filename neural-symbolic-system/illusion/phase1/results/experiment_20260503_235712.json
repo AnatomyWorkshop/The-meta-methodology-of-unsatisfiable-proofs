@@ -1,0 +1,67 @@
+{
+  "timestamp": "20260503_235712",
+  "params": {
+    "n": 8,
+    "depth": 3,
+    "n_circuits": 50,
+    "n_samples": 2000,
+    "seed": 42
+  },
+  "candidates": [
+    {
+      "name": "exhaustive_parity_equivalent_check",
+      "avg_error": 0.49957999999999997,
+      "avg_collapse": 1.0,
+      "error_lift": 0.00025999999999992696,
+      "parity_affected": false
+    },
+    {
+      "name": "random_restriction",
+      "avg_error": 0.50325,
+      "avg_collapse": 0.969194,
+      "error_lift": 0.0039299999999999335,
+      "parity_affected": false
+    },
+    {
+      "name": "random_restriction",
+      "avg_error": 0.49963,
+      "avg_collapse": 0.939836,
+      "error_lift": 0.00030999999999997696,
+      "parity_affected": false
+    },
+    {
+      "name": "input_permutation",
+      "avg_error": 0.5005,
+      "avg_collapse": 0.892364,
+      "error_lift": 0.0011799999999999033,
+      "parity_affected": false
+    },
+    {
+      "name": "random_restriction",
+      "avg_error": 0.50478,
+      "avg_collapse": 0.879404,
+      "error_lift": 0.005459999999999965,
+      "parity_affected": false
+    }
+  ],
+  "rejected": [
+    {
+      "name": "gate_substitution",
+      "avg_error": 0.5029399999999999,
+      "avg_collapse": 0.9926860000000001,
+      "parity_affected": true
+    },
+    {
+      "name": "gate_substitution",
+      "avg_error": 0.5018499999999999,
+      "avg_collapse": 0.991982,
+      "parity_affected": true
+    },
+    {
+      "name": "depth_reduction",
+      "avg_error": 0.49973,
+      "avg_collapse": 0.75586,
+      "parity_affected": true
+    }
+  ]
+}

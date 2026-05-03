@@ -220,7 +220,8 @@ class ExhaustiveParityEquivalentCheck(Transform):
             parity_val = sum(bits) % 2 == 1
             if circuit.evaluate(bits) != parity_val:
                 # Not PARITY-equivalent: collapse to constant 0
-                const_gate = Gate(GateType.AND, list(range(n)), negated=True)
+                # OR([]) evaluates to False (any([]) == False) — true constant-0
+                const_gate = Gate(GateType.OR, [], negated=False)
                 return AC0Circuit(n, 1, [const_gate])
         # PARITY-equivalent: return unchanged
         return circuit

@@ -40,7 +40,7 @@ _UNSAFE_PATTERNS: list[tuple[str, str]] = [
     # Note: the transform itself may cause high collapse, but that is a separate
     # question from whether the *induced property* is self-referentially safe.
     (r"permut", "the induced property (permutation invariance of f) is decidable "
-                "in polynomial time — check all n! input permutations; "
+                "in polynomial time - check all n! input permutations; "
                 "this does not exceed AC^0 capability in the relevant asymptotic sense"),
     (r"symmetr", "symmetry under a group action is decidable in polynomial time "
                  "for groups of polynomial size"),
@@ -173,7 +173,7 @@ class L3Verdict:
             f"L3 CHECK: '{self.transform_name}'\n"
             f"  Question: Can an AC^0 circuit decide whether a function satisfies\n"
             f"            the property induced by this transform?\n"
-            f"  AI diagnosis: {self.verdict} — {self.reason}\n"
+            f"  AI diagnosis: {self.verdict} - {self.reason}\n"
             f"  Confidence: {self.confidence}\n"
             f"  Your answer: YES (unsafe, discard) / NO (safe, keep) / OVERRIDE\n"
         )
@@ -258,7 +258,7 @@ def batch_check(candidates: list[dict], verbose: bool = True) -> list[L3Verdict]
     verdicts = []
     if verbose:
         print("=" * 60)
-        print("L3 MONITOR — Self-Referential Safety Check")
+        print("L3 MONITOR - Self-Referential Safety Check")
         print("=" * 60)
 
     for c in candidates:
@@ -274,11 +274,11 @@ def batch_check(candidates: list[dict], verbose: bool = True) -> list[L3Verdict]
         print("\n" + "=" * 60)
         print(f"SUMMARY: {len(safe)} SAFE, {len(unsafe)} UNSAFE, {len(unknown)} UNKNOWN")
         for v in safe:
-            print(f"  ✓ SAFE:    {v.transform_name}")
+            print(f"  [SAFE]    {v.transform_name}")
         for v in unsafe:
-            print(f"  ✗ UNSAFE:  {v.transform_name}")
+            print(f"  [UNSAFE]  {v.transform_name}")
         for v in unknown:
-            print(f"  ? UNKNOWN: {v.transform_name} — needs human review")
+            print(f"  [UNKNOWN] {v.transform_name} -- needs human review")
 
     return verdicts
 

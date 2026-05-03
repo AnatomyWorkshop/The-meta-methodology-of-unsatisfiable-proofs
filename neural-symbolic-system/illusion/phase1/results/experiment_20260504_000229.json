@@ -1,0 +1,67 @@
+{
+  "timestamp": "20260504_000229",
+  "params": {
+    "n": 12,
+    "depth": 3,
+    "n_circuits": 30,
+    "n_samples": 3000,
+    "seed": 7
+  },
+  "candidates": [
+    {
+      "name": "exhaustive_parity_equivalent_check",
+      "avg_error": 0.49975555555555556,
+      "avg_collapse": 1.0,
+      "error_lift": -0.0009555555555555428,
+      "parity_affected": false
+    },
+    {
+      "name": "random_restriction",
+      "avg_error": 0.4987333333333333,
+      "avg_collapse": 0.9571366666666666,
+      "error_lift": -0.0019777777777778005,
+      "parity_affected": false
+    },
+    {
+      "name": "random_restriction",
+      "avg_error": 0.5026666666666667,
+      "avg_collapse": 0.9339,
+      "error_lift": 0.0019555555555555992,
+      "parity_affected": false
+    },
+    {
+      "name": "random_restriction",
+      "avg_error": 0.5004888888888889,
+      "avg_collapse": 0.88674,
+      "error_lift": -0.00022222222222223476,
+      "parity_affected": false
+    },
+    {
+      "name": "input_permutation",
+      "avg_error": 0.4986333333333333,
+      "avg_collapse": 0.8694033333333333,
+      "error_lift": -0.0020777777777777895,
+      "parity_affected": false
+    }
+  ],
+  "rejected": [
+    {
+      "name": "gate_substitution",
+      "avg_error": 0.5024888888888889,
+      "avg_collapse": 1.0,
+      "parity_affected": true
+    },
+    {
+      "name": "gate_substitution",
+      "avg_error": 0.4999333333333333,
+      "avg_collapse": 1.0,
+      "parity_affected": true
+    },
+    {
+      "name": "depth_reduction",
+      "avg_error": 0.49922222222222223,
+      "avg_collapse": 0.8259500000000001,
+      "parity_affected": true
+    }
+  ]
+}
