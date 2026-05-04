@@ -107,11 +107,11 @@ illusion/
 
 ---
 
-### Phase 2：L3 自动化 — 🔄 规则库已实现，压力测试进行中
+### Phase 2：L3 自动化 — 🔄 规则库已实现，压力测试通过
 
 **目标**：把人工 L3 替换为自动检查器，并验证规则库的边界。
 
-**已完成（2026-05-02）**：
+**已完成（2026-05-02 ~ 05-04）**：
 
 `phase1/l3_monitor.py` 已实现。架构如下：
 
@@ -125,6 +125,7 @@ illusion/
   │     linear → GF(2) 线性性，BLR 测试
   │     constant → 常数函数，AC⁰
   │     depth_reduc / gate_substit → 电路结构性质，AC⁰
+  │     exhaustive_parity_equivalent → 指数枚举但无结构洞察（"假安全"压力测试）
   └── SAFE 模式库（已知超出 AC⁰ 的性质类）
         random_restrict → 随机限制坍塌，指数枚举，Håstad 1986
         approximat → 近似方法，Razborov 1985
@@ -138,60 +139,40 @@ illusion/
 **L3 的三种输出模式**：
 
 1. **SAFE**：规则库命中，有文献支撑，高置信度 → 直接保留候选
-2. **UNSAFE**：规则库命中，多项式时间可判定 → 直接丢弃
+2. **UNSAFE**：规则库命中，多项式时间可判定或暴力枚举 → 直接丢弃
 3. **UNKNOWN**：规则库未命中 → 生成结构化问题，升级到人类 L3
 
-**人类 L3 的最小工作量设计**：
+**统一报告输出（2026-05-04 新增）**：
 
-当 L3 输出 UNKNOWN 时，它生成一个标准化问题：
+每次实验自动生成 `results/experiment_<timestamp>_report.md`，包含：
+- 候选表（collapse / error / L3 verdict / L3 reason）
+- L2 拒绝表
+- L3 审查清单（[o]=SAFE, [x]=UNSAFE, [?]=UNKNOWN）
+- 汇总统计
 
-```
-L3 CHECK: '<transform_name>'
-  Question: Can an AC^0 circuit decide whether a function satisfies
-            the property induced by this transform?
-  AI diagnosis: UNKNOWN — No matching rule in L3 knowledge base.
-  Confidence: low
-  Your answer: YES (unsafe, discard) / NO (safe, keep) / OVERRIDE
-```
+这是实验的单一入口文件，不需要跳转四个文件拼全貌。
 
-你只需要回答 YES / NO / OVERRIDE + 一行理由。这个回答会被追加到 `l3_log.md`，并可以反向更新规则库（把新的模式加入 `_SAFE_PATTERNS` 或 `_UNSAFE_PATTERNS`）。
-
-**L3 日志机制**：
-
-所有 L3 决策记录在 `illusion/l3_log.md`。每条记录包含：
-- 时间戳 + 候选名称
-- AI 诊断（verdict + reason + reference）
-- 人类决策（如果 AI 是 UNKNOWN 或人类 override）
-- 事后验证（如果后来有新证据）
-
-这个日志是活的：它记录的不只是"这个候选是否安全"，而是"我们是怎么知道它安全的"。这是框架的认识论记录，不是执行日志。
-
-**Phase 2 验证结果（2026-05-03）**：
-
-压力测试实验已运行（n=8/seed=42，n=12/seed=7）。结果：
+**压力测试验证结果（2026-05-03）**：
 
 | 实验 | exhaustive collapse | random_restriction collapse | L3 自动判定 |
 |---|---|---|---|
 | n=8, seed=42 | **1.000** | 0.879–0.969 | UNSAFE（正确） |
 | n=12, seed=7 | **1.000** | 0.887–0.957 | UNSAFE（正确） |
 
-关键观察：
-- `exhaustive_parity_equivalent_check` 在两次实验中都以 collapse=1.000 排第一，成功通过 L2
-- L3 规则库在两次实验中都正确将其标记为 UNSAFE（0 UNKNOWN）
-- 模式在 n=8 → n=12 之间完全稳定
-- `gate_substitution` 在 n=12 时 collapse=1.000 但 parity_affected=True，被 L2 正确过滤
+关键发现：`exhaustive_parity_equivalent_check` 以满分 collapse 排第一，L3 正确拒绝。
+核心区分：**指数枚举 ≠ 自指安全**——性质必须揭示 AC⁰ 的结构性弱点，而不只是检测到它失败。
 
-**Phase 2 当前状态**：压力测试通过。L3 自动化在已知变换上准确率 100%。
+**Phase 2 当前状态**：压力测试通过。L3 自动化在已知变换上准确率 100%（8/8）。
 
-**Phase 2 下一步**：
-1. 扩展变换注册表（加入更多控制变换：identity、input_negation）
-2. 设计 UNKNOWN 候选的学习循环（人类判断 → 规则库更新）
-3. 开始 Phase 3 设计：单调电路 L1 + k-CLIQUE 目标函数
+**Phase 2 待完成**：
+1. 扩展变换注册表：加入 `IdentityTransform`（collapse ≈ 0，校准基线）和 `InputNegation`（collapse 应低，验证取反不改变复杂度）
+2. 设计 UNKNOWN 学习循环：人类判断 YES/NO/OVERRIDE → 自动提取模式 → 写入规则库
+3. 修正 collapse score 基线：加入 Δcollapse = collapse_after - collapse_before，消除电路生成的系统性偏差
 
 **输出文件**：
 - `illusion/phase1/l3_monitor.py` — 规则库 + 检查器 + 日志写入器
 - `illusion/l3_log.md` — 活的 L3 决策记录
-- `illusion/phase1/results/` — 实验 JSON（含 seed，可复现）
+- `illusion/phase1/results/` — 实验 JSON + Markdown 报告（含 seed，可复现）
 
 ---
 
@@ -241,6 +222,46 @@ Phase 1 成功 = 以下三条同时满足：
 如果原型成功，它为论文的第一定律提供了一个**构造性的支持**——不只是"已知证明都满足这个条件"，而是"按照这个条件设计的系统能重新发现这些证明"。
 
 这是从归纳到演绎的一步。
+
+### 论文当前状态（2026-05-04）
+
+```
+2026-4-28-full-paper.md（完整草稿）
+  ├── Ch.1-2: 引言 + 定义 — 成型，已修订
+  ├── Ch.3-5: 三个案例（AC⁰、单调电路、证明复杂度）— 成型，已修订
+  ├── Ch.6: 统一分析 + 三定律 — 成型，含 Phase 0 验证结果
+  └── Ch.7: 结论 + 局限性 — 需要补充 Illusion 实验作为构造性支持
+```
+
+**论文需要补充的内容**（来自 Illusion 实验）：
+
+1. **Ch.6 或 Ch.7**：加入 Illusion Phase 1 作为第一定律的构造性证据
+   - 核心论点：按照自指安全条件设计的搜索系统，能重新发现 Håstad 的随机限制方法
+   - 数据：collapse score 0.834–0.969，L3 准确率 100%，压力测试通过
+   - 这不是"工具介绍"，而是"第一定律的演绎验证"
+
+2. **局限性部分**：
+   - collapse score 无法区分"结构性坍塌"和"检查性坍塌"（input_permutation 的假阳性）
+   - 规则库混淆了固定 n 和渐近两种可判定性概念（Phase 2 待修正）
+   - 搜索空间偏向已知方法（Phase 1 是验证性的，不是开放式发现）
+
+### 论文时间节点建议
+
+**不要现在重写论文**。理由：
+
+- 论文的核心框架已经成型，Illusion 实验是锦上添花，不是地基
+- Phase 2 的 UNKNOWN 学习循环完成后，会有更强的构造性证据
+- 现在写进去的 Illusion 内容，Phase 2 完成后可能需要更新
+
+**建议的节点**：
+
+| 时间 | 动作 |
+|---|---|
+| 现在 | 在 Ch.7 局限性部分加一段关于 collapse score 盲区的说明（5 分钟，一段话） |
+| Phase 2 完成后 | 在 Ch.6 或附录加入 Illusion 实验作为构造性支持（完整的一节） |
+| Phase 3 完成后 | 考虑是否单独发表 Illusion 作为独立论文或技术报告 |
+
+**不需要写全新的工程层面论文**。Illusion 的工程细节（代码、实验参数、规则库）属于技术报告，不属于理论论文。如果要写，等 Phase 2-3 完成后，作为独立的技术报告，而不是现在。
 
 ---
 

@@ -22,6 +22,92 @@ from datetime import datetime
 from l1_circuit import parity, random_ac0_circuit
 from l2_search import search
 from evaluator import monte_carlo_error_rate
+from l3_monitor import batch_check, append_to_log
+
+
+def _write_markdown_report(report: dict, results_dir: str, timestamp: str, avg_baseline: float) -> str:
+    """Generate a unified markdown report combining L2 results and L3 verdicts."""
+    import sys
+    sys.path.insert(0, os.path.dirname(__file__))
+    from l3_monitor import batch_check
+
+    params = report["params"]
+    candidates = report["candidates"]
+    rejected = report["rejected"]
+
+    # Run L3 on candidates
+    verdicts = batch_check(candidates, verbose=False)
+    verdict_map = {v.transform_name: v for v in verdicts}
+
+    lines = [
+        f"# Experiment Report — {timestamp[:4]}-{timestamp[4:6]}-{timestamp[6:8]} {timestamp[9:11]}:{timestamp[11:13]}",
+        "",
+        "## Parameters",
+        f"n={params['n']}, depth={params['depth']}, circuits={params['n_circuits']}, "
+        f"samples={params['n_samples']}, seed={params.get('seed', 'None')}",
+        f"Baseline error on PARITY: {avg_baseline:.3f}",
+        "",
+        "## Candidates (sorted by collapse score)",
+        "",
+        "| Rank | Transform | Collapse | Error | L3 Verdict | L3 Reason |",
+        "|------|-----------|----------|-------|------------|-----------|",
+    ]
+
+    for i, c in enumerate(candidates, 1):
+        name = c["name"]
+        v = verdict_map.get(name)
+        verdict_str = v.verdict if v else "PENDING"
+        reason_str = (v.reason[:60] + "...") if v and len(v.reason) > 60 else (v.reason if v else "")
+        lines.append(
+            f"| {i} | {name} | {c['avg_collapse']:.3f} | {c['avg_error']:.3f} "
+            f"| **{verdict_str}** | {reason_str} |"
+        )
+
+    lines += [
+        "",
+        "## Rejected by L2",
+        "",
+        "| Transform | Reason |",
+        "|-----------|--------|",
+    ]
+    for r in rejected:
+        reason = "PARITY affected" if r["parity_affected"] else f"low collapse ({r['avg_collapse']:.3f})"
+        lines.append(f"| {r['name']} | {reason} |")
+
+    lines += [
+        "",
+        "## L3 Review Queue",
+        "",
+    ]
+    for c in candidates:
+        name = c["name"]
+        v = verdict_map.get(name)
+        verdict_str = v.verdict if v else "PENDING"
+        marker = "x" if verdict_str == "UNSAFE" else ("o" if verdict_str == "SAFE" else "?")
+        lines.append(f"- [{marker}] {name} => {verdict_str}")
+
+    lines += [
+        "",
+        "## Summary",
+        f"- Total transforms evaluated: {len(candidates) + len(rejected)}",
+        f"- Candidates passed to L3: {len(candidates)}",
+        f"- Rejected by L2: {len(rejected)}",
+    ]
+    if verdicts:
+        safe = sum(1 for v in verdicts if v.verdict == "SAFE")
+        unsafe = sum(1 for v in verdicts if v.verdict == "UNSAFE")
+        unknown = sum(1 for v in verdicts if v.verdict == "UNKNOWN")
+        lines += [
+            f"- L3 SAFE: {safe}",
+            f"- L3 UNSAFE: {unsafe}",
+            f"- L3 UNKNOWN (needs human review): {unknown}",
+        ]
+
+    md_path = os.path.join(results_dir, f"experiment_{timestamp}_report.md")
+    with open(md_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+    print(f"Markdown report saved to: {md_path}")
+    return md_path
 
 
 def run_experiment(
@@ -102,6 +188,9 @@ def run_experiment(
     with open(report_path, "w") as f:
         json.dump(report, f, indent=2)
     print(f"\nResults saved to: {report_path}")
+
+    # Generate unified markdown report
+    _write_markdown_report(report, results_dir, timestamp, avg_baseline=results[0].baseline_error if results else 0.5)
 
     # Key observations for the research log
     print("\n" + "=" * 60)
