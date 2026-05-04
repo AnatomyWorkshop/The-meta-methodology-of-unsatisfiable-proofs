@@ -2,7 +2,9 @@
 Phase 1 main experiment script.
 
 Runs the L2 search engine, collects results, and outputs a report
-for L3 (human) review.
+for L3 (human) review. Uses delta-collapse (after - before) as the primary
+discrimination metric, filtering out collapse artifacts from the
+circuit class's natural output distribution.
 
 Usage:
     python run_experiment.py [n] [depth] [n_circuits] [n_samples] [seed]
@@ -27,30 +29,25 @@ from l3_monitor import batch_check, append_to_log
 
 def _write_markdown_report(report: dict, results_dir: str, timestamp: str, avg_baseline: float) -> str:
     """Generate a unified markdown report combining L2 results and L3 verdicts."""
-    import sys
-    sys.path.insert(0, os.path.dirname(__file__))
-    from l3_monitor import batch_check
-
     params = report["params"]
     candidates = report["candidates"]
     rejected = report["rejected"]
 
-    # Run L3 on candidates
     verdicts = batch_check(candidates, verbose=False)
     verdict_map = {v.transform_name: v for v in verdicts}
 
     lines = [
-        f"# Experiment Report — {timestamp[:4]}-{timestamp[4:6]}-{timestamp[6:8]} {timestamp[9:11]}:{timestamp[11:13]}",
+        f"# Experiment Report - {timestamp[:4]}-{timestamp[4:6]}-{timestamp[6:8]} {timestamp[9:11]}:{timestamp[11:13]}",
         "",
         "## Parameters",
         f"n={params['n']}, depth={params['depth']}, circuits={params['n_circuits']}, "
         f"samples={params['n_samples']}, seed={params.get('seed', 'None')}",
         f"Baseline error on PARITY: {avg_baseline:.3f}",
         "",
-        "## Candidates (sorted by collapse score)",
+        "## Candidates (sorted by delta-collapse)",
         "",
-        "| Rank | Transform | Collapse | Error | L3 Verdict | L3 Reason |",
-        "|------|-----------|----------|-------|------------|-----------|",
+        "| Rank | Transform | Delta | Before | After | Error | L3 Verdict | L3 Reason |",
+        "|------|-----------|-------|--------|-------|-------|------------|-----------|",
     ]
 
     for i, c in enumerate(candidates, 1):
@@ -59,7 +56,8 @@ def _write_markdown_report(report: dict, results_dir: str, timestamp: str, avg_b
         verdict_str = v.verdict if v else "PENDING"
         reason_str = (v.reason[:60] + "...") if v and len(v.reason) > 60 else (v.reason if v else "")
         lines.append(
-            f"| {i} | {name} | {c['avg_collapse']:.3f} | {c['avg_error']:.3f} "
+            f"| {i} | {name} | {c['avg_delta_collapse']:+.3f} | {c['avg_collapse_before']:.3f} "
+            f"| {c['avg_collapse_after']:.3f} | {c['avg_error']:.3f} "
             f"| **{verdict_str}** | {reason_str} |"
         )
 
@@ -67,12 +65,12 @@ def _write_markdown_report(report: dict, results_dir: str, timestamp: str, avg_b
         "",
         "## Rejected by L2",
         "",
-        "| Transform | Reason |",
-        "|-----------|--------|",
+        "| Transform | Delta | Reason |",
+        "|-----------|-------|--------|",
     ]
     for r in rejected:
-        reason = "PARITY affected" if r["parity_affected"] else f"low collapse ({r['avg_collapse']:.3f})"
-        lines.append(f"| {r['name']} | {reason} |")
+        reason = "PARITY affected" if r["parity_affected"] else f"low delta-collapse ({r['avg_delta_collapse']:+.3f})"
+        lines.append(f"| {r['name']} | {r['avg_delta_collapse']:+.3f} | {reason} |")
 
     lines += [
         "",
@@ -126,7 +124,6 @@ def run_experiment(
     print(f"Parameters: n={n}, depth={depth}, circuits={n_circuits}, samples={n_samples}, seed={seed}")
     print("=" * 60)
 
-    # Run L2 search
     results = search(
         n=n, depth=depth,
         n_circuits=n_circuits,
@@ -134,7 +131,6 @@ def run_experiment(
         verbose=True,
     )
 
-    # Collect candidates for L3 review
     candidates = [r for r in results if r.is_candidate]
     rejected = [r for r in results if not r.is_candidate]
 
@@ -147,7 +143,7 @@ def run_experiment(
     else:
         for i, c in enumerate(candidates):
             print(f"\nCandidate {i+1}: {c.transform.name}")
-            print(f"  Collapse score: {c.avg_collapse:.3f} (threshold: 0.15)")
+            print(f"  Collapse: before={c.avg_collapse_before:.3f}, after={c.avg_collapse_after:.3f}, delta={c.avg_delta_collapse:+.3f}")
             print(f"  Average error rate: {c.avg_error:.3f} (lift: {c.error_lift:+.3f})")
             print(f"  PARITY affected: {c.parity_affected}")
             print(f"  L3 question: Can an AC^0 circuit decide whether")
@@ -159,10 +155,9 @@ def run_experiment(
     print("DEAD ENDS (rejected transforms)")
     print("=" * 60)
     for r in rejected:
-        reason = "PARITY affected" if r.parity_affected else f"low collapse ({r.avg_collapse:.3f})"
+        reason = "PARITY affected" if r.parity_affected else f"low delta-collapse ({r.avg_delta_collapse:+.3f})"
         print(f"  x {r.transform.name}: {reason}")
 
-    # Save results
     results_dir = os.path.join(os.path.dirname(__file__), "results")
     os.makedirs(results_dir, exist_ok=True)
 
@@ -172,13 +167,18 @@ def run_experiment(
         "params": {"n": n, "depth": depth, "n_circuits": n_circuits, "n_samples": n_samples, "seed": seed},
         "candidates": [
             {"name": r.transform.name, "avg_error": r.avg_error,
-             "avg_collapse": r.avg_collapse, "error_lift": r.error_lift,
+             "avg_collapse_before": r.avg_collapse_before,
+             "avg_collapse_after": r.avg_collapse_after,
+             "avg_delta_collapse": r.avg_delta_collapse,
+             "error_lift": r.error_lift,
              "parity_affected": r.parity_affected}
             for r in candidates
         ],
         "rejected": [
             {"name": r.transform.name, "avg_error": r.avg_error,
-             "avg_collapse": r.avg_collapse,
+             "avg_collapse_before": r.avg_collapse_before,
+             "avg_collapse_after": r.avg_collapse_after,
+             "avg_delta_collapse": r.avg_delta_collapse,
              "parity_affected": r.parity_affected}
             for r in rejected
         ],
@@ -189,19 +189,17 @@ def run_experiment(
         json.dump(report, f, indent=2)
     print(f"\nResults saved to: {report_path}")
 
-    # Generate unified markdown report
     _write_markdown_report(report, results_dir, timestamp, avg_baseline=results[0].baseline_error if results else 0.5)
 
-    # Key observations for the research log
     print("\n" + "=" * 60)
     print("OBSERVATIONS (for phase1-results.md)")
     print("=" * 60)
     print(f"1. L2 explored {len(results)} transforms")
     print(f"2. {len(candidates)} candidates passed to L3")
-    print(f"3. {len(rejected)} transforms rejected")
+    print(f"3. {len(rejected)} transforms rejected (PARITY affected or low delta-collapse)")
     if candidates:
         best = candidates[0]
-        print(f"4. Best candidate: {best.transform.name} (error={best.avg_error:.3f})")
+        print(f"4. Best candidate: {best.transform.name} (delta={best.avg_delta_collapse:+.3f})")
         is_hastad = "random_restriction" in best.transform.name
         print(f"5. Is this Hastad's method? {'YES' if is_hastad else 'NO'}")
 
@@ -213,4 +211,3 @@ if __name__ == "__main__":
     n_samples  = int(sys.argv[4]) if len(sys.argv) > 4 else 2000
     seed       = int(sys.argv[5]) if len(sys.argv) > 5 else None
     run_experiment(n=n, depth=depth, n_circuits=n_circuits, n_samples=n_samples, seed=seed)
-

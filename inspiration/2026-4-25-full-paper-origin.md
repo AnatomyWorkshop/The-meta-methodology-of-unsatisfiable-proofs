@@ -382,6 +382,7 @@ In the monotone world, monotone circuits **lack the capacity** to simulate the d
 
 ---
 
+
 ## Chapter 7 — Conclusion
 
 ### 7.1 What the Framework Achieves

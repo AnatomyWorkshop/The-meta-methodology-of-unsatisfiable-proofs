@@ -6,20 +6,28 @@ with respect to L1 (AC^0). A property is UNSAFE if an AC^0 circuit can decide
 whether a given function satisfies P. A property is SAFE if deciding P requires
 resources that exceed AC^0 (e.g., exponential enumeration, non-uniform advice).
 
-Phase 1 implementation: rule-based pattern matching against a known-decidable
-property library. Phase 2 will replace this with a formal complexity classifier.
+Phase 2 implementation: rule-based pattern matching + UNKNOWN learning loop.
+When no rule matches, L3 outputs UNKNOWN and escalates to human. Human provides
+YES/NO + one-line reason. System extracts keywords, generates a new rule, and
+persists it to learned_rules.json. Next time a similar candidate appears, the
+learned rule fires automatically.
 
 Usage:
     result = check(transform_name, description="...")
-    print(result.verdict)   # "SAFE" or "UNSAFE"
+    print(result.verdict)   # "SAFE", "UNSAFE", or "UNKNOWN"
     print(result.reason)    # one-line explanation
     print(result.log_entry) # formatted entry for l3_log.md
+
+    # Learning from human feedback:
+    python l3_monitor.py --learn <name> SAFE|UNSAFE "<reason>"
 """
 
 from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
+import json
+import os
 import re
 
 
@@ -94,7 +102,18 @@ _UNSAFE_PATTERNS: list[tuple[str, str]] = [
                                       "for self-referential safety"),
     (r"exhaustive_constant", "deciding whether a circuit is constant requires "
                              "2^n evaluations, but this is brute-force detection; "
-                             "exponential cost ≠ self-referential safety"),
+                             "exponential cost != self-referential safety"),
+
+    # Identity and complexity-preserving relabelings — these transforms do not
+    # change the computational structure of the circuit at all.
+    # With delta-collapse, identity gets delta ~0.005 and is rejected by L2
+    # (delta < 0.03 threshold). This L3 rule is defensive redundancy.
+    (r"\bidentity\b", "the identity transform induces no property at all; "
+                     "delta-collapse ~0.005 confirms no structural change; "
+                     "trivially decidable in AC^0"),
+    (r"input_negation", "negating inputs is a complexity-preserving relabeling; "
+                        "delta-collapse ~0.008 confirms no structural change; "
+                        "decidable in polynomial time"),
 ]
 
 
@@ -110,7 +129,7 @@ _SAFE_PATTERNS: list[tuple[str, str, str]] = [
     (r"random_restrict", "deciding whether a circuit collapses under random "
                          "restriction requires computing E[collapse] over "
                          "exp(n) restrictions; this exceeds AC^0 capability",
-     "Håstad 1986, Switching Lemma"),
+     "Hastad 1986, Switching Lemma"),
 
     # Approximation method (Razborov) — deciding whether a function has a
     # good approximation by a monotone circuit requires solving a combinatorial
@@ -128,6 +147,144 @@ _SAFE_PATTERNS: list[tuple[str, str, str]] = [
                                       "not in AC^0 for super-logarithmic degree",
      "Razborov-Smolensky 1987"),
 ]
+
+
+# ---------------------------------------------------------------------------
+# Learned rules (UNKNOWN learning loop)
+# Persisted to learned_rules.json. Loaded at import time.
+# ---------------------------------------------------------------------------
+
+_LEARNED_RULES_PATH = os.path.join(os.path.dirname(__file__), "learned_rules.json")
+
+_STOP_WORDS = {
+    "the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
+    "have", "has", "had", "do", "does", "did", "will", "would", "shall",
+    "should", "may", "might", "must", "can", "could", "this", "that",
+    "these", "those", "it", "its", "of", "in", "on", "at", "to", "for",
+    "with", "by", "from", "as", "into", "through", "during", "before",
+    "after", "above", "below", "between", "under", "over", "not", "no",
+    "nor", "but", "or", "and", "if", "then", "else", "when", "where",
+    "which", "what", "who", "whom", "how", "all", "each", "every",
+    "both", "few", "more", "most", "other", "some", "such", "only",
+    "same", "so", "than", "too", "very", "just", "because", "about",
+}
+
+
+def _load_learned_rules() -> tuple[list[tuple[str, str]], list[tuple[str, str, str]]]:
+    """Load learned rules from JSON file. Returns (unsafe_rules, safe_rules)."""
+    if not os.path.exists(_LEARNED_RULES_PATH):
+        return [], []
+    with open(_LEARNED_RULES_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    unsafe = [(r["pattern"], r["reason"]) for r in data.get("unsafe", [])]
+    safe = [(r["pattern"], r["reason"], r.get("reference", "learned from human feedback"))
+            for r in data.get("safe", [])]
+    return unsafe, safe
+
+
+def _save_learned_rules(unsafe: list[dict], safe: list[dict]) -> None:
+    """Save learned rules to JSON file."""
+    data = {"unsafe": unsafe, "safe": safe}
+    with open(_LEARNED_RULES_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
+
+def _extract_keywords(text: str) -> list[str]:
+    """Extract meaningful keywords from a human reason string."""
+    words = re.findall(r"[a-zA-Z_][a-zA-Z0-9_]*", text.lower())
+    keywords = [w for w in words if w not in _STOP_WORDS and len(w) > 2]
+    # Deduplicate while preserving order
+    seen = set()
+    result = []
+    for w in keywords:
+        if w not in seen:
+            seen.add(w)
+            result.append(w)
+    return result
+
+
+def _build_pattern(transform_name: str, keywords: list[str]) -> str:
+    """Build a regex pattern from transform name and extracted keywords.
+
+    Strategy: use the transform name as the primary pattern. If the name
+    contains underscores, also match the individual parts. Keywords from
+    the reason are added as alternatives for broader matching.
+    """
+    parts = [re.escape(transform_name.lower())]
+    name_parts = transform_name.lower().split("_")
+    if len(name_parts) > 1:
+        for part in name_parts:
+            if part not in _STOP_WORDS and len(part) > 2:
+                parts.append(re.escape(part))
+    # Add up to 3 most distinctive keywords from the reason
+    for kw in keywords[:3]:
+        if kw not in [p.replace("\\", "") for p in parts]:
+            parts.append(re.escape(kw))
+    return "|".join(parts)
+
+
+def learn_from_feedback(
+    transform_name: str,
+    verdict: str,
+    reason: str,
+    reference: str = "",
+) -> dict:
+    """
+    Learn a new rule from human feedback on an UNKNOWN candidate.
+
+    Args:
+        transform_name: Name of the transform that was UNKNOWN
+        verdict: Human's verdict: "SAFE" or "UNSAFE"
+        reason: Human's one-line reason
+        reference: Optional literature reference
+
+    Returns:
+        The new rule as a dict (pattern, reason, verdict, reference, source)
+    """
+    verdict = verdict.upper()
+    if verdict not in ("SAFE", "UNSAFE"):
+        raise ValueError(f"verdict must be SAFE or UNSAFE, got {verdict}")
+
+    keywords = _extract_keywords(reason)
+    pattern = _build_pattern(transform_name, keywords)
+
+    # Load existing learned rules
+    if os.path.exists(_LEARNED_RULES_PATH):
+        with open(_LEARNED_RULES_PATH, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    else:
+        data = {"unsafe": [], "safe": []}
+
+    new_rule = {
+        "pattern": pattern,
+        "reason": reason,
+        "reference": reference or "learned from human feedback",
+        "source_transform": transform_name,
+        "learned_at": datetime.now().isoformat(),
+        "keywords": keywords,
+    }
+
+    if verdict == "UNSAFE":
+        data["unsafe"].append(new_rule)
+    else:
+        data["safe"].append(new_rule)
+
+    _save_learned_rules(data["unsafe"], data["safe"])
+
+    # Reload into live pattern libraries
+    _reload_learned_rules()
+
+    return new_rule
+
+
+def _reload_learned_rules() -> None:
+    """Reload learned rules into the live pattern libraries."""
+    global _LEARNED_UNSAFE, _LEARNED_SAFE
+    _LEARNED_UNSAFE, _LEARNED_SAFE = _load_learned_rules()
+
+
+# Load learned rules at import time
+_LEARNED_UNSAFE, _LEARNED_SAFE = _load_learned_rules()
 
 
 # ---------------------------------------------------------------------------
@@ -214,6 +371,19 @@ def check(
                 print(verdict.l3_question)
             return verdict
 
+    # Check learned unsafe patterns
+    for pattern, reason in _LEARNED_UNSAFE:
+        if re.search(pattern, text):
+            verdict = L3Verdict(
+                transform_name=transform_name,
+                verdict="UNSAFE",
+                reason=f"[learned] {reason}",
+                confidence="medium",
+            )
+            if verbose:
+                print(verdict.l3_question)
+            return verdict
+
     # Check safe patterns
     for pattern, reason, reference in _SAFE_PATTERNS:
         if re.search(pattern, text):
@@ -223,6 +393,20 @@ def check(
                 reason=reason,
                 reference=reference,
                 confidence="high",
+            )
+            if verbose:
+                print(verdict.l3_question)
+            return verdict
+
+    # Check learned safe patterns
+    for pattern, reason, reference in _LEARNED_SAFE:
+        if re.search(pattern, text):
+            verdict = L3Verdict(
+                transform_name=transform_name,
+                verdict="SAFE",
+                reason=f"[learned] {reason}",
+                reference=reference,
+                confidence="medium",
             )
             if verbose:
                 print(verdict.l3_question)
@@ -299,18 +483,55 @@ def append_to_log(verdict: L3Verdict, log_path: str) -> None:
 
 if __name__ == "__main__":
     import sys
-    import json
+    import json as _json
 
     if len(sys.argv) < 2:
         print("Usage: python l3_monitor.py <transform_name> [description]")
         print("       python l3_monitor.py --batch <results_json>")
+        print("       python l3_monitor.py --learn <name> SAFE|UNSAFE \"<reason>\" [reference]")
+        print("       python l3_monitor.py --show-learned")
         sys.exit(1)
 
     if sys.argv[1] == "--batch":
         with open(sys.argv[2]) as f:
-            data = json.load(f)
+            data = _json.load(f)
         candidates = data.get("candidates", [])
         verdicts = batch_check(candidates)
+
+    elif sys.argv[1] == "--learn":
+        if len(sys.argv) < 5:
+            print("Usage: python l3_monitor.py --learn <name> SAFE|UNSAFE \"<reason>\" [reference]")
+            sys.exit(1)
+        name = sys.argv[2]
+        human_verdict = sys.argv[3]
+        reason = sys.argv[4]
+        ref = sys.argv[5] if len(sys.argv) > 5 else ""
+        rule = learn_from_feedback(name, human_verdict, reason, reference=ref)
+        print(f"Learned new {human_verdict} rule:")
+        print(f"  Pattern: {rule['pattern']}")
+        print(f"  Reason: {rule['reason']}")
+        print(f"  Keywords: {rule['keywords']}")
+        # Verify: re-check the same transform
+        print(f"\nVerification - re-checking '{name}':")
+        v = check(name, verbose=False)
+        print(f"  Verdict: {v.verdict} ({v.confidence} confidence)")
+        print(f"  Reason: {v.reason}")
+
+    elif sys.argv[1] == "--show-learned":
+        if os.path.exists(_LEARNED_RULES_PATH):
+            with open(_LEARNED_RULES_PATH, "r", encoding="utf-8") as f:
+                data = _json.load(f)
+            print("Learned UNSAFE rules:")
+            for r in data.get("unsafe", []):
+                print(f"  [{r['learned_at'][:10]}] /{r['pattern']}/ - {r['reason'][:60]}")
+            print(f"\nLearned SAFE rules:")
+            for r in data.get("safe", []):
+                print(f"  [{r['learned_at'][:10]}] /{r['pattern']}/ - {r['reason'][:60]}")
+            total = len(data.get("unsafe", [])) + len(data.get("safe", []))
+            print(f"\nTotal learned rules: {total}")
+        else:
+            print("No learned rules yet.")
+
     else:
         name = sys.argv[1]
         desc = sys.argv[2] if len(sys.argv) > 2 else ""

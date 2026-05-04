@@ -1,0 +1,95 @@
+{
+  "timestamp": "20260504_180648",
+  "phase": 3,
+  "domain": "monotone_circuits",
+  "target": "3-CLIQUE on 6 vertices",
+  "params": {
+    "n_vertices": 6,
+    "k": 3,
+    "depth": 3,
+    "n_circuits": 30,
+    "n_samples": 500,
+    "seed": 42
+  },
+  "candidates": [
+    {
+      "name": "subgraph_projection_p0.7",
+      "avg_collapse_before": 0.6688,
+      "avg_collapse_after": 0.9137333333333333,
+      "avg_delta_collapse": 0.24493333333333334,
+      "clique_affected": false
+    },
+    {
+      "name": "edge_deletion_p0.1",
+      "avg_collapse_before": 0.6739999999999999,
+      "avg_collapse_after": 0.755,
+      "avg_delta_collapse": 0.08099999999999999,
+      "clique_affected": false
+    }
+  ],
+  "rejected": [
+    {
+      "name": "subgraph_projection_p0.5",
+      "avg_collapse_before": 0.6670666666666667,
+      "avg_collapse_after": 0.9947333333333332,
+      "avg_delta_collapse": 0.32766666666666666,
+      "clique_affected": true
+    },
+    {
+      "name": "edge_deletion_p0.5",
+      "avg_collapse_before": 0.6668000000000001,
+      "avg_collapse_after": 0.9575999999999999,
+      "avg_delta_collapse": 0.2908,
+      "clique_affected": true
+    },
+    {
+      "name": "edge_deletion_p0.3",
+      "avg_collapse_before": 0.6710666666666667,
+      "avg_collapse_after": 0.8872,
+      "avg_delta_collapse": 0.21613333333333332,
+      "clique_affected": true
+    },
+    {
+      "name": "gate_elevation",
+      "avg_collapse_before": 0.6606000000000001,
+      "avg_collapse_after": 0.7916000000000001,
+      "avg_delta_collapse": 0.13099999999999998,
+      "clique_affected": true
+    },
+    {
+      "name": "distribution_switch",
+      "avg_collapse_before": 0.6676,
+      "avg_collapse_after": 0.6714,
+      "avg_delta_collapse": 0.0037999999999999996,
+      "clique_affected": false
+    },
+    {
+      "name": "identity",
+      "avg_collapse_before": 0.67,
+      "avg_collapse_after": 0.6682666666666667,
+      "avg_delta_collapse": -0.0017333333333333237,
+      "clique_affected": false
+    },
+    {
+      "name": "edge_permutation",
+      "avg_collapse_before": 0.6722,
+      "avg_collapse_after": 0.6574000000000001,
+      "avg_delta_collapse": -0.014800000000000002,
+      "clique_affected": false
+    }
+  ],
+  "l3_verdicts": [
+    {
+      "name": "subgraph_projection_p0.7",
+      "verdict": "SAFE",
+      "reason": "moderate subgraph projection preserves the target function but degrades circuit distinguishing power; deciding whether a circuit loses distinguishing advantage under random vertex removal requires exponential sampling",
+      "confidence": "high"
+    },
+    {
+      "name": "edge_deletion_p0.1",
+      "verdict": "UNSAFE",
+      "reason": "setting inputs to 0 in a monotone circuit is a monotone operation; deciding whether a circuit collapses under edge deletion is decidable by a monotone circuit of polynomial size",
+      "confidence": "high"
+    }
+  ]
+}
