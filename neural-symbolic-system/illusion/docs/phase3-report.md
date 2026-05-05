@@ -84,3 +84,21 @@ Phase 1 proved the architecture works on one domain. Phase 3 proves it generaliz
 This is no longer a single-domain toy. It is a validated cross-domain prototype.
 
 ---
+
+## Scaling Check: n=8 (supplementary, 2026-05-04)
+
+Parameters: n=8, k=3, depth=3, 20 circuits, 300 samples, seed=42.
+
+| Transform | Δcollapse (n=6) | Δcollapse (n=8) | Trend |
+|---|---|---|---|
+| subgraph_projection_p0.7 | +0.245 | **+0.305** | signal strengthens |
+| subgraph_projection_p0.5 | rejected (clique) | **+0.347** | now viable at larger n |
+| edge_deletion_p0.1 | +0.081 | +0.091 | stable |
+| identity | -0.002 | +0.020 | noise floor |
+| edge_permutation | -0.015 | +0.003 | noise floor |
+
+Key observation: `subgraph_projection_p0.5` flips from "clique affected" at n=6 to "clique safe" at n=8, because the expected surviving vertex count (4.0) now exceeds k=3. At larger n, more aggressive projections become viable, and the signal strengthens. This is consistent with Razborov's asymptotic argument — the approximation method becomes more powerful as n grows.
+
+(Suggested by Gemini; confirmed experimentally.)
+
+---
