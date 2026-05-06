@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "illusion": {
+      "command": "python",
+      "args": [
+        "neural-symbolic-system/illusion/mcp/server.py"
+      ],
+      "cwd": "d:/The-meta-methodology-of-unsatisfiable-proofs"
+    }
+  }
+}
