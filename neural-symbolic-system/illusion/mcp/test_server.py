@@ -99,15 +99,15 @@ async def run_tests():
             result = await session.call_tool("propose_transforms", PROPOSE_ARGS)
             content = result.content[0].text
             data = json.loads(content)
-            if data.get("status") == "prompt_ready" and "prompt" in data:
-                print("[PASS] propose_transforms returns prompt_ready with prompt")
+            if data.get("status") in ("prompt_ready", "completed"):
+                print(f"[PASS] propose_transforms returns {data['status']}")
                 passed += 1
-                # Spot-check prompt contains domain
-                if "AC0" in data["prompt"] or "AC⁰" in data["prompt"]:
-                    print("[PASS] propose_transforms prompt contains domain context")
+                check_text = data.get("prompt", "") or data.get("suggestions", "")
+                if "AC0" in check_text or "AC⁰" in check_text or "PARITY" in check_text:
+                    print("[PASS] propose_transforms response contains domain context")
                     passed += 1
                 else:
-                    print("[FAIL] propose_transforms prompt missing domain context")
+                    print("[FAIL] propose_transforms response missing domain context")
                     failed += 1
             else:
                 print(f"[FAIL] propose_transforms unexpected response: {data}")
@@ -117,14 +117,15 @@ async def run_tests():
             result = await session.call_tool("search_literature", SEARCH_ARGS)
             content = result.content[0].text
             data = json.loads(content)
-            if data.get("status") == "prompt_ready" and "prompt" in data:
-                print("[PASS] search_literature returns prompt_ready with prompt")
+            if data.get("status") in ("prompt_ready", "completed"):
+                print(f"[PASS] search_literature returns {data['status']}")
                 passed += 1
-                if "gate_elevation" in data["prompt"]:
-                    print("[PASS] search_literature prompt contains transform name")
+                check_text = data.get("prompt", "") or data.get("evidence", "")
+                if "gate_elevation" in check_text or "monotone" in check_text.lower():
+                    print("[PASS] search_literature response contains transform context")
                     passed += 1
                 else:
-                    print("[FAIL] search_literature prompt missing transform name")
+                    print("[FAIL] search_literature response missing transform context")
                     failed += 1
             else:
                 print(f"[FAIL] search_literature unexpected response: {data}")

@@ -1,5 +1,5 @@
 """
-Illusion MCP Server — Phase 4a
+Illusion MCP Server — Phase 4b
 
 Two tools:
   propose_transforms   — given domain context + existing results, suggest new transforms
@@ -7,9 +7,11 @@ Two tools:
 
 Transport: stdio (for Claude Code local MCP config)
 Requires: pip install "mcp[cli]"
+Optional: pip install anthropic  (for live LLM calls; falls back to prompt-only mode without it)
 """
 
 import json
+import os
 import sys
 from typing import Any
 
@@ -26,8 +28,37 @@ except ImportError:
     )
     sys.exit(1)
 
+# Optional: Anthropic SDK for live LLM calls
+_anthropic_client = None
+try:
+    import anthropic
+    _api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if _api_key:
+        _anthropic_client = anthropic.Anthropic(api_key=_api_key)
+except ImportError:
+    pass
+
 
 app = Server("illusion-mcp")
+
+_MODEL = os.environ.get("ILLUSION_MODEL", "claude-sonnet-4-6")
+_MAX_TOKENS = 2048
+
+
+async def _call_llm(system: str, prompt: str) -> str | None:
+    """Call Anthropic API if available. Returns response text or None."""
+    if _anthropic_client is None:
+        return None
+    try:
+        response = _anthropic_client.messages.create(
+            model=_MODEL,
+            max_tokens=_MAX_TOKENS,
+            messages=[{"role": "user", "content": prompt}],
+            system=system,
+        )
+        return response.content[0].text
+    except Exception as e:
+        return f"[LLM call failed: {e}]"
 
 
 # ---------------------------------------------------------------------------
@@ -152,9 +183,14 @@ async def _propose_transforms(args: dict[str, Any]) -> list[TextContent]:
 
     context = _build_transform_context(domain, target, safe_candidates, unsafe_candidates, rejected_l2)
 
-    prompt = f"""You are assisting the Illusion framework — a three-layer search system for discovering discriminating properties in computational complexity lower bounds.
+    system = (
+        "You are assisting the Illusion framework — a three-layer search system for "
+        "discovering discriminating properties in computational complexity lower bounds. "
+        "Your role is to propose new candidate transforms for L2 to test. "
+        "Output is for human review — do not claim transforms are definitely SAFE."
+    )
 
-DOMAIN: {domain}
+    prompt = f"""DOMAIN: {domain}
 TARGET FUNCTION: {target}
 
 EXISTING SEARCH RESULTS:
@@ -176,19 +212,32 @@ IMPORTANT: These are suggestions for human review. The human will decide whether
 
 Respond in structured format."""
 
-    # In production this would call an LLM via the Anthropic API.
-    # For now, return the prompt so the human can run it manually or wire up the API call.
-    result = {
-        "status": "prompt_ready",
-        "note": (
-            "MCP server is running. To complete this tool call, wire up an LLM API call "
-            "in _propose_transforms(). The prompt below is ready to send."
-        ),
-        "prompt": prompt,
-        "domain": domain,
-        "target": target,
-        "n_suggestions": n,
-    }
+    llm_response = await _call_llm(system, prompt)
+
+    if llm_response and not llm_response.startswith("[LLM call failed"):
+        result = {
+            "status": "completed",
+            "domain": domain,
+            "target": target,
+            "n_suggestions": n,
+            "suggestions": llm_response,
+            "note": "These are AI-generated suggestions. Human review required before implementation.",
+        }
+    else:
+        result = {
+            "status": "prompt_ready",
+            "note": (
+                "No API key configured (set ANTHROPIC_API_KEY). "
+                "The prompt below is ready to send manually."
+            ),
+            "prompt": prompt,
+            "domain": domain,
+            "target": target,
+            "n_suggestions": n,
+        }
+        if llm_response and llm_response.startswith("[LLM call failed"):
+            result["error"] = llm_response
+
     return [TextContent(type="text", text=json.dumps(result, indent=2, ensure_ascii=False))]
 
 
@@ -198,9 +247,15 @@ async def _search_literature(args: dict[str, Any]) -> list[TextContent]:
     l1_model = args["l1_model"]
     l3_question = args["l3_question"]
 
-    prompt = f"""You are assisting the Illusion framework's L3 safety monitor.
+    system = (
+        "You are assisting the Illusion framework's L3 safety monitor. "
+        "Your role is to search your knowledge for known decidability results "
+        "that bear on whether a given property is decidable within a computational model. "
+        "Be precise with citations. If uncertain, say so. "
+        "Output is advisory — a human makes the final L3 judgment."
+    )
 
-A candidate discriminating property has been flagged as UNKNOWN — the automated rule library has no matching rule.
+    prompt = f"""A candidate discriminating property has been flagged as UNKNOWN — the automated rule library has no matching rule.
 
 TRANSFORM: {transform_name}
 DESCRIPTION: {description}
@@ -220,21 +275,36 @@ For each piece of evidence, provide:
 - RELEVANCE: how it bears on the L3 question
 - CONFIDENCE: high / medium / low (low if you are uncertain about the citation)
 
-IMPORTANT: This output is advisory. The human makes the final L3 judgment. If you are uncertain about a citation, say so explicitly — a wrong citation is worse than no citation.
+IMPORTANT: If you are uncertain about a citation, say so explicitly — a wrong citation is worse than no citation.
 
 Respond in structured format."""
 
-    result = {
-        "status": "prompt_ready",
-        "note": (
-            "MCP server is running. To complete this tool call, wire up an LLM API call "
-            "in _search_literature(). The prompt below is ready to send."
-        ),
-        "prompt": prompt,
-        "transform": transform_name,
-        "l1_model": l1_model,
-        "l3_question": l3_question,
-    }
+    llm_response = await _call_llm(system, prompt)
+
+    if llm_response and not llm_response.startswith("[LLM call failed"):
+        result = {
+            "status": "completed",
+            "transform": transform_name,
+            "l1_model": l1_model,
+            "l3_question": l3_question,
+            "evidence": llm_response,
+            "note": "This is AI-generated advisory output. Human makes the final L3 judgment.",
+        }
+    else:
+        result = {
+            "status": "prompt_ready",
+            "note": (
+                "No API key configured (set ANTHROPIC_API_KEY). "
+                "The prompt below is ready to send manually."
+            ),
+            "prompt": prompt,
+            "transform": transform_name,
+            "l1_model": l1_model,
+            "l3_question": l3_question,
+        }
+        if llm_response and llm_response.startswith("[LLM call failed"):
+            result["error"] = llm_response
+
     return [TextContent(type="text", text=json.dumps(result, indent=2, ensure_ascii=False))]
 
 
