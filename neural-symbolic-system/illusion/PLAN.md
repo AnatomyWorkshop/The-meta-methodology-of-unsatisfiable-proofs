@@ -163,13 +163,14 @@ Phase 1 成功 = 以下三条同时满足：
 
 Phase 1 和 Phase 2 完成后，Illusion 将成为一个可以自动发现并验证判别性质的系统。之后的工作方向：
 
-### 接入 MCP 协议，扩充搜索空间
+### Phase 4：MCP 接入 + 代数电路（进行中）
 
-详见 `docs/mcp-plan.md`。
+**4a** ✅ MCP server 骨架 + tool schema（`mcp/server.py`）
+**4b** ✅ 文献检索辅助 L3（`mcp/l3_integration.py`，prompt 模式验证通过）
+**4c** ✅ 自动变换生成骨架（`mcp/l2_integration.py`，含 `ExhaustionCriterion` 终止条件）
+**4d** → 代数电路领域验证（下一步）
 
-核心思路：让 L2 能通过 MCP 调用外部 AI 生成新变换、检索文献辅助 L3 判定。三个方向按优先级排序：自动变换生成 > 文献检索辅助 L3 > 实验自动化。L3 安全边界不变——任何 AI 生成的候选性质都必须通过自指安全检查。
-
-**当前状态（2026-05-07）**：4a 完成（`mcp/server.py` + tool schema + Claude Code 配置 + 集成测试）。4b 待开始。
+**当前状态（2026-05-08）**：API key 已配置（中转站 Anthropic + DeepSeek 双后端，`.env` 已写入，`.gitignore` 保护）。4d 开始前需要：实现代数电路 L1 模拟器、有限域多项式计算、Permanent 目标函数、初始变换库。
 
 ### 符号体系
 

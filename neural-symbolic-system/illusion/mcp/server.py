@@ -7,13 +7,24 @@ Two tools:
 
 Transport: stdio (for Claude Code local MCP config)
 Requires: pip install "mcp[cli]"
-Optional: pip install anthropic  (for live LLM calls; falls back to prompt-only mode without it)
+
+LLM backend (pick one via .env):
+  Anthropic / relay:  set ANTHROPIC_API_KEY + optionally ANTHROPIC_BASE_URL
+  DeepSeek (OpenAI-compat): set DEEPSEEK_API_KEY + optionally DEEPSEEK_BASE_URL
+  Falls back to prompt-only mode if neither key is set.
 """
 
 import json
 import os
 import sys
 from typing import Any
+
+# Auto-load .env from the same directory as this script (optional dependency)
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
+except ImportError:
+    pass
 
 try:
     from mcp.server import Server
@@ -28,37 +39,78 @@ except ImportError:
     )
     sys.exit(1)
 
-# Optional: Anthropic SDK for live LLM calls
-_anthropic_client = None
-try:
-    import anthropic
-    _api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if _api_key:
-        _anthropic_client = anthropic.Anthropic(api_key=_api_key)
-except ImportError:
-    pass
+# ---------------------------------------------------------------------------
+# LLM backend selection
+# Priority: ANTHROPIC_API_KEY > DEEPSEEK_API_KEY > prompt-only
+# ---------------------------------------------------------------------------
 
+_backend = None   # "anthropic" | "openai" | None
+_client = None
+_MODEL = os.environ.get("ILLUSION_MODEL", "")
+
+_anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+_anthropic_base = os.environ.get("ANTHROPIC_BASE_URL", "")  # relay base URL if set
+
+_deepseek_key = os.environ.get("DEEPSEEK_API_KEY", "")
+_deepseek_base = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+
+if _anthropic_key:
+    try:
+        import anthropic as _anthropic_sdk
+        kwargs: dict = {"api_key": _anthropic_key}
+        if _anthropic_base:
+            kwargs["base_url"] = _anthropic_base
+        _client = _anthropic_sdk.Anthropic(**kwargs)
+        _backend = "anthropic"
+        if not _MODEL:
+            _MODEL = "claude-opus-4-7"
+    except ImportError:
+        pass
+
+if _backend is None and _deepseek_key:
+    try:
+        import openai as _openai_sdk
+        _client = _openai_sdk.OpenAI(
+            api_key=_deepseek_key,
+            base_url=_deepseek_base,
+        )
+        _backend = "openai"
+        if not _MODEL:
+            _MODEL = "deepseek-chat"
+    except ImportError:
+        pass
+
+_MAX_TOKENS = int(os.environ.get("ILLUSION_MAX_TOKENS", "2048"))
 
 app = Server("illusion-mcp")
 
-_MODEL = os.environ.get("ILLUSION_MODEL", "claude-sonnet-4-6")
-_MAX_TOKENS = 2048
-
 
 async def _call_llm(system: str, prompt: str) -> str | None:
-    """Call Anthropic API if available. Returns response text or None."""
-    if _anthropic_client is None:
+    """Call the configured LLM backend. Returns response text, error string, or None."""
+    if _backend is None or _client is None:
         return None
     try:
-        response = _anthropic_client.messages.create(
-            model=_MODEL,
-            max_tokens=_MAX_TOKENS,
-            messages=[{"role": "user", "content": prompt}],
-            system=system,
-        )
-        return response.content[0].text
+        if _backend == "anthropic":
+            response = _client.messages.create(
+                model=_MODEL,
+                max_tokens=_MAX_TOKENS,
+                messages=[{"role": "user", "content": prompt}],
+                system=system,
+            )
+            return response.content[0].text
+        elif _backend == "openai":
+            response = _client.chat.completions.create(
+                model=_MODEL,
+                max_tokens=_MAX_TOKENS,
+                messages=[
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": prompt},
+                ],
+            )
+            return response.choices[0].message.content
     except Exception as e:
         return f"[LLM call failed: {e}]"
+    return None
 
 
 # ---------------------------------------------------------------------------

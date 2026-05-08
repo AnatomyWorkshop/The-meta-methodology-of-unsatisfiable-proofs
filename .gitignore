@@ -1,0 +1,20 @@
+# Secrets
+neural-symbolic-system/illusion/mcp/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# Experiment outputs (large, reproducible)
+neural-symbolic-system/illusion/phase*/results/*.json
+
+# OS
+.DS_Store
+Thumbs.db
