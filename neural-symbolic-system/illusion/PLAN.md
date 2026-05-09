@@ -163,19 +163,46 @@ Phase 1 成功 = 以下三条同时满足：
 
 Phase 1 和 Phase 2 完成后，Illusion 将成为一个可以自动发现并验证判别性质的系统。之后的工作方向：
 
-### Phase 4：MCP 接入 + 代数电路（进行中）
+### Phase 4：MCP 接入 + 代数电路 — ✅ 完成
 
 **4a** ✅ MCP server 骨架 + tool schema（`mcp/server.py`）
 **4b** ✅ 文献检索辅助 L3（`mcp/l3_integration.py`，prompt 模式验证通过）
 **4c** ✅ 自动变换生成骨架（`mcp/l2_integration.py`，含 `ExhaustionCriterion` 终止条件）
-**4d** ✅ 代数电路领域验证（2026-05-09）
+**4d** ✅ 代数电路领域验证，n=3，GF(7)（2026-05-09）
+**4e** ✅ n=4 扩展验证，信号随 n 增强确认（2026-05-09）
 
-**当前状态（2026-05-09）**：Phase 4d 完成。`phase4/` 目录实现完整，GF(7) 上 3×3 Permanent 实验通过三条成功标准。Razborov-Smolensky 类比验证成功。详见 `docs/phase4d-report.md`。
+**Phase 4 核心发现**：
+1. L2 找到 `algebraic_restriction_p0.3/0.5`，Δcollapse ≈ +0.10–0.12 → SAFE（Razborov-Smolensky 类比）
+2. `field_reduction_q2` Δ=+0.105，与 `algebraic_restriction_p0.3` 持平，但 L3 判 UNSAFE（局部操作）
+3. n=4 验证：`algebraic_restriction` 信号增强（+0.104→+0.124），`field_reduction` 信号减弱（+0.105→+0.082）
+4. MCP live 模式验证通过：客户端直接调用 LLM，绕过 subprocess 网络限制
+5. 假阳性模式在单调域（`edge_deletion_p0.1`）和代数域（`field_reduction`）独立出现——L3 必要性的双重证据
 
-**Phase 4d 成功标准**（三条全部满足 ✅）：
-1. L2 找到 `algebraic_restriction_p0.3/0.5`，Δcollapse ≈ +0.10–0.12 ✅
-2. 控制变换（identity/input_permutation/scalar_multiplication）Δ ≈ 0，正确拒绝 ✅
-3. L3：`algebraic_restriction` → SAFE（Razborov-Smolensky），`field_reduction` → UNSAFE ✅
+详见 `docs/phase4d-report.md`。
+
+---
+
+### Phase 5：证明复杂度（Resolution）— ✅ 完成
+
+**目标**：进入答案不完全已知的领域，让 L3 上报 UNKNOWN。
+
+**结果（2026-05-09）**：
+
+| 变换 | Δcollapse | L3 判定 |
+|------|-----------|---------|
+| clause_restriction_p0.2 | +0.600 | SAFE |
+| clause_restriction_p0.4 | +0.780 | SAFE |
+| clause_projection_p0.7 | +0.780 | SAFE |
+| clause_projection_p0.8 | +0.780 | SAFE |
+| variable_elimination_p0.2 | +0.640 | **UNKNOWN** |
+| variable_elimination_p0.3 | +0.780 | **UNKNOWN** |
+
+**核心发现**：
+1. `clause_restriction` → SAFE：Ben-Sasson-Wigderson 宽度方法的 Resolution 类比，L2 在不知道该证明的情况下找到了它
+2. `variable_elimination` → **UNKNOWN**（Δ=+0.64–0.78）：对应 Extended Resolution，Resolution 与 Extended Resolution 的分离是开放问题，L3 无法判定
+3. 这是 Illusion 系统第一次上报 UNKNOWN——从验证工具到探索工具的转折点
+
+详见 `docs/phase5-design.md`，论文草稿：`papers/illusion-proof-complexity.md`。
 
 ### 符号体系
 
@@ -197,10 +224,9 @@ Phase 1 和 Phase 2 完成后，Illusion 将成为一个可以自动发现并验
 
 ### 从 AC⁰ 到更强模型
 
-Phase 3 已完成：单调电路验证成功。补充实验（n=8）确认信号随 n 增大而增强（subgraph_projection Δ: +0.245 → +0.305）。之后可以扩展到：
-- 代数电路（L1 = 代数 P/poly）
-- 证明复杂度（L1 = Resolution/Frege）
-- 形式系统（L1 = PA/ZFC 的可证明性）
+Phase 1（AC⁰）、Phase 3（单调电路）、Phase 4d/4e（代数电路）已完成。信号随 n 增强在 Phase 3（n=6→8 待验证）和 Phase 4e（n=3→4 已验证）均有支持。之后扩展路径：
+- 证明复杂度（L1 = Resolution/Frege）← **Phase 5 当前目标**
+- 形式系统（L1 = PA/ZFC 的可证明性）← 远期
 
 ### 从证明数学公式到 AI 进化最优路径
 

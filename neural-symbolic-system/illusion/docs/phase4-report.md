@@ -1,4 +1,4 @@
-# Phase 4d Experiment Report
+# Phase 4 Experiment Report
 
 > 日期：2026-05-09
 > 领域：代数电路，GF(7) 上的 3×3 Permanent
