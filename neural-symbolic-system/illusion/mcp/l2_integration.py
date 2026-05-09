@@ -110,7 +110,8 @@ async def propose_new_transforms(
     n_suggestions: int = 2,
 ) -> dict:
     """
-    Call the MCP server's propose_transforms tool.
+    Call the MCP server's propose_transforms tool, then call the LLM directly
+    if the server returns prompt_ready (server-side LLM call failed or not configured).
 
     Args:
         domain: Description of the L1 model
@@ -136,7 +137,83 @@ async def propose_new_transforms(
             await session.initialize()
             result = await session.call_tool("propose_transforms", args)
             content = result.content[0].text
-            return json.loads(content)
+            data = json.loads(content)
+
+    # If server returned prompt_ready, call LLM directly from client side
+    if data.get("status") == "prompt_ready" and data.get("prompt"):
+        llm_result = await _call_llm_direct(data["prompt"])
+        if llm_result:
+            data["status"] = "completed"
+            data["suggestions"] = llm_result
+            data.pop("error", None)
+
+    return data
+
+
+async def _call_llm_direct(prompt: str) -> str | None:
+    """Call LLM directly from the client side (avoids MCP subprocess network issues)."""
+    try:
+        import os
+        from dotenv import load_dotenv
+        load_dotenv(Path(__file__).parent / ".env")
+
+        anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        raw_base = os.environ.get("ANTHROPIC_BASE_URL", "").rstrip("/")
+        if raw_base.endswith("/v1"):
+            base = raw_base[:-3].rstrip("/")
+        else:
+            base = raw_base
+        model = os.environ.get("ILLUSION_MODEL", "claude-opus-4-7")
+        max_tokens = int(os.environ.get("ILLUSION_MAX_TOKENS", "2048"))
+
+        if anthropic_key:
+            import httpx
+            url = f"{base}/v1/messages" if base else "https://api.anthropic.com/v1/messages"
+            system = (
+                "You are an expert in computational complexity theory and circuit lower bounds. "
+                "Propose new transform ideas for the Illusion L2 search system. "
+                "Be precise, concise, and grounded in known proof techniques."
+            )
+            async with httpx.AsyncClient(timeout=60) as client:
+                resp = await client.post(
+                    url,
+                    headers={
+                        "x-api-key": anthropic_key,
+                        "anthropic-version": "2023-06-01",
+                        "content-type": "application/json",
+                    },
+                    json={
+                        "model": model,
+                        "max_tokens": max_tokens,
+                        "system": system,
+                        "messages": [{"role": "user", "content": prompt}],
+                    },
+                )
+                resp.raise_for_status()
+                data = resp.json()
+                for block in data.get("content", []):
+                    if isinstance(block, dict) and block.get("type") == "text":
+                        return block["text"]
+
+        deepseek_key = os.environ.get("DEEPSEEK_API_KEY", "")
+        deepseek_base = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
+        if deepseek_key:
+            import openai
+            client = openai.AsyncOpenAI(api_key=deepseek_key, base_url=deepseek_base)
+            ds_model = os.environ.get("ILLUSION_MODEL", "deepseek-chat")
+            response = await client.chat.completions.create(
+                model=ds_model,
+                max_tokens=max_tokens,
+                messages=[
+                    {"role": "system", "content": "You are an expert in computational complexity theory."},
+                    {"role": "user", "content": prompt},
+                ],
+            )
+            return response.choices[0].message.content
+
+    except Exception as e:
+        print(f"[_call_llm_direct failed: {e}]", file=sys.stderr)
+    return None
 
 
 def format_suggestions_for_human(result: dict) -> str:

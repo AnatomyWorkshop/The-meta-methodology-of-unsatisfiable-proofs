@@ -49,18 +49,21 @@ _client = None
 _MODEL = os.environ.get("ILLUSION_MODEL", "")
 
 _anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
-_anthropic_base = os.environ.get("ANTHROPIC_BASE_URL", "")  # relay base URL if set
+# Normalize base URL: strip trailing slash and trailing /v1 so we always append /v1/messages once.
+_raw_base = os.environ.get("ANTHROPIC_BASE_URL", "").rstrip("/")
+if _raw_base.endswith("/v1"):
+    _anthropic_base = _raw_base[:-3].rstrip("/")  # strip /v1 suffix
+else:
+    _anthropic_base = _raw_base
 
 _deepseek_key = os.environ.get("DEEPSEEK_API_KEY", "")
 _deepseek_base = os.environ.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 
 if _anthropic_key:
+    # Use httpx directly to avoid Anthropic SDK URL construction issues with relay servers.
+    # The SDK appends /v1 in a way that can double-append when the relay already routes /v1.
     try:
-        import anthropic as _anthropic_sdk
-        kwargs: dict = {"api_key": _anthropic_key}
-        if _anthropic_base:
-            kwargs["base_url"] = _anthropic_base
-        _client = _anthropic_sdk.Anthropic(**kwargs)
+        import httpx as _httpx
         _backend = "anthropic"
         if not _MODEL:
             _MODEL = "claude-opus-4-7"
@@ -87,17 +90,40 @@ app = Server("illusion-mcp")
 
 async def _call_llm(system: str, prompt: str) -> str | None:
     """Call the configured LLM backend. Returns response text, error string, or None."""
-    if _backend is None or _client is None:
+    if _backend is None:
         return None
     try:
         if _backend == "anthropic":
-            response = _client.messages.create(
-                model=_MODEL,
-                max_tokens=_MAX_TOKENS,
-                messages=[{"role": "user", "content": prompt}],
-                system=system,
-            )
-            return response.content[0].text
+            import httpx as _httpx
+            import asyncio as _asyncio
+            base = _anthropic_base if _anthropic_base else "https://api.anthropic.com"
+            url = f"{base}/v1/messages"
+            headers = {
+                "x-api-key": _anthropic_key,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json",
+            }
+            body = {
+                "model": _MODEL,
+                "max_tokens": _MAX_TOKENS,
+                "system": system,
+                "messages": [{"role": "user", "content": prompt}],
+            }
+
+            def _sync_call():
+                with _httpx.Client(timeout=60) as client:
+                    resp = client.post(url, headers=headers, json=body)
+                    resp.raise_for_status()
+                    data = resp.json()
+                    for block in data.get("content", []):
+                        if isinstance(block, dict) and block.get("type") == "text":
+                            return block["text"]
+                    return f"[no text block: {list(data.keys())}]"
+
+            # Run sync httpx in thread to avoid blocking the MCP event loop
+            loop = _asyncio.get_event_loop()
+            return await loop.run_in_executor(None, _sync_call)
+
         elif _backend == "openai":
             response = _client.chat.completions.create(
                 model=_MODEL,
