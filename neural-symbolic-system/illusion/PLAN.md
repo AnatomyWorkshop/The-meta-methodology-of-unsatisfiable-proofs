@@ -168,9 +168,14 @@ Phase 1 和 Phase 2 完成后，Illusion 将成为一个可以自动发现并验
 **4a** ✅ MCP server 骨架 + tool schema（`mcp/server.py`）
 **4b** ✅ 文献检索辅助 L3（`mcp/l3_integration.py`，prompt 模式验证通过）
 **4c** ✅ 自动变换生成骨架（`mcp/l2_integration.py`，含 `ExhaustionCriterion` 终止条件）
-**4d** → 代数电路领域验证（下一步）
+**4d** ✅ 代数电路领域验证（2026-05-09）
 
-**当前状态（2026-05-08）**：API key 已配置（中转站 Anthropic + DeepSeek 双后端，`.env` 已写入，`.gitignore` 保护）。4d 开始前需要：实现代数电路 L1 模拟器、有限域多项式计算、Permanent 目标函数、初始变换库。
+**当前状态（2026-05-09）**：Phase 4d 完成。`phase4/` 目录实现完整，GF(7) 上 3×3 Permanent 实验通过三条成功标准。Razborov-Smolensky 类比验证成功。详见 `docs/phase4d-report.md`。
+
+**Phase 4d 成功标准**（三条全部满足 ✅）：
+1. L2 找到 `algebraic_restriction_p0.3/0.5`，Δcollapse ≈ +0.10–0.12 ✅
+2. 控制变换（identity/input_permutation/scalar_multiplication）Δ ≈ 0，正确拒绝 ✅
+3. L3：`algebraic_restriction` → SAFE（Razborov-Smolensky），`field_reduction` → UNSAFE ✅
 
 ### 符号体系
 

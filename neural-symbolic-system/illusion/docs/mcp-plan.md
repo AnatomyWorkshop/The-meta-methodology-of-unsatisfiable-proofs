@@ -104,7 +104,7 @@ MCP Hub 是 L2 和 L3 的扩展接口，不是替代。核心搜索循环不变�
 | 4a | 定义 MCP tool schema（变换生成、文献检索） | Phase 3 完成 ✅ | 1-2 天 | ✅ 完成 |
 | 4b | 实现方向 2（文献检索辅助 L3） | 4a ✅ | 2-3 天 | ✅ 完成 |
 | 4c | 实现方向 1（自动变换生成） | 4b ✅ | 3-5 天 | ✅ 骨架完成，待 live 验证 |
-| 4d | 在新领域（代数电路）上验证 MCP 流程 | 4c ✅ | 1 周 | 下一步 |
+| 4d | 在新领域（代数电路）上验证 MCP 流程 | 4c ✅ | 1 周 | ✅ 完成 |
 | 4e | 方向 3（实验自动化）评估 | 4d 完成后决定 | 待定 | 待开始 |
 
 **当前状态（2026-05-07）**：4a 完成（server.py + schema + config + test）。4b 完成（`l3_integration.py`，prompt 模式验证通过）。4c 骨架完成（`l2_integration.py`，含 `ExhaustionCriterion` 终止条件，prompt 模式验证通过）。等 API key 配置后可切换为 live 模式。
