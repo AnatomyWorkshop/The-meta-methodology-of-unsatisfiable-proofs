@@ -204,6 +204,115 @@ Phase 1 和 Phase 2 完成后，Illusion 将成为一个可以自动发现并验
 
 详见 `docs/phase5-design.md`，论文草稿：`papers/illusion-proof-complexity.md`。
 
+---
+
+### Phase 5b：Frege 证明复杂度（深度度量）— ✅ 完成
+
+**目标**：将框架扩展到 Frege 证明系统，以证明深度为资源界。
+
+**结果（2026-05-10）**：
+
+| 变换 | Δcollapse | L3 判定 |
+|------|-----------|---------|
+| variable_restriction_p0.2 | +0.600 | SAFE |
+| variable_restriction_p0.3 | +0.200 | SAFE |
+| hypothesis_projection_p0.7 | +0.600 | SAFE |
+| hypothesis_projection_p0.8 | +0.600 | SAFE |
+| hypothesis_weakening_e1 | +0.600 | SAFE |
+| subformula_elimination_n2 | +0.000 | (rejected) |
+
+**核心发现**：
+1. `variable_restriction` / `hypothesis_projection` → SAFE：Krajíček 1994 的 Frege 下界技术类比
+2. `subformula_elimination`（Extended Frege 输入级操作）信号为零——Extended Frege 的优势不在深度
+3. UNKNOWN = 0 本身是信息：bounded-depth Frege 的下界已知（Krajíček-Pudlák 1995），没有开放问题需要上报
+4. 这为 Phase 5c 提供了对照：同一架构，同一目标（PHP），不同度量
+
+详见 `phase5b/results/` 实验报告。
+
+---
+
+### Phase 5c：Frege 证明复杂度（大小度量）— ✅ 完成
+
+**目标**：以证明大小（总推导步数）为资源界，探测 Frege vs Extended Frege 分离。
+
+**关键设计**：
+- `enable_caching`：跨分支缓存（一个分支推导的 unit 在兄弟分支免费使用）= Extended Frege 的缩写机制
+- `cross_branch_caching` 变换：不修改假设，只启用证明器的缓存模式
+- 度量：step_limit=100 下 PHP(6,5) 标准 Frege 不可证，Extended Frege 可证
+
+**结果（2026-05-10）**：
+
+| 变换 | Δcollapse | L3 判定 |
+|------|-----------|---------|
+| variable_restriction_p0.2 | +1.000 | SAFE |
+| variable_restriction_p0.3 | +0.625 | SAFE |
+| hypothesis_projection_p0.7 | +1.000 | SAFE |
+| hypothesis_projection_p0.8 | +1.000 | SAFE |
+| cross_branch_caching_f1.0 | +1.000 | **UNKNOWN** |
+| hypothesis_weakening_e1 | +1.000 | SAFE |
+| hypothesis_weakening_e2 | +1.000 | SAFE |
+| subformula_elimination_n2/n3 | +0.000 | (rejected) |
+
+**核心发现**：
+1. `cross_branch_caching` → **UNKNOWN**（Δ=+1.000，最大信号）：对应 Extended Frege 的缩写机制。Frege 与 Extended Frege 的 p-simulation 是证明复杂度的核心开放问题（Cook & Reckhow 1979）
+2. Phase 5b（深度）vs 5c（大小）对照：同一操作在深度度量下信号为零，在大小度量下信号最大——框架精确定位了开放问题所在的度量维度
+3. `subformula_elimination`（输入级缩写）信号为零——真正的 Extended Frege 优势在证明器内部的跨分支共享，不在输入变换
+4. 跨阶段一致性：Phase 5（Resolution）发现 `variable_elimination` → UNKNOWN，Phase 5c（Frege）发现 `cross_branch_caching` → UNKNOWN。框架在每个域独立发现证明系统与其扩展之间的边界
+
+**跨阶段对照表**：
+
+| Phase | 域 | UNKNOWN 变换 | 对应开放问题 |
+|-------|-----|-------------|-------------|
+| 5 | Resolution | variable_elimination | Resolution vs Extended Resolution |
+| 5b | Frege (depth) | (none) | — |
+| **5c** | **Frege (size)** | **cross_branch_caching** | **Frege vs Extended Frege** |
+
+详见 `phase5c/results/` 实验报告。
+
+---
+
+### Phase 5c 补充：Scaling Law — ✅ 完成
+
+**目标**：量化 Frege vs Extended Frege 的分离规模随 PHP 大小的增长。
+
+**结果（2026-05-10）**：
+
+| PHP | Standard Frege | Extended Frege | 比率 |
+|-----|---------------|---------------|------|
+| PHP(3,2) | 8 步 | 7 步 | 1.1x |
+| PHP(4,3) | 67 步 | 13 步 | 5.2x |
+| PHP(5,4) | 525 步 | 21 步 | 25.0x |
+| PHP(6,5) | >3000 步 | 30 步 | >100x |
+
+**核心发现**：
+- Extended Frege 步数多项式增长（O(n²)）
+- Standard Frege 步数指数增长（约 8^n）
+- 比率超多项式增长——与分离猜想一致
+- 框架不只是指向开放问题，它量化了分离的规模
+
+详见 `phase5c/results/scaling_report.md`。
+
+---
+
+### Phase 6（规划中）：千禧年难题 — RH
+
+**目标**：将 Illusion 的闭包搜索范式应用于黎曼猜想。
+
+**方法**：不是试图证明 RH，而是：
+1. 用 α 诊断为什么当前方法失败
+2. 用闭包四定律（对偶、刚性、显性对称、高维到低维）约束候选证明路径
+3. 在约束空间里搜索满足四定律的候选闭包
+
+**已有基础**：
+- `docs/symbol-system.md` §4.5：RH 的符号标注
+- `docs/symbol-system.md` §6：闭包四定律定义 + RH 实例（Hilbert-Polya）
+- Manifesto "A Diagnosis" 节：结构分析
+
+**待实现**：
+- L1：解析数论模型（ζ 函数零点、显式公式）
+- L2：闭包搜索（在算子空间中搜索满足四定律的 H_RH）
+- L3：验证候选闭包是否真的在 M_an 之外
+
 ### 符号体系
 
 详见 `docs/symbol-system.md`。

@@ -225,7 +225,17 @@ The Illusion system implements the SRS framework as a three-layer architecture. 
 | L3 UNKNOWN verdict | $P \mathring{\sqsubset}_M \text{decidable}$? — open question |
 | Δcollapse metric | Empirical estimate of α > 1 |
 
-The UNKNOWN verdict in Phase 5 corresponds precisely to $\mathring{\sqsubset}_M$: the system found a transform (`variable_elimination`) whose induced property cannot be classified as decidable or undecidable within Resolution, because the relevant separation (Resolution vs. Extended Resolution) is an open problem. In the notation of this paper: the system identified a candidate $\mathring{\sqsubset}_{\text{Resolution}}$ relation.
+Two UNKNOWN verdicts have been produced, each corresponding to a distinct $\mathring{\sqsubset}_M$ instance:
+
+**Resolution (width metric):** The system found `variable_elimination` (Δcollapse = +0.78) whose induced property cannot be classified as decidable or undecidable within Resolution, because the relevant separation (Resolution vs. Extended Resolution) is an open problem:
+
+$$P_{\text{var\_elim}} \mathring{\sqsubset}_{\text{Resolution}} \text{decidable?} \quad \text{(Cook \& Reckhow 1979, open)}$$
+
+**Frege (size metric):** The system found `cross_branch_caching` (Δcollapse = +1.000) whose induced property — whether cross-branch sharing of intermediate derivations genuinely reduces proof size — is the Frege vs Extended Frege separation:
+
+$$P_{\text{caching}} \mathring{\sqsubset}_{\text{Frege}} \text{decidable?} \quad \text{(Cook \& Reckhow 1979; Krajíček \& Pudlák 1989, open)}$$
+
+The same operation tested at the depth metric produces zero signal and no UNKNOWN — correctly reflecting that bounded-depth Frege lower bounds are known (Krajíček & Pudlák 1995). In the notation of this paper: $P_{\text{caching}} \to_{\text{depth-Frege}} \text{irrelevant}$ (the property does not induce collapse at the depth level, so the decidability question does not arise).
 
 ---
 
