@@ -13,9 +13,9 @@
 | PHP(3,2) | 8 | 7 | 1.1x | — |
 | PHP(4,3) | 67 | 13 | 5.2x | Std: ~8x per step |
 | PHP(5,4) | 525 | 21 | 25.0x | Std: ~8x per step |
-| PHP(6,5) | >3000 | 30 | >100x | Std: exponential |
-| PHP(7,6) | >3000 | 42 | >71x | Ext: linear |
-| PHP(8,7) | >3000 | 56 | >53x | Ext: linear |
+| PHP(6,5) | 3869 | 30 | 129x | Std: ~7.4x per step |
+| PHP(7,6) | >20000 | 42 | >476x | Ext: linear |
+| PHP(8,7) | >20000 | 56 | >357x | Ext: linear |
 
 ## Scaling Laws
 
@@ -23,9 +23,9 @@
 - Differences: 6, 8, 9, 12, 14
 - Growth: O(n²) — polynomial
 
-**Standard Frege**: steps ∈ {8, 67, 525, >3000, ...}
-- Ratios: 8.4x, 7.8x, >5.7x
-- Growth: exponential in n (approximately 8^n)
+**Standard Frege**: steps ∈ {8, 67, 525, 3869, >20000, ...}
+- Ratios: 8.4x, 7.8x, 7.4x, >5.2x
+- Growth: exponential in n (approximately 7-8x per increment)
 
 **Ratio** (Std/Ext): 1.1, 5.2, 25.0, >100, ...
 - Super-polynomial growth — consistent with genuine separation
