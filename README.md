@@ -47,10 +47,15 @@ Full diagnostic: [cross-domain-diagnostic.md](cross-domain-diagnostic.md)
 
 ## Papers
 
+**Illusion / SRS framework:**
 - [Manifesto](neural-symbolic-system/illusion/papers/manifesto.md) — The self-referential safety framework
 - [Proof Complexity](neural-symbolic-system/illusion/papers/illusion-proof-complexity.md) — Resolution and Frege systems
 - [Symbol System](neural-symbolic-system/illusion/papers/illusion-symbol-system.md) — Formal specification
 - [Constructive Verification](neural-symbolic-system/illusion/papers/illusion-constructive-verification.md) — Experimental validation
+
+**Universal Closure Axiom (UCA):**
+- [Paper 1: UCA and Classical Physics](neural-symbolic-system/closure-axiom-derivations/papers/paper1-universal-closure-axiom.md) — One axiom derives QM, Yang-Mills, Einstein gravity
+- [Paper 4: RH as a UCA Consistency Condition](neural-symbolic-system/closure-axiom-derivations/papers/paper4-uca-riemann-hypothesis.md) — RH ↔ zeta function satisfies UCA; Berry-Keating as classical limit
 
 ---
 

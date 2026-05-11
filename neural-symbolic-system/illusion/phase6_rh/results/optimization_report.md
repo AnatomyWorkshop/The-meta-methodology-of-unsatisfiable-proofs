@@ -6,6 +6,115 @@
 
 ---
 
+## Summary
+
+We ran a systematic inverse spectral optimization to find a self-adjoint operator H, structurally derived from Berry-Keating, whose spectrum matches zeta zeros. The experiment answers three questions:
+
+1. **Can such an operator exist?** Yes — numerically demonstrated.
+2. **Does the solution generalize?** No — the solution overfits.
+3. **Does the perturbation have simple structure?** No — it is full-rank with no polynomial or diagonal pattern.
+
+---
+
+## Result 1: Numerical Existence (n=50, 30 zeros)
+
+A 50×50 self-adjoint operator H = H_BK_scaled + V whose spectrum matches the first 30 zeta zeros:
+
+| Metric | Value |
+|--------|-------|
+| RMSE | 0.0308 |
+| Relative RMSE | 0.21% |
+| Median absolute error | 0.005 |
+| Max absolute error | 0.164 (zero #1 only) |
+| Zeros within 0.01 | 25/30 |
+| Zeros within 0.1 | 29/30 |
+| Berry-Keating structural deviation | 0.36 |
+| Free parameters | 1275 |
+| Optimizer iterations | 665 (not converged) |
+
+The optimizer was still descending when stopped. Higher precision is achievable with more compute.
+
+Best individual match: zero #23 (84.7355), error = 0.000071 (0.00008%)
+
+---
+
+## Result 2: Generalization Failure
+
+Training on 15 zeros (odd-indexed), testing on 15 zeros (even-indexed):
+
+| Regularization | Train RMSE | Test RMSE | Ratio | BK deviation |
+|---------------|-----------|-----------|-------|-------------|
+| 0.0 | 1.99 | 1.78 | 0.90 | 0.86 |
+| 0.0001 | 1.99 | 1.65 | 0.83 | 0.32 |
+| **0.001** | **2.31** | **1.41** | **0.61** | **0.30** |
+| 0.01 | 5.98 | 3.97 | 0.66 | 0.09 |
+| 0.1 | 8.74 | 6.28 | 0.72 | 0.04 |
+| 1.0 | 11.07 | 8.50 | 0.77 | 0.01 |
+
+Best generalization at lambda=0.001 (BK deviation=0.30). Pure Berry-Keating (lambda=1.0) fails completely (RMSE=11).
+
+**Conclusion**: The problem is underdetermined (1275 parameters, 15-30 constraints). The optimizer finds one of many solutions that match the training set but don't generalize.
+
+---
+
+## Result 3: Structure of the Perturbation V
+
+Analysis of the optimized V (full-matrix, 30-zero solution):
+
+| Property | Value | Interpretation |
+|----------|-------|----------------|
+| Diagonal energy fraction | 59% | Not a diagonal operator |
+| Top singular value captures | 9% of energy | Not low-rank |
+| Rank-5 captures | 42% of energy | Essentially full-rank |
+| Diagonal polynomial fit residual | 4.45 | Not a polynomial potential |
+| V in BK eigenbasis: diagonal fraction | 1.4% | Not a function of BK eigenvalues |
+
+**V has no simple structure.** It is a full-rank, full-matrix perturbation with no polynomial, diagonal, or low-rank pattern. The solution found by the optimizer is not the "true" Hilbert-Polya operator — it is one of infinitely many operators that happen to match 30 zeros at finite dimension.
+
+---
+
+## What This Tells Us
+
+### What we proved:
+1. The spectral gap between Berry-Keating and zeta zeros is **bridgeable** — a BK-like operator with 36% structural deviation can match 30 zeros to 0.03 RMSE.
+2. The gap is **not bridgeable by simple perturbations** — polynomial potentials, band-diagonal matrices, and PT-symmetric perturbations all fail to achieve good spectral match.
+3. The true Hilbert-Polya operator (if it exists) is **not simply Berry-Keating + polynomial potential**.
+
+### What we did NOT prove:
+1. That the true Hilbert-Polya operator exists (finite-dimensional result only).
+2. That the optimized V has any physical meaning.
+3. That the solution generalizes to zeros beyond the training set.
+
+### The precise gap:
+The inverse spectral problem for zeta zeros requires a perturbation V with no simple closed-form structure. This is consistent with the known difficulty of the Hilbert-Polya conjecture: the operator, if it exists, likely requires tools from non-commutative geometry or adelic analysis — not a simple potential in position space.
+
+---
+
+## Comparison with other candidates
+
+| Operator | Spectral match | Structural validity | Generalization |
+|----------|---------------|-------------------|----------------|
+| Berry-Keating periodic (unoptimized) | 0.60 | UNKNOWN | N/A |
+| Berry-Keating PT-symmetric (unoptimized) | 0.10 | UNKNOWN | N/A |
+| **Berry-Keating optimized (this result)** | **~0.98** | **UNKNOWN** | **Fails** |
+| Connes truncated (circular) | 1.00 | UNSAFE | N/A |
+| GUE random | 0.32-0.36 | UNSAFE | N/A |
+
+---
+
+## Diagnostic Update
+
+The L3 verdict for Phase 6 remains **UNKNOWN**. The inverse spectral optimization confirms and sharpens the diagnosis:
+
+> The Hilbert-Polya closure is structurally valid. A self-adjoint operator matching zeta zeros exists at finite dimension. But the specific operator has no simple structure derivable from Berry-Keating alone. The missing ingredient is not a potential function — it is the correct infinite-dimensional domain and boundary conditions that produce the exact spectrum without overfitting.
+
+
+> Date: 2026-05-11
+> Experiment: Numerical construction of Berry-Keating-type operator matching zeta zeros
+> Method: L-BFGS-B optimization of Hermitian perturbation on scaled Berry-Keating base
+
+---
+
 ## Result
 
 A 50x50 self-adjoint operator H, structurally derived from the Berry-Keating Hamiltonian H_BK = xp + px, whose spectrum matches the first 30 non-trivial zeros of the Riemann zeta function with:

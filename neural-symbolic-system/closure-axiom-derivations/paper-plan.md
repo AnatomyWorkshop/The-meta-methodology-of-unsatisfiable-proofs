@@ -82,7 +82,32 @@ This is the paper's original contribution. The strategy is clear; the execution 
 
 ---
 
-## Paper 2: Duality Defect and Quantum Gravity
+## Paper 4: The Riemann Hypothesis as a UCA Consistency Condition
+
+**Claim**: RH is equivalent to the statement that the completed zeta function satisfies UCA. The functional equation $\xi(s) = \xi(1-s)$ is duality compatibility $[\mathcal{D}, \star] = 0$; the Hilbert-Polya conjecture is the self-adjointness limit. Berry-Keating is the classical limit of UCA applied to the $xp$ system; the gap is the duality defect $\delta_{BK} = [\mathcal{D}_{BK}, \star]$.
+
+**Status**: Draft complete (2026-05-11). See `papers/paper2-uca-riemann-hypothesis.md`.
+
+| § | Content | Key result |
+|---|---------|-----------|
+| 1 | Introduction: RH as spectral problem | Hilbert-Polya conjecture |
+| 2 | Functional equation as duality compatibility | $\xi(s)=\xi(1-s)$ ↔ $[\mathcal{D},\star]=0$ |
+| 3 | Self-adjointness and Hilbert-Polya | UCA forces real spectrum → RH |
+| 4 | Four closure laws as UCA limits | Duality/Rigidity/Symmetry/Reduction |
+| 5 | Berry-Keating as classical limit | $H_{BK}$ satisfies Liouville but not quantum UCA |
+| 6 | The structural gap | Duality defect $\delta_{BK}$; adelic setting |
+| 7 | Relation to Connes | Complementary: Connes = framework, UCA = why |
+| 8 | Computational evidence | Phase 6 inverse spectral results |
+| 9 | What would constitute a proof | Three conditions on adelic operator |
+
+**Key insight**: The perturbation $V$ needed to go from Berry-Keating to $H_{RH}$ is the operator that cancels the duality defect: $[V, \star] = -\delta_{BK}$. This is a structural equation, not a spectral fitting problem.
+
+**Length**: 15–18 pages.
+**Prerequisite**: Paper 1 complete.
+
+---
+
+## Paper 3: Duality Defect and Quantum Gravity
 
 **Claim**: Relaxing DCC produces a commutator $\delta = [\mathcal{D}, \star] \neq 0$ that is the first-order quantum gravity correction. Its algebraic structure yields testable predictions.
 
