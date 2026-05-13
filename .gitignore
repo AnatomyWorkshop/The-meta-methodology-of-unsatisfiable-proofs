@@ -1,5 +1,6 @@
 # Secrets
-neural-symbolic-system/illusion/mcp/.env
+.env.keys
+illusion/mcp/.env
 
 # Python
 __pycache__/
@@ -13,10 +14,14 @@ dist/
 build/
 
 # Experiment outputs (large, reproducible)
-neural-symbolic-system/illusion/phase*/results/*.json
+illusion/phase*/results/*.json
 
 # Private plans (publish after completion)
-neural-symbolic-system/inspiration/A-Man's-Revolution/
+private/
+
+# Editor
+.vscode/
+.idea/
 
 # OS
 .DS_Store
