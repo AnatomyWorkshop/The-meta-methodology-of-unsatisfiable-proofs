@@ -15,6 +15,9 @@ build/
 # Experiment outputs (large, reproducible)
 neural-symbolic-system/illusion/phase*/results/*.json
 
+# Private plans (publish after completion)
+neural-symbolic-system/inspiration/A-Man's-Revolution/
+
 # OS
 .DS_Store
 Thumbs.db
