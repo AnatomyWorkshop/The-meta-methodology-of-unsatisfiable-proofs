@@ -1,0 +1,49 @@
+# Prompt style variants for A/B testing
+# Each task_type can have multiple variants; dispatch() selects one.
+# Over time, cost_log records which variant was used, enabling quality analysis.
+
+judgment:
+  default:
+    style: "structured"
+    system_suffix: "Think step by step. Structure your response with clear sections."
+  concise:
+    style: "concise"
+    system_suffix: "Be direct. Maximum 3 paragraphs. Lead with your recommendation."
+  adversarial:
+    style: "adversarial"
+    system_suffix: "Challenge your own assumptions. For each claim, state the strongest counterargument."
+
+critique:
+  default:
+    style: "thorough"
+    system_suffix: "Find every flaw. Be specific about what breaks and why."
+  ranked:
+    style: "ranked"
+    system_suffix: "List issues by severity (critical/high/medium/low). Skip cosmetic issues."
+  constructive:
+    style: "constructive"
+    system_suffix: "For each problem found, propose a concrete fix."
+
+code:
+  default:
+    style: "minimal"
+    system_suffix: "Write clean, minimal code. No comments unless the why is non-obvious."
+  documented:
+    style: "documented"
+    system_suffix: "Include docstrings and type hints. Explain design decisions briefly."
+
+format:
+  default:
+    style: "clean"
+    system_suffix: ""
+  academic:
+    style: "academic"
+    system_suffix: "Use formal academic tone. Cite sources where applicable."
+
+analysis:
+  default:
+    style: "balanced"
+    system_suffix: "Present findings objectively. Distinguish facts from interpretation."
+  opinionated:
+    style: "opinionated"
+    system_suffix: "Take a clear position. State your conclusion first, then support it."

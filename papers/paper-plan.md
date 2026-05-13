@@ -24,7 +24,7 @@ A field's internal evolution under the full derivative operator must equal its i
 | 4 | UCA + Riemann Hypothesis | Content complete | RG (pending upload) |
 | 5 | UCA + BSD Conjecture | Draft complete | RG (pending review) |
 | 2 | Duality Defect + Quantum Gravity | Planned | — |
-| 3 | Closure Particles | Planned | — |
+| 3 | Closure Particles — Predictions | Planned (post-publicity) | — |
 
 ---
 
@@ -114,6 +114,50 @@ Specifically, L2 could search for:
 This is a millennium problem. The rank ≥ 2 case has resisted all approaches for 40 years. UCA reframes it but does not obviously solve it. The reframing is valuable (it identifies the exact structural gap), but claiming to solve it would be dishonest.
 
 What UCA genuinely adds: the observation that rank ≥ 2 is equivalent to "the UCA eigenspace at the central point has dimension ≥ 2, and this dimension must equal the arithmetic rank." This is a cleaner statement than the original BSD, and it suggests that the proof should come from representation theory (eigenspace structure) rather than algebraic geometry (explicit point construction).
+
+---
+
+## Paper 2: Duality Defect + Quantum Gravity (PLANNED)
+
+> Priority: After UCA gains traction (post-Paper 1/4/5 publicity)
+> Prerequisite: UCA framework accepted/discussed by at least some readers
+
+Core idea: When $[\mathcal{D}, \star] \neq 0$, the duality defect $\delta$ becomes dynamical. GR is the $\delta \to 0$ limit. Quantum gravity = full $\delta$-dynamics at Planck scale.
+
+Key content:
+- Derive GR as low-energy projection of UCA ($\delta = 0$ sector)
+- Show that $\delta \neq 0$ defines the boundary where continuous spacetime fails
+- Formulate the "defect evolution equation" — the UCA replacement for Wheeler-DeWitt
+- Predict: information is never lost (eigenvalue conservation), resolving black hole information paradox
+- Connect to Berry-Keating spectral convergence rate ($\alpha \approx 0.26$) as testable prediction
+
+Open questions to resolve before writing:
+- Exact functional form of $\delta$-dynamics on compact manifolds
+- Whether the defect equation reduces to known quantum gravity candidates (LQG, CDT) in any limit
+- Numerical experiments: can Illusion detect the $\delta$-transition in toy models?
+
+---
+
+## Paper 3: Closure Particles — Predictions and Constraints (PLANNED)
+
+> Priority: After Paper 2. Must contain falsifiable predictions or reinterpretations.
+> Strategy: Write AFTER UCA has audience. Paper 3 is the "so what does this mean for experiments" paper.
+
+Core idea: UCA constrains what particles CAN exist (the "grammar") but doesn't fix the specific "vocabulary" (masses, couplings). Paper 3 explores what UCA forces and what it leaves open.
+
+Key content:
+- Why gauge groups must exist (non-abelian structure forced by duality compatibility)
+- Why symmetry breaking is necessary (massive gauge bosons require anomaly cancellation)
+- What UCA says about fermion generations (currently silent — silence = new physics needed)
+- The neutrino mass problem: UCA's silence points to beyond-Standard-Model structure
+- Testable constraint: any BSM theory must satisfy UCA, eliminating certain exotic proposals
+
+Possible strong predictions:
+- Berry-Keating convergence rate bound (numerically observed $\alpha \approx 0.26$)
+- Constraints on dark matter candidates from UCA eigenvalue conservation
+- Reinterpretation of hierarchy problem as a projection artifact
+
+Decision criterion: Paper 3 must either (a) predict something measurable, or (b) definitively rule out a class of BSM theories. Without this, it stays in lab/.
 
 ---
 
