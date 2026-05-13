@@ -1,0 +1,33 @@
+# Meta-Dispatch Configuration
+
+# Task type → model routing
+routing:
+  judgment: claude      # architecture, strategy, creative decisions
+  critique: deepseek    # finding holes, adversarial review
+  code: deepseek        # code generation, numerical experiments
+  format: deepseek      # formatting, translation, data cleaning
+  analysis: deepseek    # literature review, data analysis
+
+# @op whitelist (only these operations can be triggered by AI output)
+ops:
+  - diagnose     # run Illusion diagnosis
+  - transform    # apply L2 transform
+  - srs_check    # SRS safety classification
+  - validate     # validate against known data
+  - archive      # move file to archive/
+  - dispatch     # route sub-task to another model
+
+# Context injection levels
+context:
+  level_0: "Company identity (1 sentence)"
+  level_1: "Current state (3-5 sentences)"
+  level_2: "Task background (1 paragraph, per-call)"
+  level_3: "Specific content (the actual task)"
+
+# Which levels to inject per task type
+injection:
+  format: [0, 3]
+  code: [0, 3]
+  analysis: [0, 1, 3]
+  critique: [0, 1, 2, 3]
+  judgment: [0, 1, 2, 3]

@@ -26,3 +26,4 @@ private/
 # OS
 .DS_Store
 Thumbs.db
+meta-dispatch/cost_log.jsonl
