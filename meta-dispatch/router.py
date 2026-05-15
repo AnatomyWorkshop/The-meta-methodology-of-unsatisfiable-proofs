@@ -6,7 +6,6 @@ Built on raw HTTP (LiteLLM integration in v0.2).
 """
 
 import json
-import urllib.request
 import os
 import sys
 import time
@@ -37,6 +36,36 @@ def load_env():
 
 ENV = load_env()
 
+CONFIG_FILE = ROOT / "meta-dispatch" / "config.yaml"
+
+
+def _load_config() -> dict:
+    """Load config.yaml as a simple nested dict (no PyYAML dependency)."""
+    if not CONFIG_FILE.exists():
+        return {}
+    cfg = {}
+    current_section = None
+    for line in CONFIG_FILE.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#"):
+            continue
+        indent = len(line) - len(line.lstrip())
+        if indent == 0 and stripped.endswith(":"):
+            current_section = stripped[:-1]
+            cfg[current_section] = {}
+        elif indent == 2 and current_section and ":" in stripped:
+            k, v = stripped.split(":", 1)
+            cfg[current_section][k.strip()] = v.strip().split("#")[0].strip()
+        elif indent == 2 and current_section and stripped.startswith("- "):
+            val = stripped[2:].split("#")[0].strip()
+            if not isinstance(cfg[current_section], list):
+                cfg[current_section] = []
+            cfg[current_section].append(val)
+    return cfg
+
+
+CONFIG = _load_config()
+
 # Model configurations
 MODELS = {
     "deepseek": {
@@ -44,26 +73,40 @@ MODELS = {
         "key": ENV.get("RELAY_SPACECX_KEY", ""),
         "model": ENV.get("RELAY_SPACECX_MODEL", "deepseek-v4-pro"),
     },
+    "deepseek-1m": {
+        "base_url": ENV.get("RELAY_SPACECX_BASE_URL", "https://ai.space.cx/"),
+        "key": ENV.get("RELAY_SPACECX_KEY", ""),
+        "model": "deepseek-v4-pro[1m]",
+    },
     "claude": {
         "base_url": ENV.get("RELAY_LANYI_BASE_URL", "https://lanyiapi.com/"),
         "key": ENV.get("RELAY_LANYI_KEY", ""),
-        "model": "claude-sonnet-4-20250514",
+        "model": "claude-sonnet-4-6",
     },
     "sonnet-4.6": {
         "base_url": ENV.get("RELAY_LANYI_BASE_URL", "https://lanyiapi.com/"),
         "key": ENV.get("RELAY_LANYI_KEY", ""),
-        "model": "claude-sonnet-4-6-20250514",
+        "model": "claude-sonnet-4-6",
+    },
+    "sonnet-4.6-thinking": {
+        "base_url": ENV.get("RELAY_LANYI_BASE_URL", "https://lanyiapi.com/"),
+        "key": ENV.get("RELAY_LANYI_KEY", ""),
+        "model": "claude-sonnet-4-6-thinking",
     },
 }
 
-# Task type → model routing table
-ROUTING_TABLE = {
-    "judgment": "claude",       # architecture, strategy, creative decisions
-    "critique": "deepseek",     # finding holes, adversarial review
-    "code": "deepseek",         # code generation, numerical experiments
-    "format": "deepseek",       # formatting, translation, data cleaning
-    "analysis": "deepseek",     # literature review, data analysis
+# Single source of truth: routing loaded from config.yaml
+# Fallback defaults only if config.yaml is missing or malformed
+_ROUTING_DEFAULTS = {
+    "judgment": "claude",
+    "critique": "deepseek",
+    "code": "deepseek",
+    "format": "deepseek",
+    "analysis": "deepseek",
 }
+ROUTING_TABLE = CONFIG.get("routing", _ROUTING_DEFAULTS)
+if not isinstance(ROUTING_TABLE, dict):
+    ROUTING_TABLE = _ROUTING_DEFAULTS
 
 
 # ---------------------------------------------------------------------------
@@ -151,67 +194,124 @@ def inject_context(task_type: str, task_background: str = "", variant: str = "de
 # @op Protocol
 # ---------------------------------------------------------------------------
 
-# Whitelist of allowed operations
-OP_WHITELIST = {
-    "diagnose",    # run Illusion diagnosis on a target
-    "transform",   # apply a transform in L2 search
-    "srs_check",   # check SRS safety classification
-    "validate",    # validate a result against known data
-    "archive",     # move a file to archive/
-    "dispatch",    # route a sub-task to another model
+# Protocol schema — frozen for stability. Drives validation, replay, debugging.
+OP_SPEC = {
+    "diagnose": {
+        "required": ["target"],
+        "optional": [],
+        "side_effect": True,
+        "recursive": False,
+        "description": "Run Illusion SRS diagnosis on a target domain",
+    },
+    "transform": {
+        "required": ["name"],
+        "optional": ["target"],
+        "side_effect": False,
+        "recursive": False,
+        "description": "Apply a named transform in L2 search",
+    },
+    "srs_check": {
+        "required": ["target"],
+        "optional": [],
+        "side_effect": False,
+        "recursive": False,
+        "description": "Check SRS safety classification for a domain",
+    },
+    "validate": {
+        "required": ["claim"],
+        "optional": ["source"],
+        "side_effect": False,
+        "recursive": False,
+        "description": "Validate a claim against known data",
+    },
+    "archive": {
+        "required": ["path"],
+        "optional": [],
+        "side_effect": True,
+        "recursive": False,
+        "description": "Move a file to archive/",
+    },
+    "dispatch": {
+        "required": ["task"],
+        "optional": ["type", "model"],
+        "side_effect": True,
+        "recursive": True,
+        "description": "Route a sub-task to another model",
+    },
 }
+
+# Whitelist derived from spec (single source of truth)
+OP_WHITELIST = set(OP_SPEC.keys())
+
+
+def validate_op(op_name: str, params: dict) -> list[str]:
+    """Return list of validation errors for an op call. Empty = valid."""
+    spec = OP_SPEC.get(op_name)
+    if not spec:
+        return [f"unknown op: @{op_name}"]
+    missing = [r for r in spec["required"] if r not in params]
+    if missing:
+        return [f"@{op_name} missing required params: {missing}"]
+    return []
 
 
 def parse_ops(text: str) -> list[dict]:
-    """Extract @op markers from model output."""
+    """Extract @op markers from model output. Supports both key=value and JSON params."""
     ops = []
     for line in text.splitlines():
         line = line.strip()
-        if line.startswith("@") and " " in line:
+        if line.startswith("@") and (" " in line or line.endswith("}") or "{" in line):
             parts = line.split(None, 1)
-            op_name = parts[0][1:]  # remove @
+            op_name = parts[0][1:]
             if op_name in OP_WHITELIST:
-                # Parse key=value pairs
                 params = {}
                 if len(parts) > 1:
-                    for token in parts[1].split():
-                        if "=" in token:
-                            k, v = token.split("=", 1)
-                            params[k] = v
+                    rest = parts[1].strip()
+                    if rest.startswith("{"):
+                        try:
+                            params = json.loads(rest)
+                        except json.JSONDecodeError:
+                            pass
+                    else:
+                        for token in rest.split():
+                            if "=" in token:
+                                k, v = token.split("=", 1)
+                                params[k] = v.strip('"').strip("'")
                 ops.append({"op": op_name, "params": params})
+    return ops
     return ops
 
 
 # ---------------------------------------------------------------------------
-# API Call
+# API Call (via LiteLLM)
 # ---------------------------------------------------------------------------
 
 def call_model(model_name: str, messages: list[dict], max_tokens: int = 2000) -> dict:
-    """Call a model via its configured API."""
+    """Call a model via LiteLLM. Provider config comes from MODELS registry."""
+    import litellm
+    import warnings
+    litellm.suppress_debug_info = True
+    warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
+
     config = MODELS[model_name]
-    url = config["base_url"].rstrip("/") + "/v1/chat/completions"
-
-    data = json.dumps({
-        "model": config["model"],
-        "messages": messages,
-        "max_tokens": max_tokens,
-        "temperature": 0.7,
-    }).encode("utf-8")
-
-    req = urllib.request.Request(url, data=data, headers={
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {config['key']}",
-    })
-
     start = time.time()
+
     try:
-        with urllib.request.urlopen(req, timeout=120) as resp:
-            result = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
+        response = litellm.completion(
+            model=f"openai/{config['model']}",
+            messages=messages,
+            max_tokens=max_tokens,
+            temperature=0.7,
+            api_key=config["key"],
+            api_base=config["base_url"].rstrip("/") + "/v1",
+            timeout=120,
+            drop_params=True,
+            num_retries=2,
+        )
+    except litellm.exceptions.APIError as e:
         elapsed = time.time() - start
-        body = e.read().decode("utf-8", errors="replace")[:500] if e.fp else ""
         return {
-            "content": f"[API ERROR {e.code}] {e.reason}\n{body}",
+            "content": f"[API ERROR] {e}",
             "model": model_name,
             "elapsed": elapsed,
             "input_tokens": 0,
@@ -219,10 +319,10 @@ def call_model(model_name: str, messages: list[dict], max_tokens: int = 2000) ->
             "ops": [],
             "error": True,
         }
-    except (urllib.error.URLError, TimeoutError) as e:
+    except Exception as e:
         elapsed = time.time() - start
         return {
-            "content": f"[NETWORK ERROR] {e}",
+            "content": f"[ERROR] {e}",
             "model": model_name,
             "elapsed": elapsed,
             "input_tokens": 0,
@@ -232,15 +332,15 @@ def call_model(model_name: str, messages: list[dict], max_tokens: int = 2000) ->
         }
 
     elapsed = time.time() - start
-    content = result["choices"][0]["message"]["content"]
-    usage = result.get("usage", {})
+    content = response.choices[0].message.content or ""
+    usage = response.usage or {}
 
     return {
         "content": content,
         "model": model_name,
         "elapsed": elapsed,
-        "input_tokens": usage.get("prompt_tokens", 0),
-        "output_tokens": usage.get("completion_tokens", 0),
+        "input_tokens": getattr(usage, "prompt_tokens", 0),
+        "output_tokens": getattr(usage, "completion_tokens", 0),
         "ops": parse_ops(content),
     }
 
@@ -257,6 +357,7 @@ def dispatch(
     model_override: Optional[str] = None,
     auto_execute: bool = False,
     variant: str = "default",
+    _ctx: dict = None,
 ) -> dict:
     """
     Main dispatch function.
@@ -269,7 +370,9 @@ def dispatch(
         model_override: Force a specific model (bypass routing table)
         auto_execute: If True, automatically execute any @ops in the response
         variant: Prompt style variant for A/B testing (logged in cost_log)
+        _ctx: Internal dispatch context (carries depth, trace lineage — do not set manually)
     """
+    ctx = _ctx or {}
     model = model_override or ROUTING_TABLE.get(task_type, "deepseek")
     context = inject_context(task_type, background, variant=variant)
 
@@ -284,9 +387,10 @@ def dispatch(
     result["variant"] = variant
 
     _log_cost(result)
+    log_trace(result, task=task, context=context)
 
     if auto_execute and result["ops"]:
-        result["op_results"] = execute_ops(result["ops"])
+        result["op_results"] = execute_ops(result["ops"], context=ctx)
 
     return result
 
@@ -296,10 +400,17 @@ def dispatch(
 # ---------------------------------------------------------------------------
 
 COST_LOG = ROOT / "meta-dispatch" / "cost_log.jsonl"
+TRACE_LOG = ROOT / "meta-dispatch" / "trace_log.jsonl"
+
+
+def _context_hash(context: str) -> str:
+    """Short hash of the system prompt for dedup/replay."""
+    import hashlib
+    return hashlib.md5(context.encode("utf-8")).hexdigest()[:8]
 
 
 def _log_cost(result: dict):
-    """Append cost entry to log file."""
+    """Append cost entry to cost_log (lightweight, backward-compatible)."""
     entry = {
         "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
         "model": result["model"],
@@ -312,6 +423,32 @@ def _log_cost(result: dict):
     }
     with open(COST_LOG, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry) + "\n")
+
+
+def log_trace(result: dict, task: str, context: str, human_score: int = None):
+    """
+    Append full trace entry. This is the primary research asset.
+    human_score: 1-5 optional quality rating, added post-hoc.
+    """
+    entry = {
+        "trace_id": uuid.uuid4().hex[:12],
+        "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"),
+        "thread_id": result.get("thread_id", ""),
+        "model": result["model"],
+        "task_type": result["task_type"],
+        "variant": result.get("variant", "default"),
+        "context_hash": _context_hash(context),
+        "task_preview": task[:200],
+        "ops": result.get("ops", []),
+        "op_results": result.get("op_results", []),
+        "input_tokens": result["input_tokens"],
+        "output_tokens": result["output_tokens"],
+        "elapsed": round(result["elapsed"], 2),
+        "error": result.get("error", False),
+        "human_score": human_score,
+    }
+    with open(TRACE_LOG, "a", encoding="utf-8") as f:
+        f.write(json.dumps(entry, ensure_ascii=False) + "\n")
 
 
 # ---------------------------------------------------------------------------
@@ -327,6 +464,12 @@ def execute_ops(ops: list[dict], context: dict = None) -> list[dict]:
     for op in ops:
         name = op["op"]
         params = op.get("params", {})
+
+        errors = validate_op(name, params)
+        if errors:
+            results.append({"op": name, "status": "invalid", "errors": errors})
+            continue
+
         handler = _OP_HANDLERS.get(name)
         if not handler:
             results.append({"op": name, "status": "error", "msg": f"no handler for @{name}"})
@@ -380,25 +523,21 @@ def _op_archive(params: dict, ctx: dict) -> dict:
     return {"msg": f"archived {src_path.name}"}
 
 
-_DISPATCH_DEPTH = 0
 _MAX_DISPATCH_DEPTH = 3
 
 
 def _op_dispatch(params: dict, ctx: dict) -> dict:
     """Route a sub-task to another model (recursive dispatch)."""
-    global _DISPATCH_DEPTH
-    if _DISPATCH_DEPTH >= _MAX_DISPATCH_DEPTH:
+    depth = ctx.get("_dispatch_depth", 0)
+    if depth >= _MAX_DISPATCH_DEPTH:
         return {"msg": f"max recursion depth ({_MAX_DISPATCH_DEPTH}) reached", "status": "blocked"}
     task = params.get("task", "")
     task_type = params.get("type", "analysis")
     model = params.get("model")
     if not task:
         return {"msg": "no task specified"}
-    _DISPATCH_DEPTH += 1
-    try:
-        result = dispatch(task, task_type=task_type, model_override=model)
-    finally:
-        _DISPATCH_DEPTH -= 1
+    child_ctx = {**ctx, "_dispatch_depth": depth + 1}
+    result = dispatch(task, task_type=task_type, model_override=model, _ctx=child_ctx)
     return {"msg": "sub-dispatch complete", "content_preview": result["content"][:200]}
 
 

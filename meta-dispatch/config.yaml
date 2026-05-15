@@ -2,7 +2,7 @@
 
 # Task type → model routing
 routing:
-  judgment: claude      # architecture, strategy, creative decisions
+  judgment: sonnet-4.6   # architecture, strategy, creative decisions
   critique: deepseek    # finding holes, adversarial review
   code: deepseek        # code generation, numerical experiments
   format: deepseek      # formatting, translation, data cleaning

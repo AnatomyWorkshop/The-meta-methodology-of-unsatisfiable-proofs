@@ -103,6 +103,8 @@ Specifically, L2 could search for:
 2. Algebraic cycles on $E \times E$ that project to independent rational points
 3. p-adic L-functions whose zeros at $s=1$ give rank information (Mazur-Tate-Teitelbaum)
 
+Note: Prism (spectral constraint engine) may also contribute here — if the spectral multiplicity of the hyperbolic Laplacian can be computed for specific curves, it gives a direct numerical test of the rank prediction.
+
 ### What would constitute progress
 
 1. **Minimal**: Show that UCA + known results (Selberg, Eichler-Selberg, Wiles, parity) imply rank ≥ 2 for a SPECIFIC curve (e.g., 389a1) — even if the proof is non-constructive

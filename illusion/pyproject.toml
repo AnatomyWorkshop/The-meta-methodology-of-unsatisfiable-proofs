@@ -1,0 +1,21 @@
+[project]
+name = "illusion"
+version = "0.1.0"
+description = "Structural diagnosis of proof barriers"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "Apophenia", email = "contact@apophenia.ai"}]
+dependencies = [
+    "numpy>=1.24",
+]
+
+[project.scripts]
+illusion = "illusion.cli:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["illusion*"]

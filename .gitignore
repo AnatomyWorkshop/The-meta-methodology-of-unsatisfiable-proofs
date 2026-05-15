@@ -28,3 +28,4 @@ private/
 Thumbs.db
 meta-dispatch/cost_log.jsonl
 meta-dispatch/batch_log.jsonl
+meta-dispatch/trace_log.jsonl
