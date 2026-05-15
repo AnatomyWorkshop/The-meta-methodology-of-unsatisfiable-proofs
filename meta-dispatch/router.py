@@ -174,15 +174,25 @@ LEVEL_1 = _load_level_1()
 
 
 def inject_context(task_type: str, task_background: str = "", variant: str = "default") -> str:
-    """Build context packet based on task complexity + prompt variant."""
-    if task_type in ("format", "code"):
-        ctx = LEVEL_0
-    elif task_type == "analysis":
-        ctx = f"{LEVEL_0}\n\n{LEVEL_1}"
+    """Build context packet driven by config.yaml injection levels."""
+    injection_cfg = CONFIG.get("injection", {})
+    if isinstance(injection_cfg, dict):
+        levels = injection_cfg.get(task_type, injection_cfg.get("analysis", [0, 1, 3]))
+        if isinstance(levels, str):
+            levels = [int(x.strip()) for x in levels.strip("[]").split(",") if x.strip()]
     else:
-        ctx = f"{LEVEL_0}\n\n{LEVEL_1}"
-        if task_background:
-            ctx += f"\n\nTask background: {task_background}"
+        levels = [0, 1, 3]
+
+    parts = []
+    if 0 in levels:
+        parts.append(LEVEL_0)
+    if 1 in levels:
+        parts.append(LEVEL_1)
+    if 2 in levels and task_background:
+        parts.append(f"Task background: {task_background}")
+    # Level 3 (task content) is the user message, not injected into system prompt
+
+    ctx = "\n\n".join(parts)
 
     suffix = get_variant_suffix(task_type, variant)
     if suffix:
@@ -279,7 +289,6 @@ def parse_ops(text: str) -> list[dict]:
                                 params[k] = v.strip('"').strip("'")
                 ops.append({"op": op_name, "params": params})
     return ops
-    return ops
 
 
 # ---------------------------------------------------------------------------
@@ -304,7 +313,7 @@ def call_model(model_name: str, messages: list[dict], max_tokens: int = 2000) ->
             temperature=0.7,
             api_key=config["key"],
             api_base=config["base_url"].rstrip("/") + "/v1",
-            timeout=120,
+            timeout=180,
             drop_params=True,
             num_retries=2,
         )
@@ -617,6 +626,10 @@ def adversarial(
             thread_id=thread_id,
         )
         history.append({"role": "critic", "round": i + 1, **critique})
+
+        if critique.get("error"):
+            history.append({"role": "system", "content": f"Round {i+1}: critic returned error, skipping"})
+            continue
 
         if _is_converged(critique["content"]):
             no_new_issues += 1
