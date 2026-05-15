@@ -78,6 +78,11 @@ MODELS = {
         "key": ENV.get("RELAY_SPACECX_KEY", ""),
         "model": "deepseek-v4-pro[1m]",
     },
+    "deepseek-official": {
+        "base_url": ENV.get("DEEPSEEK_BASE_URL", "https://api.deepseek.com/"),
+        "key": ENV.get("DEEPSEEK_API_KEY", ""),
+        "model": ENV.get("DEFAULT_CHEAP_MODEL", "deepseek-chat"),
+    },
     "claude": {
         "base_url": ENV.get("RELAY_LANYI_BASE_URL", "https://lanyiapi.com/"),
         "key": ENV.get("RELAY_LANYI_KEY", ""),
@@ -295,8 +300,24 @@ def parse_ops(text: str) -> list[dict]:
 # API Call (via LiteLLM)
 # ---------------------------------------------------------------------------
 
+FALLBACK_MAP = {
+    "deepseek": "deepseek-official",
+    "deepseek-1m": "deepseek-official",
+}
+
+
 def call_model(model_name: str, messages: list[dict], max_tokens: int = 2000) -> dict:
-    """Call a model via LiteLLM. Provider config comes from MODELS registry."""
+    """Call a model via LiteLLM. Falls back to alternate endpoint on timeout."""
+    result = _call_model_once(model_name, messages, max_tokens)
+    if result.get("error") and model_name in FALLBACK_MAP:
+        fallback = FALLBACK_MAP[model_name]
+        result = _call_model_once(fallback, messages, max_tokens)
+        result["fallback_from"] = model_name
+    return result
+
+
+def _call_model_once(model_name: str, messages: list[dict], max_tokens: int = 2000) -> dict:
+    """Single attempt to call a model via LiteLLM."""
     import litellm
     import warnings
     litellm.suppress_debug_info = True
@@ -594,15 +615,18 @@ def adversarial(
     rounds: int = 4,
     thread_id: str = "",
     converge_threshold: int = 2,
+    synthesize: bool = True,
 ) -> list[dict]:
     """
     Run adversarial iteration: Claude proposes → Deepseek critiques → repeat.
     Stops early if critic produces no new substantive issues for `converge_threshold`
     consecutive rounds (inspired by CEGAR counterexample elimination).
+    If synthesize=True, produces a final merged answer after all rounds.
     Returns list of all responses.
     """
     history = []
     no_new_issues = 0
+    converged = False
 
     proposal = dispatch(
         task=task,
@@ -634,6 +658,7 @@ def adversarial(
         if _is_converged(critique["content"]):
             no_new_issues += 1
             if no_new_issues >= converge_threshold:
+                converged = True
                 history.append({"role": "system", "content": f"Converged after {i + 1} rounds (no new issues x{converge_threshold})"})
                 break
         else:
@@ -649,7 +674,34 @@ def adversarial(
         )
         history.append({"role": "proposer", "round": i + 1, **proposal})
 
+    if synthesize and not converged:
+        synthesis = _synthesize(history, task, background, thread_id)
+        history.append(synthesis)
+
     return history
+
+
+def _synthesize(history: list[dict], task: str, background: str, thread_id: str) -> dict:
+    """Produce a final merged answer from adversarial history, noting unresolved conflicts."""
+    proposals = [h["content"] for h in history if h.get("role") == "proposer" and not h.get("error")]
+    critiques = [h["content"] for h in history if h.get("role") == "critic" and not h.get("error")]
+
+    synthesis_prompt = (
+        f"原始任务：{task}\n\n"
+        f"经过 {len(proposals)} 轮提案和 {len(critiques)} 轮批评，请综合以下内容给出最终方案。\n"
+        "要求：1) 采纳所有有效批评 2) 明确标注未解决的分歧 3) 给出可执行的结论。\n\n"
+        f"最终提案：\n{proposals[-1][:3000] if proposals else '(无)'}\n\n"
+        f"最后一轮批评：\n{critiques[-1][:2000] if critiques else '(无)'}"
+    )
+
+    result = dispatch(
+        task=synthesis_prompt,
+        task_type="judgment",
+        background=background,
+        thread_id=thread_id,
+        model_override="claude",
+    )
+    return {"role": "synthesis", **result}
 
 
 def _is_converged(critique_text: str) -> bool:
