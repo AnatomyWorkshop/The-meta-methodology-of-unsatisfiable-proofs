@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apophenia | Separating signal from noise</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #111111;
+            --muted: #666666;
+            --border: #e0e0e0;
+            --code-bg: #f5f5f5;
+            --safe: #2d7d46;
+            --unknown: #b8860b;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0a0a0a;
+                --text: #eeeeee;
+                --muted: #999999;
+                --border: #222222;
+                --code-bg: #1a1a1a;
+                --safe: #4caf50;
+                --unknown: #ffc107;
+            }
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            background: var(--bg);
+            max-width: 780px;
+            margin: 0 auto;
+            padding: 60px 24px;
+        }
+
+        header { margin-bottom: 80px; }
+        h1 { font-size: 1.6rem; font-weight: 600; margin-bottom: 4px; letter-spacing: -0.02em; }
+        .tagline { color: var(--muted); font-style: italic; margin-bottom: 30px; font-size: 0.95rem; }
+
+        section { margin-bottom: 70px; }
+        h2 { font-size: 1.15rem; font-weight: 600; margin-top: 50px; margin-bottom: 16px; border-left: 3px solid var(--text); padding-left: 14px; }
+        h3 { font-size: 0.9rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 16px; }
+
+        p { margin-bottom: 1.4rem; }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .product-card {
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: border-color 0.2s;
+        }
+        .product-card:hover { border-color: var(--text); }
+        .product-card h4 { margin: 0 0 8px 0; font-size: 1.05rem; }
+        .product-card p { margin-bottom: 0; font-size: 0.92rem; color: var(--muted); }
+
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+        th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+        th { font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+
+        .status-safe { color: var(--safe); font-weight: 600; }
+        .status-unknown { color: var(--unknown); font-weight: 600; }
+
+        code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            background: var(--code-bg);
+            padding: 0.15em 0.4em;
+            font-size: 0.85rem;
+            border-radius: 3px;
+        }
+
+        pre {
+            background: var(--code-bg);
+            padding: 16px;
+            overflow-x: auto;
+            font-size: 0.85rem;
+            border-radius: 4px;
+            line-height: 1.5;
+        }
+        pre code { background: none; padding: 0; }
+
+        footer {
+            margin-top: 100px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+        a:hover { opacity: 0.7; }
+
+        @media (min-width: 600px) {
+            .product-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Apophenia</h1>
+        <div class="tagline">Separating signal from noise</div>
+        <p>We build tools that determine whether a structural pattern is real or an artifact. Our work sits at the intersection of mathematical proof theory, spectral analysis, and AI orchestration.</p>
+    </header>
+
+    <section id="products">
+        <h3>Products</h3>
+        <div class="product-grid">
+            <div class="product-card">
+                <h4>Illusion</h4>
+                <p>Structural diagnosis of proof barriers. Classifies open problems as SAFE, UNSAFE, or UNKNOWN based on the Universal Closure Axiom.</p>
+            </div>
+            <div class="product-card">
+                <h4>Prism</h4>
+                <p>Spectral constraint engine. Predicts eigenvalue structure of complex systems under UCA duality bounds.</p>
+            </div>
+            <div class="product-card">
+                <h4>Meta-Dispatch</h4>
+                <p>AI model orchestration. Cost-aware routing, adversarial iteration, and structured trace logging for research workflows.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="illusion">
+        <h2>Illusion</h2>
+        <p>Illusion is a structural search engine for proof barriers. Given a mathematical domain, it identifies discriminating transforms that separate provable from unprovable claims.</p>
+
+        <p>Validated across 6 domains:</p>
+
+        <table>
+            <thead>
+                <tr><th>Domain</th><th>Status</th><th>Result</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>AC&#8304; Circuit Complexity</td><td class="status-safe">SAFE</td><td>Rediscovered H&aring;stad's switching lemma</td></tr>
+                <tr><td>Monotone Circuits</td><td class="status-safe">SAFE</td><td>Rediscovered Razborov's approximation</td></tr>
+                <tr><td>Algebraic Circuits</td><td class="status-safe">SAFE</td><td>Partial derivatives method confirmed</td></tr>
+                <tr><td>Resolution Proofs</td><td class="status-safe">SAFE</td><td>Width-size relationship confirmed</td></tr>
+                <tr><td>Frege Systems</td><td class="status-safe">SAFE</td><td>Bounded-depth lower bounds confirmed</td></tr>
+                <tr><td>Riemann Hypothesis</td><td class="status-unknown">UNKNOWN</td><td>Structural gap in Hilbert-P&oacute;lya identified</td></tr>
+            </tbody>
+        </table>
+
+        <p>Key property: Illusion returns SAFE on domains with known proofs and UNKNOWN on open problems. It does not hallucinate solutions.</p>
+
+        <pre><code>$ illusion list
+  Domain       Status     Name
+  circuit      SAFE       Circuit Complexity (AC0 vs Parity)
+  monotone     SAFE       Monotone Circuit Complexity
+  algebraic    SAFE       Algebraic Circuit Complexity
+  resolution   SAFE       Resolution Proof Complexity
+  frege        SAFE       Frege Proof Systems
+  rh           UNKNOWN    Riemann Hypothesis (Hilbert-Polya)
+
+$ illusion demo
+  L2 Search: n=8, depth=3, 20 circuits, 10 transforms
+  Candidates found: 4/10
+  VERDICT: SAFE</code></pre>
+    </section>
+
+    <section id="prism">
+        <h2>Prism</h2>
+        <p>Prism applies UCA spectral constraints to predict eigenvalue distributions of complex systems. Where random matrix theory gives universal statistics, Prism gives system-specific structural bounds.</p>
+        <p>Target applications: network risk propagation, materials phonon spectra, protein interaction networks, quantum hardware verification.</p>
+        <p><em>Status: undergoing external validation on public network datasets. We do not sell Prism until validation is complete.</em></p>
+    </section>
+
+    <section id="meta-dispatch">
+        <h2>Meta-Dispatch</h2>
+        <p>An AI orchestration layer for research teams. Routes tasks to the most appropriate model based on task type, tracks costs by research thread, and runs adversarial iteration loops with automatic convergence detection.</p>
+        <p>Currently used internally. Open beta planned for Q3 2026.</p>
+    </section>
+
+    <section id="research">
+        <h2>Research</h2>
+        <p>Our theoretical foundation is the Universal Closure Axiom (UCA):</p>
+        <pre><code>D &middot; &phi; = &#9733; &middot; D&dagger; &middot; &#9733; &middot; &phi;</code></pre>
+        <p>A field's internal evolution must equal its image under the duality-conjugated constraint. Published papers:</p>
+        <ul style="list-style:none;padding:0;">
+            <li style="margin-bottom:8px;">Paper 1: UCA + Classical Physics (DOI: 10.13140/RG.2.2.11627.91685)</li>
+            <li style="margin-bottom:8px;">Paper 4: UCA + Riemann Hypothesis</li>
+            <li style="margin-bottom:8px;">Paper 5: UCA + BSD Conjecture</li>
+        </ul>
+        <p>All papers available on <a href="https://www.researchgate.net/">ResearchGate</a>.</p>
+    </section>
+
+    <section id="about">
+        <h2>About</h2>
+        <p>Apophenia Pte. Ltd. is an AI-native research company based in Singapore. We determine which perceived structural connections are real before you stake your work on them.</p>
+        <p>The name: apophenia is the tendency to see connections in unrelated things. Our job is to tell you which ones are actually there.</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 Apophenia Pte. Ltd. | Singapore</p>
+        <p><a href="https://github.com/apophenia-labs">GitHub</a></p>
+    </footer>
+
+</body>
+</html>
