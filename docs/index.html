@@ -101,8 +101,11 @@
         a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
         a:hover { opacity: 0.7; }
 
+        ul { padding-left: 1.2em; }
+        li { margin-bottom: 0.5rem; }
+
         @media (min-width: 600px) {
-            .product-grid { grid-template-columns: 1fr 1fr; }
+            .product-grid { grid-template-columns: 1fr 1fr 1fr; }
         }
     </style>
 </head>
@@ -111,7 +114,8 @@
     <header>
         <h1>Apophenia</h1>
         <div class="tagline">Separating signal from noise</div>
-        <p>We build tools that determine whether a structural pattern is real or an artifact. Our work sits at the intersection of mathematical proof theory, spectral analysis, and AI orchestration.</p>
+        <p>Modern science runs on patterns. But not all patterns are real. Most are statistical noise. The cost of confusing them is measured in abandoned research directions, failed clinical trials, and architectural instabilities that surface too late.</p>
+        <p>We build tools that tell the difference. Our engines apply a mathematical constraint framework &mdash; the Universal Closure Axiom &mdash; to separate structural signal from statistical noise in complex systems.</p>
     </header>
 
     <section id="products">
@@ -119,24 +123,24 @@
         <div class="product-grid">
             <div class="product-card">
                 <h4>Illusion</h4>
-                <p>Structural diagnosis of proof barriers. Classifies open problems as SAFE, UNSAFE, or UNKNOWN based on the Universal Closure Axiom.</p>
+                <p>Structural diagnosis for open problems. Input a conjecture, get a classification: provable, or structurally blocked.</p>
             </div>
             <div class="product-card">
                 <h4>Prism</h4>
-                <p>Spectral constraint engine. Predicts eigenvalue structure of complex systems under UCA duality bounds.</p>
+                <p>Spectral constraint analysis for networks. Input a graph, get UCA-constrained eigenvalue bounds and duality diagnostics.</p>
             </div>
             <div class="product-card">
                 <h4>Meta-Dispatch</h4>
-                <p>AI model orchestration. Cost-aware routing, adversarial iteration, and structured trace logging for research workflows.</p>
+                <p>AI orchestration for research workflows. Routes tasks to optimal models with adversarial iteration and cost tracking.</p>
             </div>
         </div>
     </section>
 
     <section id="illusion">
         <h2>Illusion</h2>
-        <p>Illusion is a structural search engine for proof barriers. Given a mathematical domain, it identifies discriminating transforms that separate provable from unprovable claims.</p>
+        <p>Illusion takes an open problem and classifies it: <strong>SAFE</strong> (a constructive proof path exists), <strong>UNKNOWN</strong> (insufficient structural information), or <strong>UNSAFE</strong> (structural obstruction detected). Each classification comes with reasons &mdash; not a probability, not a guess.</p>
 
-        <p>Validated across 6 domains:</p>
+        <p>Validated across 6 mathematical domains:</p>
 
         <table>
             <thead>
@@ -152,7 +156,7 @@
             </tbody>
         </table>
 
-        <p>Key property: Illusion returns SAFE on domains with known proofs and UNKNOWN on open problems. It does not hallucinate solutions.</p>
+        <p>In domains where the answer is known, Illusion found the correct proof technique without being told what to look for. In both cases, the L3 safety layer rejected every false positive that the L2 search layer produced.</p>
 
         <pre><code>$ illusion list
   Domain       Status     Name
@@ -167,26 +171,64 @@ $ illusion demo
   L2 Search: n=8, depth=3, 20 circuits, 10 transforms
   Candidates found: 4/10
   VERDICT: SAFE</code></pre>
+
+        <p>Available as an open-source CLI tool. <a href="https://github.com/AnatomyWorkshop/apophenia">GitHub</a></p>
     </section>
 
     <section id="prism">
         <h2>Prism</h2>
-        <p>Prism applies UCA spectral constraints to predict eigenvalue distributions of complex systems. Where random matrix theory gives universal statistics, Prism gives system-specific structural bounds.</p>
-        <p>Target applications: network risk propagation, materials phonon spectra, protein interaction networks, quantum hardware verification.</p>
-        <p><em>Status: undergoing external validation on public network datasets. We do not sell Prism until validation is complete.</em></p>
+        <p>Prism applies UCA duality constraints to the eigenvalue structure of complex networks. Where random matrix theory gives universal statistics, Prism gives system-specific structural bounds by enforcing self-consistency under duality conjugation.</p>
+
+        <p>Core capability: given a network, Prism computes how much its spectrum must shift to satisfy UCA duality. Networks with small shifts are structurally self-consistent; large shifts indicate asymmetric features that violate duality.</p>
+
+        <pre><code>$ prism demo
+  Prism Demo: Zachary's Karate Club (34 nodes, 78 edges)
+
+  PRISM SPECTRAL ANALYSIS
+  Network: 34 nodes
+  Duality defect (original):    16.733201
+  Duality defect (constrained): 0.00e+00
+  Spectral RMSE (shift):        0.562236
+  Max eigenvalue shift:         1.529174
+  Converged:                    True
+  Time: 0.08s
+
+  VERDICT: Significant duality gap (RMSE = 0.5622)</code></pre>
+
+        <p>Applications:</p>
+        <ul>
+            <li>Network risk propagation &mdash; predict cascade failure thresholds</li>
+            <li>GNN regularization &mdash; duality defect as structural prior</li>
+            <li>Adversarial detection &mdash; perturbations that spike duality defect</li>
+            <li>Graph quality filtering &mdash; discard structurally inconsistent subgraphs</li>
+        </ul>
+
+        <p><em>Status: CLI functional, undergoing validation on public network datasets (SNAP, NetworkX).</em></p>
     </section>
 
     <section id="meta-dispatch">
         <h2>Meta-Dispatch</h2>
-        <p>An AI orchestration layer for research teams. Routes tasks to the most appropriate model based on task type, tracks costs by research thread, and runs adversarial iteration loops with automatic convergence detection.</p>
-        <p>Currently used internally. Open beta planned for Q3 2026.</p>
+        <p>An AI orchestration layer that decomposes research tasks, routes sub-tasks to the most appropriate model, and assembles results with full traceability.</p>
+
+        <p>Features:</p>
+        <ul>
+            <li>Static routing via config &mdash; no black-box decisions</li>
+            <li>Adversarial iteration &mdash; proposer/critic loop with convergence detection</li>
+            <li>@op protocol &mdash; models can trigger tools (diagnose, validate, archive)</li>
+            <li>Cost tracking &mdash; every call logged with token usage and latency</li>
+            <li>Fallback routing &mdash; automatic failover between API endpoints</li>
+        </ul>
+
+        <p>Currently used internally at Apophenia. Open beta planned Q3 2026.</p>
     </section>
 
     <section id="research">
         <h2>Research</h2>
         <p>Our theoretical foundation is the Universal Closure Axiom (UCA):</p>
         <pre><code>D &middot; &phi; = &#9733; &middot; D&dagger; &middot; &#9733; &middot; &phi;</code></pre>
-        <p>A field's internal evolution must equal its image under the duality-conjugated constraint. Published papers:</p>
+        <p>A system's internal evolution must equal its image under duality-conjugated constraint. This single self-consistency condition, applied to different domains, yields the structural skeleton of known physics and the diagnosis of open mathematical problems.</p>
+
+        <p>Published papers:</p>
         <ul style="list-style:none;padding:0;">
             <li style="margin-bottom:8px;">Paper 1: UCA + Classical Physics (DOI: 10.13140/RG.2.2.11627.91685)</li>
             <li style="margin-bottom:8px;">Paper 4: UCA + Riemann Hypothesis</li>
@@ -197,13 +239,14 @@ $ illusion demo
 
     <section id="about">
         <h2>About</h2>
-        <p>Apophenia Pte. Ltd. is an AI-native research company based in Singapore. We determine which perceived structural connections are real before you stake your work on them.</p>
-        <p>The name: apophenia is the tendency to see connections in unrelated things. Our job is to tell you which ones are actually there.</p>
+        <p>Apophenia is the tendency to perceive meaningful connections between unrelated things. It is a cognitive bias &mdash; but it is also the engine of pattern recognition and the origin of scientific hypothesis.</p>
+        <p>Our job is to determine which perceived connections are real.</p>
+        <p>Apophenia Pte. Ltd. is an AI-native research company based in Singapore. We work with research institutions, independent scientists, and technical teams who need to know whether a pattern is real &mdash; before they stake their work on it.</p>
     </section>
 
     <footer>
         <p>&copy; 2026 Apophenia Pte. Ltd. | Singapore</p>
-        <p><a href="https://github.com/apophenia-labs">GitHub</a></p>
+        <p><a href="https://github.com/AnatomyWorkshop/apophenia">GitHub</a></p>
     </footer>
 
 </body>
