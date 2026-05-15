@@ -72,14 +72,14 @@ illusion/           Proof barrier diagnosis (CLI + experiments)
 prism/              Network spectral constraint analysis (CLI)
 meta-dispatch/      AI model router + adversarial iteration
 papers/             Published research (UCA series)
-docs/               Website (GitHub Pages)
-archive/            Historical research process
 ```
 
 Each product has its own README:
 - [illusion/](illusion/) — install, commands, domain list
 - [prism/](prism/) — install, usage, algorithm, applications
 - [meta-dispatch/](meta-dispatch/) — routing, @op protocol, adversarial iteration
+
+Note: `docs/`, `archive/`, and experiment results are excluded from ZIP downloads. Clone the repo for full access.
 
 ---
 

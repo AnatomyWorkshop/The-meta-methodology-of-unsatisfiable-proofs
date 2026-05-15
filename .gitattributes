@@ -1,0 +1,7 @@
+# Directories not needed by end users (excluded from GitHub ZIP downloads)
+docs/               export-ignore
+archive/            export-ignore
+lab/                export-ignore
+private/            export-ignore
+illusion/phase*/results/  export-ignore
+.claude/            export-ignore
