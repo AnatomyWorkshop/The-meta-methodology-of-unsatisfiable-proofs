@@ -76,6 +76,11 @@ docs/               Website (GitHub Pages)
 archive/            Historical research process
 ```
 
+Each product has its own README:
+- [illusion/](illusion/) — install, commands, domain list
+- [prism/](prism/) — install, usage, algorithm, applications
+- [meta-dispatch/](meta-dispatch/) — routing, @op protocol, adversarial iteration
+
 ---
 
 ## Website
