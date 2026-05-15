@@ -1,0 +1,23 @@
+[project]
+name = "prism"
+version = "0.1.0"
+description = "UCA-constrained spectral analysis for complex networks"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "Apophenia", email = "contact@apophenia.ai"}]
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "networkx>=3.0",
+]
+
+[project.scripts]
+prism = "prism.cli:main"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["prism*"]
