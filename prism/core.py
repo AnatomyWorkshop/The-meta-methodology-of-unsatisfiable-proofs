@@ -34,6 +34,7 @@ class PrismResult:
     n_iterations: int
     converged: bool
     metadata: dict
+    constrained_matrix: np.ndarray = None
 
 
 def parity_operator(n: int) -> np.ndarray:
@@ -180,6 +181,107 @@ def optimize(
             "reg": reg,
             "final_loss": float(result.fun),
         },
+        constrained_matrix=L_constrained,
+    )
+
+
+def learned_parity_operator(L: np.ndarray) -> np.ndarray:
+    """
+    Learn the intrinsic duality operator P from the network's spectral structure.
+
+    Strategy: find the permutation matrix P that maximizes the block-diagonal
+    structure of L in the P-eigenbasis, i.e., minimizes ||[L, P]||_F over all
+    involutory permutation matrices P (P^2 = I, P != I).
+
+    For a network with true community structure, the natural duality pairs nodes
+    across communities. This is found by looking at the Fiedler vector: nodes
+    with opposite signs in the Fiedler vector are natural duality partners.
+
+    Returns an involutory symmetric matrix P with P^2 = I.
+    """
+    n = L.shape[0]
+    eigenvalues, eigenvectors = np.linalg.eigh(L)
+
+    # Fiedler vector: second eigenvector (first non-trivial)
+    fiedler = eigenvectors[:, 1]
+
+    # Sort nodes by Fiedler value
+    order = np.argsort(fiedler)
+
+    # Pair node i (low Fiedler) with node n-1-i (high Fiedler)
+    # This creates a natural duality: nodes on opposite sides of the cut
+    perm = np.zeros(n, dtype=int)
+    for rank, node in enumerate(order):
+        perm[node] = order[n - 1 - rank]
+
+    # Build permutation matrix
+    P = np.zeros((n, n))
+    for i in range(n):
+        P[i, perm[i]] = 1.0
+
+    # Make it symmetric (average with transpose to handle non-involutory cases)
+    P = (P + P.T) / 2
+    # Re-normalize rows to keep it close to involutory
+    # For a true pairing perm[perm[i]] = i, P is already symmetric and P^2 = I
+    return P
+
+
+def optimize_with_P(
+    L: np.ndarray,
+    P: np.ndarray,
+    reg: float = 1e-6,
+    max_iter: int = 2000,
+    tol: float = 1e-10,
+) -> PrismResult:
+    """
+    Find the closest UCA-compatible Laplacian to L using a given P operator.
+    Same as optimize() but accepts an arbitrary P instead of index-reversal.
+    """
+    n = L.shape[0]
+    L_sym = (L + L.T) / 2
+
+    defect_original = np.linalg.norm(L_sym @ P - P @ L_sym, 'fro')
+
+    # Compute P-eigenbasis
+    evals, evecs = np.linalg.eigh(P)
+    idx_minus = np.where(evals < 0)[0]
+    idx_plus = np.where(evals >= 0)[0]
+    U = evecs
+    m_plus = len(idx_plus)
+    m_minus = len(idx_minus)
+
+    M_plus_0, M_minus_0 = matrix_to_blocks(L_sym, U, idx_plus, idx_minus)
+    x0 = blocks_to_params(M_plus_0, M_minus_0)
+    original_eigs = np.sort(np.linalg.eigvalsh(L_sym))
+
+    result = minimize(
+        proximity_loss,
+        x0,
+        args=(U, idx_plus, idx_minus, n, m_plus, m_minus, L_sym, reg),
+        method='L-BFGS-B',
+        options={'maxiter': max_iter, 'ftol': tol, 'gtol': 1e-12},
+    )
+
+    M_plus_f, M_minus_f = params_to_blocks(result.x, m_plus, m_minus)
+    L_constrained = blocks_to_matrix(M_plus_f, M_minus_f, U, idx_plus, idx_minus, n)
+    constrained_eigs = np.sort(np.linalg.eigvalsh(L_constrained))
+    defect_constrained = np.linalg.norm(L_constrained @ P - P @ L_constrained, 'fro')
+    spectral_shift = constrained_eigs - original_eigs
+    rmse = np.sqrt(np.mean(spectral_shift ** 2))
+
+    return PrismResult(
+        original_eigenvalues=original_eigs,
+        constrained_eigenvalues=constrained_eigs,
+        duality_defect_original=defect_original,
+        duality_defect_constrained=defect_constrained,
+        spectral_shift=spectral_shift,
+        rmse=rmse,
+        max_shift=np.max(np.abs(spectral_shift)),
+        n_iterations=result.nit,
+        converged=result.success,
+        metadata={"n": n, "m_plus": m_plus, "m_minus": m_minus,
+                  "reg": reg, "final_loss": float(result.fun)},
+        constrained_matrix=L_constrained,
     )
 
 
