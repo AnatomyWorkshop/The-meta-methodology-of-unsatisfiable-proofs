@@ -49,8 +49,9 @@ of geometric and spectral proof strategies for RH, and $P_{\mathrm{AC}}$
 (arithmetic compactness) is the discriminating property. The conflict
 condition follows from Deligne's proof of the Weil conjectures (1974):
 any compact arithmetic scheme $X$ whose $L$-function equals the Riemann
-zeta function would force all zeta zeros onto the critical line---which
-is RH itself. The self-referential safety condition follows from the fact
+zeta function would immediately yield RH---so establishing this
+identification is not a step toward RH but is RH itself, of equal
+difficulty. The self-referential safety condition follows from the fact
 that deciding $P_{\mathrm{AC}}$ requires establishing this identification,
 which is outside the scope of any strategy in $M_{\mathrm{RH}}$.
 
@@ -93,7 +94,8 @@ certificate} in the sense of the meta-methodological framework
 $\MRH$ of geometric and spectral strategies, not just known instances.
 The key tool is Deligne's theorem \cite{deligne1974}, which forces
 any compact arithmetic scheme to satisfy RH for its own $L$-function---
-making the identification with $\zeta(s)$ circular.
+making the identification with $\zeta(s)$ not circular in principle,
+but irreducible: establishing it is of equal difficulty to RH itself.
 
 \subsection*{Main result}
 
@@ -325,7 +327,9 @@ by this argument. Such a proof would lie outside $\MRH$ by definition.
 
 \begin{proposition}
 \label{prop:conflict}
-Any strategy $\mathcal{A} \in \MRH$ satisfying $\PAC$ cannot prove RH.
+Any strategy $\mathcal{A} \in \MRH$ satisfying $\PAC$ cannot prove RH
+without the identification step $L(H^1(X),s) = \zeta(s)$ being
+equivalent to RH itself.
 \end{proposition}
 
 \begin{proof}
@@ -346,19 +350,33 @@ Therefore \emph{all} zeros of $L(H^1(X), s)$ lie on the critical line.
 If $L(H^1(X), s) = \zeta(s)$, then all non-trivial zeros of $\zeta(s)$
 lie on the critical line. That is RH.
 
-Therefore: the identification $L(H^1(X), s) = \zeta(s)$ is equivalent
-to RH. Any strategy satisfying $\PAC$ must establish this identification
-as a step---but establishing it \emph{is} proving RH. The strategy
-cannot prove RH without already having proved RH. Constraint (C2) is
-violated.
+Therefore: establishing the identification $L(H^1(X), s) = \zeta(s)$
+\emph{implies} RH. This is not a logical circularity---the identification
+does not \emph{assume} RH. However, it means that the identification
+step is not a lemma on the way to RH; it \emph{is} RH. Any strategy
+satisfying $\PAC$ must produce this identification as an intermediate
+step, but no such step can be easier than RH itself: any method that
+constructs $X/\FF_q$ with $L(H^1(X),s) = \zeta(s)$ has already proved
+RH (by Deligne). The strategy reduces RH to a step of equal difficulty.
+Constraint (C3) is not satisfied: the strategy does not prove
+$W_-(f,f) \geq 0$; it merely restates the problem in geometric language.
 \end{proof}
 
 \begin{remark}
-The conflict condition does not rely on any unproved conjecture. It
-uses only Deligne's theorem \cite{deligne1974}, which is a theorem.
-The argument is: Deligne forces $L(H^1(X),s)$ to satisfy RH; therefore
-$L(H^1(X),s) = \zeta(s)$ implies $\zeta(s)$ satisfies RH; therefore
-the identification step assumes what it is trying to prove.
+\label{rem:conflict-clarification}
+The conflict condition is not a claim of logical circularity. It is a
+claim of \emph{irreducibility}: the identification $L(H^1(X),s) =
+\zeta(s)$ is not a step that can be established independently of RH,
+because Deligne's theorem makes it immediately equivalent to RH. A
+strategy satisfying $\PAC$ does not assume RH (it satisfies C2), but
+it cannot complete its proof without establishing a fact of equal
+difficulty to RH. This is the structural obstruction.
+
+No known method constructs $X/\FF_q$ with $L(H^1(X),s) = \zeta(s)$
+without assuming RH. The non-existence of such $X$ is itself a
+consequence of the fact that $\zeta(s)$ has zeros off the critical
+line if RH is false---so any $X$ with $L(H^1(X),s) = \zeta(s)$ would
+force RH to be true, and constructing $X$ unconditionally would prove RH.
 \end{remark}
 
 \subsection{Self-referential safety}
@@ -476,8 +494,10 @@ Connes \cite{connes1999} identified the spectral interpretation of
 zeta zeros and explicitly noted that the positivity of $W_-$ is the
 key unproved step. The present work makes precise \emph{why} this
 step cannot be proved within $\MRH$: any strategy satisfying $\PAC$
-must establish $L(H^1(X),s) = \zeta(s)$, which is equivalent to RH
-(Proposition~\ref{prop:conflict}).
+must establish $L(H^1(X),s) = \zeta(s)$, which by Deligne's theorem
+is of equal difficulty to RH itself---not a lemma, but the full problem
+restated in geometric language (Proposition~\ref{prop:conflict},
+Remark~\ref{rem:conflict-clarification}).
 
 Faltings \cite{faltings1984} proved the arithmetic Hodge Index Theorem
 for single arithmetic surfaces. This does not satisfy $\PAC$ because
