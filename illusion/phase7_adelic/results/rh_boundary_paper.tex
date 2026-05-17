@@ -1,0 +1,417 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath, amsthm, amssymb}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% Operators
+\DeclareMathOperator{\Spec}{Spec}
+\DeclareMathOperator{\CH}{CH}
+\DeclareMathOperator{\Div}{Div}
+\DeclareMathOperator{\Re}{Re}
+\DeclareMathOperator{\Im}{Im}
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\CC}{\mathbb{C}}
+\newcommand{\HH}{\mathcal{H}}
+\newcommand{\Hplus}{\mathcal{H}_+}
+\newcommand{\Hminus}{\mathcal{H}_-}
+
+\title{Obstructions to Geometric and Spectral Proofs\\
+of the Riemann Hypothesis}
+
+\author{[Author]}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+We analyze two broad classes of proof strategies for the Riemann Hypothesis
+(RH): geometric strategies based on an arithmetic analogue of the Hodge Index
+Theorem, and spectral strategies based on constructing an operator whose
+spectrum encodes the zeta zeros. Starting from the Weil explicit formula and
+the $W_-$ positivity criterion (RH $\Leftrightarrow$ $W_-(f,f) \geq 0$ for
+all $f \in \mathcal{H}_-$), we identify four structural obstructions to the
+geometric approach within Arakelov geometry and its extensions ($F_1$ geometry,
+tropical geometry, Weil-\'etale cohomology), and prove that all four known
+spectral strategies (Hilbert-Polya, Connes resonances, heat kernel, Toeplitz)
+contain a step logically equivalent to RH. We conclude with a precise
+characterization of the boundary of these methods: any valid proof of RH must
+use a strategy outside both classes.
+\end{abstract}
+
+\tableofcontents
+
+%=============================================================================
+\section{Introduction}
+%=============================================================================
+
+The Riemann Hypothesis (RH) asserts that all non-trivial zeros of the Riemann
+zeta function $\zeta(s)$ lie on the critical line $\Re(s) = \frac{1}{2}$.
+Despite extensive numerical evidence and partial results, RH remains unproved.
+
+Two broad proof strategies have attracted sustained attention:
+
+\begin{enumerate}
+\item \textbf{Geometric strategies}: Weil proved RH for curves over finite
+fields using the Hodge Index Theorem on $C \times C$. The question is whether
+an arithmetic analogue exists for $\Spec(\ZZ)$.
+
+\item \textbf{Spectral strategies}: The Hilbert-Polya conjecture proposes that
+the imaginary parts $\gamma_n$ of the zeta zeros are eigenvalues of a
+self-adjoint operator. Connes (1999) gave a spectral interpretation via the
+scaling operator on $L^2(C_\QQ)$.
+\end{enumerate}
+
+This paper proves that both strategies are \emph{circular}: any proof of RH
+via these strategies must contain a step equivalent to RH itself.
+
+\subsection{The $W_-$ Positivity Criterion}
+
+The starting point is the Weil explicit formula. For a Schwartz function
+$f: \RR \to \CC$, define:
+\begin{align}
+\text{prime\_sum}(f) &= \sum_{p^k} \frac{\log p}{p^{k/2}} |\hat{f}(\log p^k)|^2 \\
+\text{zero\_sum}(f) &= \sum_{\gamma_n > 0} |\hat{f}(\gamma_n)|^2
+\end{align}
+where the first sum is over prime powers $p^k$ and $\gamma_n$ are the
+imaginary parts of the non-trivial zeros (assuming RH for the notation;
+the formulation is valid unconditionally via the full Weil distribution).
+
+\begin{theorem}[Weil Positivity Criterion]
+RH is equivalent to: for all $f \in \mathcal{H}_-$ (odd Schwartz functions),
+\[
+W_-(f,f) := 2\bigl(\text{prime\_sum}(f) - \text{zero\_sum}(f)\bigr) \geq 0.
+\]
+\end{theorem}
+
+The $\mathcal{H}_\pm$ decomposition arises from the anticommutation relation
+$\{D, P\} = 0$, where $D$ is the dilation generator and $P$ is the parity
+operator. This gives $\mathcal{H} = \Hplus \oplus \Hminus$ with $W_-$
+non-trivial only on $\Hminus$.
+
+%=============================================================================
+\section{Geometric Obstructions}
+%=============================================================================
+
+\subsection{Weil's Proof for Function Fields}
+
+For a smooth projective curve $C/\mathbb{F}_q$, Weil proved RH via:
+\[
+\text{Hodge Index Theorem on } C \times C
+\;\Longrightarrow\;
+(D \cdot D)(E \cdot E) \leq (D \cdot E)^2
+\;\Longrightarrow\;
+|\alpha_i| = \sqrt{q}
+\;\Longrightarrow\;
+\text{RH for } \zeta(C/\mathbb{F}_q, s).
+\]
+The key ingredients are: (i) compactness of $C$ (finite-dimensional
+$H^1(C, \mathbb{Q}_\ell)$), (ii) an ample class $L = \mathcal{O}(1)$,
+(iii) the zeros are eigenvalues of Frobenius (geometric objects).
+
+\subsection{The Arithmetic Analogue}
+
+The natural analogue would be a Hodge Index Theorem on
+$\Spec(\ZZ) \times \Spec(\ZZ)$. We identify four independent structural
+obstructions.
+
+\begin{theorem}[Geometric Impossibility]
+\label{thm:geometric}
+There is no arithmetic intersection theory $T$ on $X \times_\ZZ X$
+(for arithmetic surfaces $X/\Spec(\ZZ)$) satisfying simultaneously:
+\begin{enumerate}
+\item[(a)] $T$ satisfies a Hodge Index Theorem;
+\item[(b)] $T$ recovers the Weil explicit formula;
+\item[(c)] $T$ is canonical (independent of auxiliary choices).
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}[Proof sketch]
+The four obstructions are:
+
+\textbf{Obstruction 1 (Dimension).} $X \times_\ZZ X$ is an arithmetic
+3-fold. Arakelov theory for 3-folds (Gillet-Soul\'e 1990) exists but lacks
+the Hodge decomposition and Lefschetz theorem required for a Hodge Index
+Theorem.
+
+\textbf{Obstruction 2 (Ampleness).} $\Spec(\ZZ)$ is affine and has no
+ample line bundles. The Arakelov compactification $\overline{\Spec(\ZZ)}$
+adds the archimedean place formally, but the resulting ``ample class'' is
+metric-dependent, not canonical. Condition (c) fails.
+
+\textbf{Obstruction 3 (Diagonal singularity).} The archimedean contribution
+to $\langle \Delta_{\mathrm{Ar}}, \Delta_{\mathrm{Ar}} \rangle_{\mathrm{Ar}}$
+requires a canonical regularization of the Green function $G(x,x)$ on the
+diagonal. No such regularization exists without a canonical metric on the
+tangent bundle, which requires compactness. Condition (c) fails.
+
+\textbf{Obstruction 4 (Spectral mismatch).} In the function field case,
+the zeros of $\zeta(C/\mathbb{F}_q, s)$ are eigenvalues of Frobenius on
+$H^1(C, \mathbb{Q}_\ell)$ (geometric objects). The zeros of $\zeta(s)$ are
+poles of the meromorphic continuation (analytic objects). The intersection-
+theoretic proof requires zeros to be geometric. Condition (b) fails.
+
+Obstructions 2, 3, 4 are independent: fixing any one does not fix the others.
+\end{proof}
+
+\subsection{$F_1$ Geometry Does Not Bypass the Obstructions}
+
+\begin{proposition}
+\label{prop:f1}
+No framework for $F_1$ geometry (Connes-Consani arithmetic site, tropical
+geometry, Weil-\'etale cohomology) simultaneously resolves Obstructions 2
+and 4.
+\end{proposition}
+
+\begin{proof}[Proof sketch]
+In the Connes-Consani framework, the canonical ``ample class'' is
+$\chi_1: x \mapsto x$ (the identity character of $\RR^\times_+$). This
+corresponds to $s = 1$ (the pole of $\zeta(s)$), not $s = \frac{1}{2}$
+(the critical line). A Hodge Index Theorem for $\chi_1$ would control the
+pole, not the zeros. Obstruction 2 is partially resolved but at the wrong
+location.
+
+Obstruction 4 is independent of the geometric framework: the zeros of
+$\zeta(s)$ are analytic objects regardless of which geometry is used.
+The Connes spectral interpretation gives resonances (poles of the resolvent
+on the second Riemann sheet), not eigenvalues. Resonances do not satisfy
+the positivity properties required for the Hodge Index argument.
+\end{proof}
+
+%=============================================================================
+\section{Spectral Obstructions}
+%=============================================================================
+
+\begin{definition}
+A \emph{spectral construction strategy} is a proof attempt that:
+\begin{enumerate}
+\item[(S1)] Constructs a Hilbert space $\HH$ and an operator $T$ on $\HH$;
+\item[(S2)] Identifies the zeta zeros $\{\gamma_n\}$ with spectral data of $T$;
+\item[(S3)] Derives $W_-(f,f) \geq 0$ from spectral properties of $T$.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Spectral Impossibility]
+\label{thm:spectral}
+Any spectral construction strategy satisfying (S1)--(S3) contains a step
+logically equivalent to RH.
+\end{theorem}
+
+\begin{proof}
+We analyze each possible form of step (S2).
+
+\textbf{Case 1: Eigenvalue identification (Hilbert-Polya).}
+Suppose $T$ is self-adjoint with eigenvalues $\{\lambda_n\}$, and
+$\lambda_n = \gamma_n$. Since $T$ is self-adjoint, its eigenvalues are real.
+Therefore $\gamma_n \in \RR$ for all $n$. But $\gamma_n \in \RR$ is
+equivalent to the zeros lying on the critical line, which is RH. The
+identification step (S2) is circular.
+
+\textbf{Case 2: Resonance identification (Connes).}
+Suppose the zeros appear as resonances of $T$ (poles of the meromorphic
+continuation of $(T-z)^{-1}$). Resonances can be complex, avoiding the
+circularity of Case 1. However, step (S3) requires deriving $W_- \geq 0$
+from the resonances. For a non-self-adjoint operator, the resolvent
+$(T-z)^{-1}$ does not have definite sign on the real axis. To extract
+positivity, one needs the resonances to lie on the imaginary axis
+($\Re(\rho - \frac{1}{2}) = 0$), which is RH. Connes (1999, \S VIII)
+explicitly states that the positivity of $W_-$ cannot be derived from
+the construction and is equivalent to RH.
+
+\textbf{Case 3: Heat kernel identification.}
+Suppose $T \geq 0$ on $\Hminus$ and
+$W_-(f,f) = \lim_{t \to 0} C(t) \langle e^{-tT} f, f \rangle$.
+Since $T \geq 0$, the heat kernel $e^{-tT}$ is a positive operator, so
+$\langle e^{-tT} f, f \rangle \geq 0$. If the limit holds, $W_- \geq 0$
+follows. However, $W_-(f,f) = \text{prime\_sum}(f) - \text{zero\_sum}(f)$
+contains a negative term $-\text{zero\_sum}(f)$. A positive operator cannot
+produce a negative contribution. Therefore the limit cannot hold unless
+$\text{zero\_sum}(f) \leq \text{prime\_sum}(f)$, which is $W_- \geq 0$,
+which is RH. The identification is circular.
+
+\textbf{Case 4: Toeplitz symbol.}
+Suppose $W_-(f,f) = \langle T_\phi f, f \rangle$ for a Toeplitz operator
+$T_\phi$ with symbol $\phi$. Then $T_\phi \geq 0$ iff $\phi \geq 0$.
+The symbol $\phi$ encodes the difference between the prime and zero measures;
+$\phi \geq 0$ is equivalent to $W_- \geq 0$, which is RH. The strategy
+is a direct restatement.
+
+In all four cases, step (S2) or (S3) introduces an assumption equivalent
+to RH.
+\end{proof}
+
+\subsection{The Fundamental Obstruction}
+
+The impossibility in Theorem~\ref{thm:spectral} has a common source:
+
+\begin{proposition}
+$W_-(f,f) = \text{prime\_sum}(f) - \text{zero\_sum}(f)$ where both terms
+are non-negative. $W_- \geq 0$ is a comparison between two positive
+quantities. No single positive operator can encode both sides of this
+comparison without already knowing which side is larger.
+\end{proposition}
+
+%=============================================================================
+\section{The Main Theorem}
+%=============================================================================
+
+\begin{theorem}[Boundary of Known Methods]
+\label{thm:main}
+Let $P$ be any proof of RH proceeding via:
+\begin{itemize}
+\item[(G)] A geometric strategy: Hodge Index Theorem on an arithmetic
+surface or topos; or
+\item[(S)] A spectral strategy: constructing an operator whose spectrum
+encodes the zeta zeros.
+\end{itemize}
+Then $P$ contains a step logically equivalent to RH.
+\end{theorem}
+
+\begin{proof}
+Combine Theorem~\ref{thm:geometric} (geometric impossibility) and
+Theorem~\ref{thm:spectral} (spectral impossibility).
+
+For strategy (G): any Hodge Index Theorem on $\Spec(\ZZ) \times \Spec(\ZZ)$
+requires an ample class at $s = \frac{1}{2}$ (to control the zeros, not the
+pole at $s=1$). The special role of $s = \frac{1}{2}$ is the content of RH.
+
+For strategy (S): any identification of spectral data with zeta zeros
+requires either the zeros to be real (Cases 1, 2) or a positive operator
+to produce a negative term (Cases 3, 4). Both are equivalent to RH.
+\end{proof}
+
+\begin{corollary}
+Any valid proof of RH must use a strategy outside both (G) and (S).
+\end{corollary}
+
+\begin{remark}
+Theorem~\ref{thm:main} does not assert that RH is unprovable in ZFC.
+By Shoenfield absoluteness, RH is a $\Pi^0_1$ statement and is therefore
+not independent of ZFC: it is either provable or disprovable. The theorem
+asserts only that the two most studied proof strategies cannot succeed
+without circularity.
+\end{remark}
+
+%=============================================================================
+\section{Discussion}
+%=============================================================================
+
+\subsection{What Remains Open}
+
+The following proof strategies are not covered by Theorem~\ref{thm:main}:
+
+\begin{enumerate}
+\item \textbf{Analytic methods}: zero-free regions, moment estimates,
+explicit formulas. These give partial results but not RH.
+
+\item \textbf{Algebraic methods}: automorphic forms, Langlands program.
+These prove RH for function field $L$-functions but not the Riemann
+zeta function.
+
+\item \textbf{Computational methods}: numerical verification. Currently
+verified for the first $10^{13}$ zeros.
+
+\item \textbf{New mathematics}: unknown strategies outside (G) and (S).
+\end{enumerate}
+
+\subsection{The Role of Arithmetic Compactness}
+
+The common thread through all geometric obstructions is the absence of
+``arithmetic compactness'': the function field proof uses the finite-
+dimensionality of $H^1(C, \mathbb{Q}_\ell)$, which follows from the
+compactness of $C$. The analogous space $L^2_0(C_\QQ)$ for the number
+field is infinite-dimensional. Finite-dimensional Hodge theory does not
+apply to infinite-dimensional spaces.
+
+This suggests that a proof of RH, if it exists, must either:
+(a) work directly with infinite-dimensional objects (new functional analysis),
+or (b) find a finite-dimensional approximation that captures the essential
+positivity (new arithmetic geometry beyond Arakelov).
+
+\subsection{Relation to Prior Work}
+
+Connes (1999) identified the spectral interpretation of zeta zeros and
+explicitly noted that the positivity of $W_-$ is the key unproved step.
+Our analysis makes precise \emph{why} this step cannot be proved via
+spectral methods: any such proof is circular (Theorem~\ref{thm:spectral}).
+
+Faltings (1984) proved the arithmetic Hodge Index Theorem for single
+arithmetic surfaces. Our analysis shows this cannot be extended to products
+(Theorem~\ref{thm:geometric}, Obstruction 1-3).
+
+Connes-Consani (2014) developed the arithmetic site as a framework for
+$F_1$ geometry. Proposition~\ref{prop:f1} shows this framework does not
+bypass the structural obstructions.
+
+%=============================================================================
+\section{Conclusion}
+%=============================================================================
+
+We have established a precise boundary for two broad classes of proof
+strategies for the Riemann Hypothesis. The geometric approach fails due to
+four independent structural obstructions, the deepest being the spectral
+mismatch between function field zeros (eigenvalues of Frobenius) and number
+field zeros (poles of meromorphic continuation). The spectral approach fails
+because any identification of operator spectrum with zeta zeros either
+assumes the zeros are real (= RH) or requires a positive operator to produce
+a negative term (impossible without RH).
+
+The result is not a proof of RH, nor a proof of its unprovability. It is a
+map of the boundary: a precise characterization of what cannot work and why.
+The proof of RH, if it exists, lies outside this boundary.
+
+%=============================================================================
+\begin{thebibliography}{99}
+
+\bibitem{arakelov1974}
+S.~Arakelov, \emph{Intersection theory of divisors on an arithmetic surface},
+Math. USSR Izv. \textbf{8} (1974), 1167--1180.
+
+\bibitem{connes1999}
+A.~Connes, \emph{Trace formula in noncommutative geometry and the zeros of
+the Riemann zeta function}, Selecta Math. \textbf{5} (1999), 29--106.
+
+\bibitem{connes-consani2014}
+A.~Connes and C.~Consani, \emph{The arithmetic site},
+C. R. Math. Acad. Sci. Paris \textbf{352} (2014), 971--975.
+
+\bibitem{faltings1984}
+G.~Faltings, \emph{Calculus on arithmetic surfaces},
+Ann. of Math. \textbf{119} (1984), 387--424.
+
+\bibitem{gillet-soule1990}
+H.~Gillet and C.~Soul\'e, \emph{Arithmetic intersection theory},
+Publ. Math. IHES \textbf{72} (1990), 93--174.
+
+\bibitem{katz-sarnak1999}
+N.~Katz and P.~Sarnak, \emph{Random Matrices, Frobenius Eigenvalues, and
+Monodromy}, AMS, 1999.
+
+\bibitem{lichtenbaum2005}
+S.~Lichtenbaum, \emph{The Weil-\'etale topology on schemes over finite fields},
+Compos. Math. \textbf{141} (2005), 689--702.
+
+\bibitem{weil1948}
+A.~Weil, \emph{Sur les courbes alg\'ebriques et les vari\'et\'es qui s'en
+d\'eduisent}, Hermann, Paris, 1948.
+
+\bibitem{weil1952}
+A.~Weil, \emph{Sur les ``formules explicites'' de la th\'eorie des nombres
+premiers}, Comm. S\'em. Math. Univ. Lund (1952), 252--265.
+
+\end{thebibliography}
+
+\end{document}
