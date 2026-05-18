@@ -15,6 +15,7 @@ import numpy as np
 from pathlib import Path
 
 from prism.core import analyze_network, parity_operator, PrismResult
+from prism.learnable import optimize_learnable_multistart, interpret_P, LearnableResult
 
 
 def load_network(path: str, fmt: str = "auto") -> np.ndarray:
@@ -131,6 +132,86 @@ def print_result(result: PrismResult, verbose: bool = False):
     print()
 
 
+def cmd_discover(args):
+    """Discover hidden mirror structure via learnable duality operator."""
+    A = load_network(args.input, fmt=args.format)
+    n = A.shape[0]
+    D = np.diag(A.sum(axis=1))
+    L = D - A
+
+    print(f"Prism Discover: {n} nodes, learning duality structure...")
+    print(f"  Starts: {args.starts}, max_iter: {args.max_iter}")
+    print()
+
+    start = time.time()
+    result = optimize_learnable_multistart(
+        L,
+        alpha=args.alpha,
+        beta=args.beta,
+        gamma=args.gamma,
+        max_iter=args.max_iter,
+        n_starts=args.starts,
+        verbose=args.verbose,
+    )
+    elapsed = time.time() - start
+
+    interp = interpret_P(result.learned_P)
+
+    print(f"{'=' * 60}")
+    print(f"  PRISM DISCOVER: LEARNED DUALITY STRUCTURE")
+    print(f"{'=' * 60}")
+    print(f"  Network:              {n} nodes")
+    print(f"  Duality defect:       {result.duality_defect_constrained:.6f}")
+    print(f"  Involution defect:    {result.involution_defect:.6f}  (0 = perfect P^2=I)")
+    print(f"  Spectral RMSE:        {result.spectral_rmse:.6f}")
+    print(f"  Converged:            {result.converged}")
+    print(f"  Time:                 {elapsed:.2f}s")
+    print()
+    print(f"  Learned duality structure:")
+    print(f"    Cross-dual pairs:   {interp['n_pairs']}  (nodes mapped to mirror nodes)")
+    print(f"    Self-dual nodes:    {interp['n_self_dual']}  (nodes mapped to themselves)")
+    print(f"    Is involution:      {interp['is_involution']}")
+
+    if interp['n_pairs'] > 0:
+        print()
+        print(f"  Mirror pairs (node i <-> node j):")
+        for i, j in interp['cross_dual_pairs'][:10]:
+            strength = float(result.learned_P[i, j])
+            print(f"    {i:>4} <-> {j:<4}  (strength: {strength:.3f})")
+        if len(interp['cross_dual_pairs']) > 10:
+            print(f"    ... ({len(interp['cross_dual_pairs']) - 10} more pairs)")
+
+    print()
+    if result.duality_defect_constrained < 0.1 and interp['n_pairs'] > 0:
+        print("  VERDICT: Hidden mirror structure found.")
+        print("  The network contains nodes that are spectrally dual to each other.")
+        print("  These pairs may represent opposing communities, roles, or functions.")
+    elif result.duality_defect_constrained < 0.1:
+        print("  VERDICT: Network is self-dual (no cross-mirror structure).")
+        print("  All nodes map to themselves under the learned duality.")
+    else:
+        print("  VERDICT: Weak duality structure. Network may lack clear mirror symmetry.")
+        print("  Try --starts with a higher value for better optimization.")
+
+    if args.json:
+        out = {
+            "n": n,
+            "duality_defect": result.duality_defect_constrained,
+            "involution_defect": result.involution_defect,
+            "spectral_rmse": result.spectral_rmse,
+            "converged": result.converged,
+            "n_pairs": interp["n_pairs"],
+            "n_self_dual": interp["n_self_dual"],
+            "cross_dual_pairs": interp["cross_dual_pairs"],
+            "learned_P": result.learned_P.tolist(),
+        }
+        if args.output:
+            Path(args.output).write_text(json.dumps(out, indent=2))
+            print(f"\n  Results written to: {args.output}")
+        else:
+            print(json.dumps(out, indent=2))
+
+
 def cmd_analyze(args):
     A = load_network(args.input, fmt=args.format)
     n = A.shape[0]
@@ -231,6 +312,19 @@ def main():
     p_analyze.add_argument("--output", "-o", help="Write JSON results to file")
     p_analyze.add_argument("--verbose", "-v", action="store_true")
 
+    # discover
+    p_discover = subparsers.add_parser("discover", help="Learn hidden mirror structure (v0.2)")
+    p_discover.add_argument("input", help="Input file (edgelist, .npy, or .csv)")
+    p_discover.add_argument("--format", default="auto", choices=["auto", "edgelist", "npy", "csv"])
+    p_discover.add_argument("--starts", type=int, default=5, help="Number of random starts")
+    p_discover.add_argument("--max-iter", type=int, default=400, help="Max optimizer iterations")
+    p_discover.add_argument("--alpha", type=float, default=2.0, help="Duality constraint weight")
+    p_discover.add_argument("--beta", type=float, default=1.0, help="Involution constraint weight")
+    p_discover.add_argument("--gamma", type=float, default=0.2, help="Community regularizer weight")
+    p_discover.add_argument("--json", action="store_true", help="Output JSON")
+    p_discover.add_argument("--output", "-o", help="Write JSON results to file")
+    p_discover.add_argument("--verbose", "-v", action="store_true")
+
     # check
     p_check = subparsers.add_parser("check", help="Check duality defect (no optimization)")
     p_check.add_argument("input", help="Input file")
@@ -242,7 +336,9 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == "analyze":
+    if args.command == "discover":
+        cmd_discover(args)
+    elif args.command == "analyze":
         cmd_analyze(args)
     elif args.command == "check":
         cmd_check(args)
