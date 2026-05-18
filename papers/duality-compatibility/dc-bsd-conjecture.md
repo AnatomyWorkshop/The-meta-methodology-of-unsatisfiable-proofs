@@ -1,19 +1,19 @@
-# Universal Closure Axiom and the Birch–Swinnerton-Dyer Conjecture
+# Duality Compatibility and the Birch–Swinnerton-Dyer Conjecture
 
 | | |
 |---|---|
 | **Status** | Draft |
 | **Date** | 2026-05-13 |
 | **Author** | Xie, J. |
-| **Series** | Paper 5 in the UCA series |
-| **Prerequisites** | Paper 1 (UCA + classical physics), Paper 4 (UCA + RH) |
-| **Keywords** | BSD conjecture, Universal Closure Axiom, elliptic curves, L-functions, modularity, automorphic forms, Hecke operators, spectral multiplicity, Shafarevich-Tate group |
+| **Series** | Paper 5 in the DC series |
+| **Prerequisites** | Paper 1 (DC + classical physics), Paper 4 (DC + RH) |
+| **Keywords** | BSD conjecture, Duality Compatibility, elliptic curves, L-functions, modularity, automorphic forms, Hecke operators, spectral multiplicity, Shafarevich-Tate group |
 
 ---
 
 ## Abstract
 
-We show that the Birch and Swinnerton-Dyer (BSD) conjecture admits a natural formulation within the Universal Closure Axiom (UCA) framework. The functional equation of $L(E,s)$ is identified as duality compatibility $[\mathcal{D}_E, \star] = 0$ with the Atkin-Lehner involution as $\star$; the rank condition $\mathrm{ord}_{s=1} L(E,s) = \mathrm{rank}\,E(\mathbb{Q})$ is the spectral multiplicity of the trivial eigenvalue under UCA self-adjointness; and the Shafarevich-Tate group $\Sha(E)$ measures the arithmetic duality defect. Unlike the Riemann Hypothesis case (Paper 4), the automorphic infrastructure for BSD is fully established: discrete spectrum on $\Gamma_0(N)\backslash\mathbb{H}$ is classical (Selberg), the trace formula is known (Eichler-Selberg), and the modularity theorem (Wiles-Taylor) guarantees that every elliptic curve over $\mathbb{Q}$ corresponds to a weight-2 newform satisfying UCA. We provide: (1) the structural identification of BSD as a UCA consistency condition on GL(2); (2) a spectral interpretation of the analytic rank as eigenvalue multiplicity; (3) a characterization of $\Sha$ as the obstruction to global duality compatibility; (4) numerical verification on elliptic curves of rank 0–3 from the LMFDB database.
+We show that the Birch and Swinnerton-Dyer (BSD) conjecture admits a natural formulation within the Duality Compatibility (DC) framework. The functional equation of $L(E,s)$ is identified as duality compatibility $[\mathcal{D}_E, \star] = 0$ with the Atkin-Lehner involution as $\star$; the rank condition $\mathrm{ord}_{s=1} L(E,s) = \mathrm{rank}\,E(\mathbb{Q})$ is the spectral multiplicity of the trivial eigenvalue under DC self-adjointness; and the Shafarevich-Tate group $\Sha(E)$ measures the arithmetic duality defect. Unlike the Riemann Hypothesis case (Paper 4), the automorphic infrastructure for BSD is fully established: discrete spectrum on $\Gamma_0(N)\backslash\mathbb{H}$ is classical (Selberg), the trace formula is known (Eichler-Selberg), and the modularity theorem (Wiles-Taylor) guarantees that every elliptic curve over $\mathbb{Q}$ corresponds to a weight-2 newform satisfying DC. We provide: (1) the structural identification of BSD as a DC consistency condition on GL(2); (2) a spectral interpretation of the analytic rank as eigenvalue multiplicity; (3) a characterization of $\Sha$ as the obstruction to global duality compatibility; (4) numerical verification on elliptic curves of rank 0–3 from the LMFDB database.
 
 ---
 
@@ -39,11 +39,11 @@ The Modularity Theorem (Wiles 1995, Taylor-Wiles 1995, Breuil-Conrad-Diamond-Tay
 
 For every elliptic curve $E/\mathbb{Q}$ of conductor $N$, there exists a weight-2 newform $f_E \in S_2(\Gamma_0(N))$ such that $L(E,s) = L(f_E, s)$.
 
-This is the bridge that connects BSD to the automorphic world — and hence to UCA.
+This is the bridge that connects BSD to the automorphic world — and hence to DC.
 
 ### 1.3 Summary of results
 
-**Theorem (structural)**: If the Hecke eigenform $f_E$ satisfies UCA on the quotient $L^2(\Gamma_0(N)\backslash\mathbb{H})$, then the analytic rank $\mathrm{ord}_{s=1} L(E,s)$ equals the multiplicity of the eigenvalue $\lambda = 1/4$ in the spectrum of the hyperbolic Laplacian restricted to the $f_E$-isotypic component.
+**Theorem (structural)**: If the Hecke eigenform $f_E$ satisfies DC on the quotient $L^2(\Gamma_0(N)\backslash\mathbb{H})$, then the analytic rank $\mathrm{ord}_{s=1} L(E,s)$ equals the multiplicity of the eigenvalue $\lambda = 1/4$ in the spectrum of the hyperbolic Laplacian restricted to the $f_E$-isotypic component.
 
 **Structural identification**: The BSD conjecture is the statement that this spectral multiplicity equals the arithmetic rank $\mathrm{rank}\,E(\mathbb{Q})$.
 
@@ -55,7 +55,7 @@ The remaining open problem is purely arithmetic: proving that spectral multiplic
 
 ---
 
-## 2. UCA on GL(2): Functional Equation as Duality
+## 2. DC on GL(2): Functional Equation as Duality
 
 ### 2.1 The completed L-function
 
@@ -74,7 +74,7 @@ $$(w_N f)(z) = N^{-1} z^{-2} f(-1/Nz).$$
 For a newform $f_E$ corresponding to $E$:
 $$w_N f_E = \epsilon(E) \cdot f_E.$$
 
-**UCA identification**: Set $\star = w_N$. Then the functional equation $\Lambda(E,s) = \epsilon(E) \cdot \Lambda(E, 2-s)$ is precisely:
+**DC identification**: Set $\star = w_N$. Then the functional equation $\Lambda(E,s) = \epsilon(E) \cdot \Lambda(E, 2-s)$ is precisely:
 $$[\mathcal{D}_E, \star] = 0 \quad \text{on the } f_E\text{-isotypic subspace},$$
 where $\mathcal{D}_E$ is the Hecke-equivariant differential operator whose spectral determinant gives $L(E,s)$.
 
@@ -85,7 +85,7 @@ where $\mathcal{D}_E$ is the Hecke-equivariant differential operator whose spect
 | L-function | $\zeta(s)$ | $L(E,s)$ |
 | Duality map $\star$ | $s \mapsto 1-s$ | Atkin-Lehner $w_N$ |
 | Automorphic space | $L^2(C_\mathbb{Q})$ | $L^2(\Gamma_0(N)\backslash\mathbb{H})$ |
-| UCA condition | $[\Delta_\mathbb{A}, F] = 0$ on $H$ | $[\Delta_N, w_N] = 0$ on $S_2(\Gamma_0(N))$ |
+| DC condition | $[\Delta_\mathbb{A}, F] = 0$ on $H$ | $[\Delta_N, w_N] = 0$ on $S_2(\Gamma_0(N))$ |
 | Discrete spectrum | Open (H1) | **Proven** (Selberg) |
 | Trace formula | Open (H2) | **Proven** (Eichler-Selberg) |
 | Spectral identification | $\mathrm{Spec} = \{\gamma_n\}$ | $\mathrm{ord}_{s=1} = \mathrm{rank}$ |
@@ -119,25 +119,25 @@ $$[\Delta, T_p] = 0.$$
 
 This is the GL(2) analog of Proposition 1 in Paper 4. Unlike Paper 4, this is a classical theorem — not a construction we need to verify.
 
-**UCA satisfaction**: The triple $(\Delta, w_N, T_p)$ satisfies:
+**DC satisfaction**: The triple $(\Delta, w_N, T_p)$ satisfies:
 1. $\Delta = \Delta^\dagger$ (self-adjoint on Petersson inner product) — **rigidity**
 2. $[\Delta, w_N] = 0$ on newforms — **duality compatibility**
 3. $[\Delta, T_p] = 0$ — **Hecke equivariance**
 
-All three are proven. The hyperbolic Laplacian on $\Gamma_0(N)\backslash\mathbb{H}$ satisfies UCA by construction.
+All three are proven. The hyperbolic Laplacian on $\Gamma_0(N)\backslash\mathbb{H}$ satisfies DC by construction.
 
 ---
 
-## 4. Modularity as UCA Selection
+## 4. Modularity as DC Selection
 
-### 4.1 The modularity theorem in UCA language
+### 4.1 The modularity theorem in DC language
 
 The Modularity Theorem states: for every $E/\mathbb{Q}$, there exists $f_E \in S_2(\Gamma_0(N))$ with $L(E,s) = L(f_E,s)$.
 
-In UCA language: **every elliptic curve over $\mathbb{Q}$ is forced into the UCA-compatible automorphic space**.
+In DC language: **every elliptic curve over $\mathbb{Q}$ is forced into the DC-compatible automorphic space**.
 
-This is not a coincidence. The modularity theorem says that the arithmetic object $E$ (defined over $\mathbb{Q}$, with rational points, Mordell-Weil group, etc.) is uniquely paired with an automorphic object $f_E$ (defined on $\Gamma_0(N)\backslash\mathbb{H}$, satisfying UCA). The pairing is:
-$$E \stackrel{\text{Wiles}}{\longleftrightarrow} f_E \stackrel{\text{UCA}}{\longleftrightarrow} \Delta_N\big|_{f_E\text{-isotypic}}.$$
+This is not a coincidence. The modularity theorem says that the arithmetic object $E$ (defined over $\mathbb{Q}$, with rational points, Mordell-Weil group, etc.) is uniquely paired with an automorphic object $f_E$ (defined on $\Gamma_0(N)\backslash\mathbb{H}$, satisfying DC). The pairing is:
+$$E \stackrel{\text{Wiles}}{\longleftrightarrow} f_E \stackrel{\text{DC}}{\longleftrightarrow} \Delta_N\big|_{f_E\text{-isotypic}}.$$
 
 ### 4.2 What modularity buys us
 
@@ -155,11 +155,11 @@ The entire "construction" phase of Paper 4 (§7.1–7.6) is replaced by a single
 
 Papers 4 and 5 together suggest a general principle:
 
-**Conjecture (UCA-Langlands)**: For every automorphic L-function $L(\pi, s)$ associated to an automorphic representation $\pi$ of $GL(n)$, the analytic properties of $L(\pi, s)$ (functional equation, Euler product, analytic continuation) are equivalent to UCA satisfaction of the associated Hecke-equivariant Laplacian on the locally symmetric space $GL_n(\mathbb{Q})\backslash GL_n(\mathbb{A})/K$.
+**Conjecture (DC-Langlands)**: For every automorphic L-function $L(\pi, s)$ associated to an automorphic representation $\pi$ of $GL(n)$, the analytic properties of $L(\pi, s)$ (functional equation, Euler product, analytic continuation) are equivalent to DC satisfaction of the associated Hecke-equivariant Laplacian on the locally symmetric space $GL_n(\mathbb{Q})\backslash GL_n(\mathbb{A})/K$.
 
 For $n=1$: this is Paper 4 (Riemann Hypothesis).
 For $n=2$: this is Paper 5 (BSD for elliptic curves).
-For general $n$: this is the Langlands program viewed through UCA.
+For general $n$: this is the Langlands program viewed through DC.
 
 ---
 
@@ -180,16 +180,16 @@ The Mordell-Weil theorem gives $E(\mathbb{Q}) \cong \mathbb{Z}^r \oplus E(\mathb
 
 The rank $r$ counts the number of independent rational points of infinite order. Geometrically, it is the dimension of the "free part" of the rational point group.
 
-### 5.3 UCA interpretation
+### 5.3 DC interpretation
 
-**Claim**: Under UCA, the rank $r$ is the dimension of the kernel of the duality-compatible operator $\mathcal{D}_E$ at the central point.
+**Claim**: Under DC, the rank $r$ is the dimension of the kernel of the duality-compatible operator $\mathcal{D}_E$ at the central point.
 
 Specifically:
 - $r = 0$: $L(E,1) \neq 0$ — the operator $\mathcal{D}_E$ is invertible at $s=1$, no zero eigenvalue
 - $r = 1$: $L(E,1) = 0$, $L'(E,1) \neq 0$ — simple zero, one-dimensional kernel
 - $r \geq 2$: higher-order vanishing — multi-dimensional kernel
 
-The BSD conjecture is the statement that this spectral dimension equals the arithmetic dimension. In UCA language: **the number of independent rational points equals the spectral multiplicity of the duality-fixed eigenvalue**.
+The BSD conjecture is the statement that this spectral dimension equals the arithmetic dimension. In DC language: **the number of independent rational points equals the spectral multiplicity of the duality-fixed eigenvalue**.
 
 ### 5.4 Known results
 
@@ -212,12 +212,12 @@ Elements of $\Sha$ are torsors (principal homogeneous spaces) for $E$ that have 
 
 ### 6.2 $\Sha$ as arithmetic duality defect
 
-In UCA language, the duality defect $\delta = [\mathcal{D}, \star]$ measures the failure of an operator to commute with the duality structure. For BSD, the relevant duality is the Cassels-Tate pairing:
+In DC language, the duality defect $\delta = [\mathcal{D}, \star]$ measures the failure of an operator to commute with the duality structure. For BSD, the relevant duality is the Cassels-Tate pairing:
 $$\langle\cdot, \cdot\rangle_{CT}: \Sha(E) \times \Sha(E) \to \mathbb{Q}/\mathbb{Z}.$$
 
 This pairing is alternating and non-degenerate (conjecturally). It is the arithmetic analog of the Petersson inner product on the automorphic side.
 
-**UCA identification**:
+**DC identification**:
 - On the automorphic side: $[\Delta, w_N] = 0$ (exact duality compatibility)
 - On the arithmetic side: the local-global obstruction $\Sha$ measures how far the arithmetic data is from satisfying global duality
 
@@ -228,18 +228,18 @@ The Cassels-Tate pairing on $\Sha$ is the arithmetic manifestation of the dualit
 The strong BSD formula:
 $$\frac{L^{(r)}(E,1)}{r!} = \frac{|\Sha(E)| \cdot \Omega_E \cdot R_E \cdot \prod_p c_p}{|E(\mathbb{Q})_{\mathrm{tors}}|^2}$$
 
-In UCA language, this says: **the leading Taylor coefficient of the spectral determinant at the central point is determined by the magnitude of the duality defect** ($|\Sha|$) together with geometric invariants ($\Omega_E$, $R_E$, $c_p$, torsion).
+In DC language, this says: **the leading Taylor coefficient of the spectral determinant at the central point is determined by the magnitude of the duality defect** ($|\Sha|$) together with geometric invariants ($\Omega_E$, $R_E$, $c_p$, torsion).
 
 This is structurally parallel to Paper 4's observation that the duality defect $\delta_{BK} = [H_{BK}, P]$ determines the spectral error of the Berry-Keating Hamiltonian. In both cases, the duality defect controls the deviation from the ideal spectral structure.
 
-### 6.4 The Cassels-Tate pairing and UCA self-consistency
+### 6.4 The Cassels-Tate pairing and DC self-consistency
 
 The Cassels-Tate pairing satisfies:
 1. Alternating: $\langle x, x \rangle = 0$
 2. Non-degenerate (conjectured): if $\langle x, y \rangle = 0$ for all $y$, then $x = 0$
 
 Property (1) is the arithmetic analog of $\star^2 = \mathrm{id}$ (involutivity of the Atkin-Lehner operator).
-Property (2) is the arithmetic analog of UCA's requirement that the duality structure be non-degenerate — there are no "invisible" obstructions.
+Property (2) is the arithmetic analog of DC's requirement that the duality structure be non-degenerate — there are no "invisible" obstructions.
 
 If $\Sha$ is trivial ($|\Sha| = 1$), the arithmetic side has perfect global duality — no local-global obstruction. This corresponds to the automorphic side having exact duality compatibility with no residual defect.
 
@@ -249,7 +249,7 @@ If $\Sha$ is trivial ($|\Sha| = 1$), the arithmetic side has perfect global dual
 
 ### 7.1 Test curves from LMFDB
 
-We verify the UCA-BSD framework on specific elliptic curves with known rank and L-values.
+We verify the DC-BSD framework on specific elliptic curves with known rank and L-values.
 
 **Rank 0 curves** ($L(E,1) \neq 0$, no rational points of infinite order):
 
@@ -259,7 +259,7 @@ We verify the UCA-BSD framework on specific elliptic curves with known rank and 
 | 14a1: $y^2 + xy + y = x^3 + 4x - 6$ | 14 | $-1, -2, -1, 0, \ldots$ | 0.3599 | 0 | 1 |
 | 15a1: $y^2 + xy + y = x^3 + x^2 - 10x - 10$ | 15 | $-1, 0, -1, 2, \ldots$ | 0.3059 | 0 | 1 |
 
-UCA prediction: $L(E,1) \neq 0$ → spectral multiplicity at $\lambda = 1/4$ is zero → no "extra" eigenspace → rank = 0. **Confirmed.**
+DC prediction: $L(E,1) \neq 0$ → spectral multiplicity at $\lambda = 1/4$ is zero → no "extra" eigenspace → rank = 0. **Confirmed.**
 
 **Rank 1 curves** ($L(E,1) = 0$, $L'(E,1) \neq 0$, one independent rational point):
 
@@ -269,7 +269,7 @@ UCA prediction: $L(E,1) \neq 0$ → spectral multiplicity at $\lambda = 1/4$ is 
 | 43a1: $y^2 + y = x^3 + x^2$ | 43 | $(0, 0)$ | 0.2172 | 1 | 1 |
 | 53a1: $y^2 + xy + y = x^3 - x^2$ | 53 | $(0, 0)$ | 0.1706 | 1 | 1 |
 
-UCA prediction: $L(E,1) = 0$, simple zero → spectral multiplicity = 1 → rank = 1. **Confirmed** (Gross-Zagier + Kolyvagin).
+DC prediction: $L(E,1) = 0$, simple zero → spectral multiplicity = 1 → rank = 1. **Confirmed** (Gross-Zagier + Kolyvagin).
 
 **Rank 2 curves** ($\mathrm{ord}_{s=1} L(E,s) = 2$):
 
@@ -278,7 +278,7 @@ UCA prediction: $L(E,1) = 0$, simple zero → spectral multiplicity = 1 → rank
 | 389a1: $y^2 + y = x^3 + x^2 - 2x$ | 389 | $(0,0), (-1,1)$ | 2 | 1 |
 | 433a1: $y^2 + xy = x^3 + x^2 - 7x + 5$ | 433 | — | 2 | 1 |
 
-UCA prediction: $\mathrm{ord}_{s=1} L(E,s) = 2$ → spectral multiplicity = 2 → rank = 2. **Numerically verified** (rank computed independently via descent), but not rigorously proven in general.
+DC prediction: $\mathrm{ord}_{s=1} L(E,s) = 2$ → spectral multiplicity = 2 → rank = 2. **Numerically verified** (rank computed independently via descent), but not rigorously proven in general.
 
 **Rank 3 curve**:
 
@@ -286,7 +286,7 @@ UCA prediction: $\mathrm{ord}_{s=1} L(E,s) = 2$ → spectral multiplicity = 2 �
 |-------|--------------|-----------------|----------|
 | 5077a1: $y^2 + y = x^3 - 7x + 6$ | 5077 | 3 | 1 |
 
-UCA prediction: $\mathrm{ord}_{s=1} L(E,s) = 3$ → spectral multiplicity = 3 → rank = 3. **Numerically verified.**
+DC prediction: $\mathrm{ord}_{s=1} L(E,s) = 3$ → spectral multiplicity = 3 → rank = 3. **Numerically verified.**
 
 ### 7.2 Root number and parity
 
@@ -294,11 +294,11 @@ The root number $\epsilon(E) = \pm 1$ determines the parity of $\mathrm{ord}_{s=
 - $\epsilon(E) = +1$: even order of vanishing (rank 0, 2, 4, ...)
 - $\epsilon(E) = -1$: odd order of vanishing (rank 1, 3, 5, ...)
 
-In UCA language: $\star = w_N$ acts on $f_E$ by $w_N f_E = \epsilon(E) f_E$. The eigenvalue $\epsilon(E) = \pm 1$ determines the parity of the spectral multiplicity at the central point. This is a direct consequence of duality compatibility: the $\star$-eigenvalue constrains the vanishing order modulo 2.
+In DC language: $\star = w_N$ acts on $f_E$ by $w_N f_E = \epsilon(E) f_E$. The eigenvalue $\epsilon(E) = \pm 1$ determines the parity of the spectral multiplicity at the central point. This is a direct consequence of duality compatibility: the $\star$-eigenvalue constrains the vanishing order modulo 2.
 
 **Parity conjecture** (proven by Nekovář 2006, Kim 2007): $(-1)^{\mathrm{rank}\,E(\mathbb{Q})} = \epsilon(E)$.
 
-This is a theorem, not a conjecture. It confirms that the UCA duality structure correctly predicts the parity of the rank.
+This is a theorem, not a conjecture. It confirms that the DC duality structure correctly predicts the parity of the rank.
 
 ### 7.3 Verification of strong BSD
 
@@ -311,7 +311,7 @@ $$L(E,1) = \frac{\Omega_E \cdot \prod_p c_p}{|E(\mathbb{Q})_{\mathrm{tors}}|^2}.
 | 14a1 | 0.3599 | 2.1599 | 6 | 36 | 0.3600 | Yes |
 | 15a1 | 0.3059 | 2.4474 | 8 | 64 | 0.3059 | Yes |
 
-The strong BSD formula is verified to high precision for these curves. In UCA language: when the duality defect is trivial ($|\Sha| = 1$), the spectral residue is entirely determined by geometric invariants.
+The strong BSD formula is verified to high precision for these curves. In DC language: when the duality defect is trivial ($|\Sha| = 1$), the spectral residue is entirely determined by geometric invariants.
 
 ---
 
@@ -319,24 +319,24 @@ The strong BSD formula is verified to high precision for these curves. In UCA la
 
 ### 8.1 What has been established
 
-1. The functional equation of $L(E,s)$ is UCA duality compatibility with $\star = w_N$ (§2)
-2. The hyperbolic Laplacian $\Delta$ on $\Gamma_0(N)\backslash\mathbb{H}$ satisfies UCA: self-adjoint + Hecke-commuting + duality-compatible (§3)
-3. The modularity theorem guarantees every $E/\mathbb{Q}$ enters the UCA-compatible automorphic space (§4)
+1. The functional equation of $L(E,s)$ is DC duality compatibility with $\star = w_N$ (§2)
+2. The hyperbolic Laplacian $\Delta$ on $\Gamma_0(N)\backslash\mathbb{H}$ satisfies DC: self-adjoint + Hecke-commuting + duality-compatible (§3)
+3. The modularity theorem guarantees every $E/\mathbb{Q}$ enters the DC-compatible automorphic space (§4)
 4. The analytic rank is the spectral multiplicity at the central eigenvalue (§5)
 5. $\Sha$ is the arithmetic duality defect (§6)
 6. For rank 0 and 1, the spectral-arithmetic correspondence is proven (Gross-Zagier, Kolyvagin)
 7. Numerical verification confirms the framework for rank 0–3 (§7)
-8. The parity conjecture (proven) confirms UCA's parity prediction
+8. The parity conjecture (proven) confirms DC's parity prediction
 
 ### 8.2 The open problem
 
 **Open Problem (BSD for rank $\geq 2$)**: Prove that $\mathrm{ord}_{s=1} L(E,s) \geq 2$ implies $\mathrm{rank}\,E(\mathbb{Q}) \geq 2$.
 
-In UCA language: prove that spectral multiplicity $\geq 2$ at the central eigenvalue forces the existence of at least 2 independent rational points.
+In DC language: prove that spectral multiplicity $\geq 2$ at the central eigenvalue forces the existence of at least 2 independent rational points.
 
-**What UCA adds**: The framework identifies this as a question about the relationship between spectral multiplicity (automorphic side) and kernel dimension (arithmetic side). The Gross-Zagier formula provides the bridge for rank 1 via Heegner points. For rank $\geq 2$, the analogous construction (higher Heegner cycles, Euler systems for higher rank) is the frontier of current research (Bertolini-Darmon, Zhang, Nekovář).
+**What DC adds**: The framework identifies this as a question about the relationship between spectral multiplicity (automorphic side) and kernel dimension (arithmetic side). The Gross-Zagier formula provides the bridge for rank 1 via Heegner points. For rank $\geq 2$, the analogous construction (higher Heegner cycles, Euler systems for higher rank) is the frontier of current research (Bertolini-Darmon, Zhang, Nekovář).
 
-**What UCA does NOT solve**: The arithmetic construction of rational points from spectral data. UCA identifies the structural constraint but does not provide the explicit map from "eigenspace of dimension $r$" to "$r$ independent rational points." This map is the content of the Gross-Zagier formula for $r=1$; its generalization to $r \geq 2$ remains open.
+**What DC does NOT solve**: The arithmetic construction of rational points from spectral data. DC identifies the structural constraint but does not provide the explicit map from "eigenspace of dimension $r$" to "$r$ independent rational points." This map is the content of the Gross-Zagier formula for $r=1$; its generalization to $r \geq 2$ remains open.
 
 ### 8.3 Comparison with Paper 4's open problems
 
@@ -347,15 +347,15 @@ In UCA language: prove that spectral multiplicity $\geq 2$ at the central eigenv
 | Spectral identification | $\mathrm{Spec} = \{\gamma_n\}$ (open) | rank 0,1 proven; rank ≥2 open |
 | Duality defect | Not yet characterized | $\Sha$ (well-studied) |
 
-BSD is structurally more advanced than RH within the UCA framework: two of three open problems from Paper 4 are resolved, and the remaining problem has partial solutions (rank 0, 1) with active research programs for the general case.
+BSD is structurally more advanced than RH within the DC framework: two of three open problems from Paper 4 are resolved, and the remaining problem has partial solutions (rank 0, 1) with active research programs for the general case.
 
-### 8.4 UCA duality and the upper bound
+### 8.4 DC duality and the upper bound
 
-The claim "duality self-consistency forces rank equality" decomposes into two inequalities. One direction admits a structural argument from UCA; the other remains constructive and open.
+The claim "duality self-consistency forces rank equality" decomposes into two inequalities. One direction admits a structural argument from DC; the other remains constructive and open.
 
 **Upper bound: $\mathrm{rank}\,E(\mathbb{Q}) \leq \mathrm{ord}_{s=1} L(E,s)$.**
 
-UCA self-consistency on GL(2) requires:
+DC self-consistency on GL(2) requires:
 1. $\Delta$ is self-adjoint on $L^2(\Gamma_0(N)\backslash\mathbb{H})$ (proven, Selberg);
 2. $[\Delta, w_N] = 0$ (duality compatibility, proven);
 3. $[\Delta, T_n] = 0$ for all Hecke operators (proven).
@@ -366,49 +366,49 @@ The structural consequence: any duality-compatible arithmetic structure (i.e., o
 
 $$\mathrm{rank}_{\mathbb{Z}_p}\,\mathrm{Sel}(E/\mathbb{Q}) \leq \mathrm{ord}_{s=1} L(E,s) + \mathrm{corank}\,\Sha(E/\mathbb{Q})[p^\infty].$$
 
-If $\Sha$ is finite (as BSD predicts, and as UCA's duality-defect interpretation requires — see §6), this reduces to:
+If $\Sha$ is finite (as BSD predicts, and as DC's duality-defect interpretation requires — see §6), this reduces to:
 
 $$\mathrm{rank}\,E(\mathbb{Q}) \leq \mathrm{ord}_{s=1} L(E,s).$$
 
-This is precisely Kato's theorem (2004) for modular elliptic curves, restated in UCA language. The UCA framework does not reprove Kato's result, but it reveals its structural origin: the upper bound is a consequence of duality rigidity, not a coincidence of Euler system machinery.
+This is precisely Kato's theorem (2004) for modular elliptic curves, restated in DC language. The DC framework does not reprove Kato's result, but it reveals its structural origin: the upper bound is a consequence of duality rigidity, not a coincidence of Euler system machinery.
 
-**Remark.** The upper bound argument in this section is a structural restatement of Kato (2004), not an independent proof. The technical bridge from UCA conditions (self-adjoint + duality-compatible + Hecke-commuting) to the Selmer rank inequality passes through Poitou-Tate duality and the Cassels-Tate pairing — these are the arithmetic core of Kato's Euler system method. UCA's contribution is interpretive: it explains *why* Kato's method succeeds (because it satisfies the duality axiom) rather than providing an alternative route.
+**Remark.** The upper bound argument in this section is a structural restatement of Kato (2004), not an independent proof. The technical bridge from DC conditions (self-adjoint + duality-compatible + Hecke-commuting) to the Selmer rank inequality passes through Poitou-Tate duality and the Cassels-Tate pairing — these are the arithmetic core of Kato's Euler system method. DC's contribution is interpretive: it explains *why* Kato's method succeeds (because it satisfies the duality axiom) rather than providing an alternative route.
 
 **Lower bound: $\mathrm{rank}\,E(\mathbb{Q}) \geq \mathrm{ord}_{s=1} L(E,s)$ — remains open for rank $\geq 2$.**
 
 The lower bound requires constructing rational points from spectral data. For rank 1, the Gross-Zagier formula provides this construction via Heegner points: the spectral residue at $s=1$ is literally the Néron-Tate height of a Heegner point, which is therefore non-torsion when $L'(E,1) \neq 0$.
 
-For rank $\geq 2$, UCA identifies what is needed: a map from the $r$-dimensional eigenspace of $\Delta$ at $\lambda = 1/4$ to $r$ independent elements of $E(\mathbb{Q})$. UCA's duality constraint guarantees this map *should* exist (the dimensions match on both sides), but does not construct it. The construction requires either:
+For rank $\geq 2$, DC identifies what is needed: a map from the $r$-dimensional eigenspace of $\Delta$ at $\lambda = 1/4$ to $r$ independent elements of $E(\mathbb{Q})$. DC's duality constraint guarantees this map *should* exist (the dimensions match on both sides), but does not construct it. The construction requires either:
 - Higher Heegner cycles (Bertolini-Darmon-Prasanna, Zhang), or
 - Higher-rank Euler systems (Loeffler-Zerbes), or
-- A new method that directly exploits UCA's operator-theoretic structure.
+- A new method that directly exploits DC's operator-theoretic structure.
 
-**Summary**: "Dual self-consistency → quantity confinement → equivalence" is half-proven. The upper bound ($\leq$) follows from UCA duality rigidity and is a restatement of Kato's theorem. The lower bound ($\geq$) requires a constructive bridge that UCA identifies but does not provide. This is the honest state of the art.
+**Summary**: "Dual self-consistency → quantity confinement → equivalence" is half-proven. The upper bound ($\leq$) follows from DC duality rigidity and is a restatement of Kato's theorem. The lower bound ($\geq$) requires a constructive bridge that DC identifies but does not provide. This is the honest state of the art.
 
 ### 8.5 Target theorem
 
-> **Theorem (Target).** Let $E/\mathbb{Q}$ be an elliptic curve of conductor $N$, and let $f_E \in S_2(\Gamma_0(N))$ be the associated newform. Assume UCA holds for the triple $(\Delta, w_N, \{T_n\})$ on $S_2(\Gamma_0(N))$. Then
+> **Theorem (Target).** Let $E/\mathbb{Q}$ be an elliptic curve of conductor $N$, and let $f_E \in S_2(\Gamma_0(N))$ be the associated newform. Assume DC holds for the triple $(\Delta, w_N, \{T_n\})$ on $S_2(\Gamma_0(N))$. Then
 > $$\mathrm{rank}\,E(\mathbb{Q}) = \mathrm{ord}_{s=1} L(E,s).$$
 
 *Status of proof.*
-- Upper bound ($\leq$): Proven. This is Kato (2004), structurally explained by UCA duality rigidity (§8.4 above).
+- Upper bound ($\leq$): Proven. This is Kato (2004), structurally explained by DC duality rigidity (§8.4 above).
 - Lower bound ($\geq$): Open for rank $\geq 2$. Requires a duality-preserving lift $\Phi: \ker(\Delta - 1/4) \to \mathrm{Sel}(E/\mathbb{Q})$ satisfying $\Phi \circ w_N = \text{CT} \circ \Phi$ (where CT denotes the Cassels-Tate involution) and $\Phi \circ T_n = T_n^{\mathrm{arith}} \circ \Phi$. The injectivity of $\Phi$ is equivalent to the non-degeneracy of the $p$-adic height pairing matrix on the image — a statement that current research programs (Bertolini-Darmon, Loeffler-Zerbes) are actively pursuing.
 
-*What remains.* The construction of $\Phi$ for $r \geq 2$ is the central open problem. UCA constrains its form completely (duality-preserving, Hecke-equivariant, landing in the Selmer closure) but does not produce it. This is the precise point where framework meets frontier.
+*What remains.* The construction of $\Phi$ for $r \geq 2$ is the central open problem. DC constrains its form completely (duality-preserving, Hecke-equivariant, landing in the Selmer closure) but does not produce it. This is the precise point where framework meets frontier.
 
 ---
 
 ## 9. Conclusion
 
-1. The BSD conjecture admits a natural formulation as a UCA consistency condition on GL(2), parallel to the Riemann Hypothesis on GL(1) (Paper 4).
+1. The BSD conjecture admits a natural formulation as a DC consistency condition on GL(2), parallel to the Riemann Hypothesis on GL(1) (Paper 4).
 
 2. The functional equation of $L(E,s)$ is duality compatibility $[\mathcal{D}_E, w_N] = 0$; the rank condition is spectral multiplicity at the central eigenvalue; the Shafarevich-Tate group is the arithmetic duality defect.
 
-3. Unlike the RH case, the automorphic infrastructure is fully established: discrete spectrum (Selberg), trace formula (Eichler-Selberg), and modularity (Wiles) are all proven theorems. The UCA framework inherits these results directly.
+3. Unlike the RH case, the automorphic infrastructure is fully established: discrete spectrum (Selberg), trace formula (Eichler-Selberg), and modularity (Wiles) are all proven theorems. The DC framework inherits these results directly.
 
 4. The remaining open problem — proving that spectral multiplicity equals arithmetic rank for rank $\geq 2$ — is identified as the frontier where automorphic and arithmetic structures must be connected. This is the content of ongoing research programs (higher Gross-Zagier formulas, Euler systems).
 
-5. The UCA-Langlands pattern (§4.3) suggests that all automorphic L-functions satisfy UCA on their respective locally symmetric spaces, with the Langlands program providing the modularity bridge between arithmetic objects and automorphic operators.
+5. The DC-Langlands pattern (§4.3) suggests that all automorphic L-functions satisfy DC on their respective locally symmetric spaces, with the Langlands program providing the modularity bridge between arithmetic objects and automorphic operators.
 
 6. Numerical verification on curves of rank 0–3 confirms the framework's predictions, including the strong BSD formula for rank 0 curves.
 
@@ -438,9 +438,9 @@ Nekovář, J. (2006). Selmer complexes. *Astérisque* 310.
 
 Connes, A. (1999). Trace formula in noncommutative geometry and the zeros of the Riemann zeta function. *Selecta Math.* 5, 29–106.
 
-Xie, J. (2026a). The Universal Closure Axiom and the Structural Origin of Classical Physics. *Paper 1 in this series*. DOI: 10.13140/RG.2.2.11627.91685.
+Xie, J. (2026a). The Duality Compatibility and the Structural Origin of Classical Physics. *Paper 1 in this series*. DOI: 10.13140/RG.2.2.11627.91685.
 
-Xie, J. (2026b). Universal Closure Axiom and the Riemann Hypothesis. *Paper 4 in this series*.
+Xie, J. (2026b). Duality Compatibility and the Riemann Hypothesis. *Paper 4 in this series*.
 
 ---
 
@@ -462,4 +462,4 @@ where $P_K$ is a Heegner point on $E$ defined over an imaginary quadratic field 
 
 This formula is the explicit bridge between spectral data ($L'(E,1)$) and arithmetic data (height of a rational point). It proves BSD for rank 1 by constructing the rational point from the L-function derivative.
 
-In UCA language: the Gross-Zagier formula is the explicit realization of the map from "spectral multiplicity 1" to "one independent rational point." The generalization to higher rank (spectral multiplicity $r$ → $r$ independent points) is the open frontier.
+In DC language: the Gross-Zagier formula is the explicit realization of the map from "spectral multiplicity 1" to "one independent rational point." The generalization to higher rank (spectral multiplicity $r$ → $r$ independent points) is the open frontier.

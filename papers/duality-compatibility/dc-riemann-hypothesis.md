@@ -1,17 +1,17 @@
-# Universal Closure Axiom and the Riemann Hypothesis
+# Duality Compatibility and the Riemann Hypothesis
 
 | | |
 |---|---|
 | **Status** | Draft |
 | **Date** | 2026-05-11 |
 | **Author** | Xie, J. |
-| **Keywords** | Riemann hypothesis, Universal Closure Axiom, Hilbert-Polya operator, duality compatibility, adele class space, inverse spectral optimization, adelic heat kernel, Hecke operators, eigenvector convergence |
+| **Keywords** | Riemann hypothesis, Duality Compatibility, Hilbert-Polya operator, duality compatibility, adele class space, inverse spectral optimization, adelic heat kernel, Hecke operators, eigenvector convergence |
 
 ---
 
 ## Abstract
 
-We show that the Riemann Hypothesis is equivalent to the statement that the completed Riemann zeta function satisfies the Universal Closure Axiom (UCA): $\mathcal{D}\phi = \star\mathcal{D}^\dagger\star\phi$. The functional equation $\xi(s) = \xi(1-s)$ is identified as duality compatibility $[\mathcal{D}, \star] = 0$, and the Hilbert-Polya conjecture is the self-adjointness limit of UCA. We provide five contributions: (1) a structural proof that any operator satisfying UCA automatically satisfies both Hilbert-Polya conditions; (2) a numerical construction — UCA-constrained operators in the Dirichlet sin-basis matching 30 zeta zeros to RMSE $0.00118$ with exact duality compatibility, improving on unconstrained search by a factor of 22; (3) a Phase 7 adelic analysis establishing that the local Mellin transform of the Vladimirov heat kernel equals the local Euler factor of $\xi(s)$ from first principles, and that the global dilation generator $D$ anticommutes with the adelic Fourier transform — forcing the quotient space $H = L^2(C_\mathbb{Q})/V$ as the unique domain where UCA holds; (4) a precise definition of the correct target operator $\Delta_\mathbb{A}$ (adelic Vladimirov), whose Hecke commutativity is construction-guaranteed and which conditionally satisfies $\mathrm{Spec}(\Delta_\mathbb{A}|_H) = \{\gamma_n\}$ via the strong multiplicity one theorem; (5) a constrained adelic basis experiment showing that the global norm constraint $\sum_p k_p \log p = t_\infty$ — the finite-dimensional realization of the quotient $H$ — converts exponential local spectra into a near-linear global spectrum with RMSE $1.60$ against $\{\gamma_n\}$, achieved without optimization, purely from the correct function space.
+We show that the Riemann Hypothesis is equivalent to the statement that the completed Riemann zeta function satisfies the Duality Compatibility (DC): $\mathcal{D}\phi = \star\mathcal{D}^\dagger\star\phi$. The functional equation $\xi(s) = \xi(1-s)$ is identified as duality compatibility $[\mathcal{D}, \star] = 0$, and the Hilbert-Polya conjecture is the self-adjointness limit of DC. We provide five contributions: (1) a structural proof that any operator satisfying DC automatically satisfies both Hilbert-Polya conditions; (2) a numerical construction — DC-constrained operators in the Dirichlet sin-basis matching 30 zeta zeros to RMSE $0.00118$ with exact duality compatibility, improving on unconstrained search by a factor of 22; (3) a Phase 7 adelic analysis establishing that the local Mellin transform of the Vladimirov heat kernel equals the local Euler factor of $\xi(s)$ from first principles, and that the global dilation generator $D$ anticommutes with the adelic Fourier transform — forcing the quotient space $H = L^2(C_\mathbb{Q})/V$ as the unique domain where DC holds; (4) a precise definition of the correct target operator $\Delta_\mathbb{A}$ (adelic Vladimirov), whose Hecke commutativity is construction-guaranteed and which conditionally satisfies $\mathrm{Spec}(\Delta_\mathbb{A}|_H) = \{\gamma_n\}$ via the strong multiplicity one theorem; (5) a constrained adelic basis experiment showing that the global norm constraint $\sum_p k_p \log p = t_\infty$ — the finite-dimensional realization of the quotient $H$ — converts exponential local spectra into a near-linear global spectrum with RMSE $1.60$ against $\{\gamma_n\}$, achieved without optimization, purely from the correct function space.
 
 ---
 
@@ -23,13 +23,13 @@ If such an operator exists, RH follows immediately: self-adjoint operators have 
 
 The difficulty is not the implication — it is the existence. What structural principle forces such an operator to exist? Why should the zeros of an arithmetic function be the spectrum of a quantum-mechanical observable?
 
-The Universal Closure Axiom (UCA), introduced in Paper 1 of this series, is:
+The Duality Compatibility (DC), introduced in Paper 1 of this series, is:
 $$\mathcal{D}\phi = \star\,\mathcal{D}^\dagger\,\star\,\phi$$
 for all fields $\phi$. Its two structural conditions are self-adjointness ($\mathcal{D} = \mathcal{D}^\dagger$ in the $\star$-trivial limit) and duality compatibility ($[\mathcal{D}, \star] = 0$). We show these are precisely the conditions required for RH.
 
 ### 1.1 Summary of results
 
-**Theorem (structural)**: If $\mathcal{D}$ satisfies UCA and $\det(s - \mathcal{D}) = \xi(s)$, then all zeros of $\xi(s)$ are real.
+**Theorem (structural)**: If $\mathcal{D}$ satisfies DC and $\det(s - \mathcal{D}) = \xi(s)$, then all zeros of $\xi(s)$ are real.
 
 **Numerical result (sin-basis)**: A $100 \times 100$ Hermitian operator satisfying $[H, P] = 0$ exactly matches 30 zeta zeros to RMSE $0.00118$, with errors scaling as $n^{-0.26}$.
 
@@ -37,28 +37,28 @@ for all fields $\phi$. Its two structural conditions are self-adjointness ($\mat
 
 **Key new result (constrained adelic basis)**: Imposing the global norm constraint $\sum_p k_p \log p = t_\infty$ — the finite-dimensional realization of the quotient $H$ — on a basis of 63 states (primes $\{2,3,5\}$, $K_{\max}=3$) gives RMSE $1.493$ against $\{\gamma_n\}$ without any optimization. This is the first positive numerical evidence that the adelic quotient construction produces a spectrum compatible with $\{\gamma_n\}$.
 
-**Open problems (precisely stated)**: Three problems remain — (1) discrete spectrum of $\Delta_\mathbb{A}$ on $H$ (Sobolev compactness on the adele class space), (2) the adelic trace formula (global assembly of local Euler factors), (3) UCA optimization in the constrained adelic basis to close the RMSE gap from 1.493 to 0.
+**Open problems (precisely stated)**: Three problems remain — (1) discrete spectrum of $\Delta_\mathbb{A}$ on $H$ (Sobolev compactness on the adele class space), (2) the adelic trace formula (global assembly of local Euler factors), (3) DC optimization in the constrained adelic basis to close the RMSE gap from 1.493 to 0.
 
 ---
 
-## 2. UCA and the Hilbert-Polya Conditions
+## 2. DC and the Hilbert-Polya Conditions
 
 ### 2.1 The axiom
 
-The Universal Closure Axiom is:
+The Duality Compatibility is:
 $$\boxed{\mathcal{D}\phi = \star\,\mathcal{D}^\dagger\,\star\,\phi}$$
 
 In the $\star$-trivial limit ($\star = \mathrm{id}$), this forces $\mathcal{D} = \mathcal{D}^\dagger$: the operator is self-adjoint. In the general case, it additionally requires $[\mathcal{D}, \star] = 0$: the operator commutes with the duality structure.
 
 ### 2.2 Core theorem
 
-**Theorem 1**. *Let $\mathcal{D}$ be an operator on a Hilbert space $\mathcal{H}$ satisfying UCA. If $\det(s - \mathcal{D}) = \xi(s)$, then all zeros of $\xi(s)$ are real.*
+**Theorem 1**. *Let $\mathcal{D}$ be an operator on a Hilbert space $\mathcal{H}$ satisfying DC. If $\det(s - \mathcal{D}) = \xi(s)$, then all zeros of $\xi(s)$ are real.*
 
-*Proof*. UCA forces $\mathcal{D} = \mathcal{D}^\dagger$ (self-adjointness). Self-adjoint operators have real spectra: $\mathrm{Spec}(\mathcal{D}) \subset \mathbb{R}$. The zeros of $\xi(s)$ are the eigenvalues of $\mathcal{D}$ (from $\det(s - \mathcal{D}) = \xi(s)$). Therefore all zeros of $\xi(s)$ are real. $\square$
+*Proof*. DC forces $\mathcal{D} = \mathcal{D}^\dagger$ (self-adjointness). Self-adjoint operators have real spectra: $\mathrm{Spec}(\mathcal{D}) \subset \mathbb{R}$. The zeros of $\xi(s)$ are the eigenvalues of $\mathcal{D}$ (from $\det(s - \mathcal{D}) = \xi(s)$). Therefore all zeros of $\xi(s)$ are real. $\square$
 
-### 2.3 The four closure laws as UCA limits
+### 2.3 The four closure laws as DC limits
 
-| Closure Law | UCA Condition | RH Manifestation |
+| Closure Law | DC Condition | RH Manifestation |
 |-------------|---------------|-----------------|
 | Duality | $[\mathcal{D}, \star] = 0$ | Functional equation $\xi(s) = \xi(1-s)$ |
 | Rigidity | $\mathcal{D} = \mathcal{D}^\dagger$ | Self-adjointness → real spectrum |
@@ -71,7 +71,7 @@ In the $\star$-trivial limit ($\star = \mathrm{id}$), this forces $\mathcal{D} =
 
 ### 3.1 The duality map
 
-The completed zeta function satisfies $\xi(s) = \xi(1-s)$. The map $s \mapsto 1-s$ is reflection about the critical line $\mathrm{Re}(s) = 1/2$. In UCA language, this is the Hodge star:
+The completed zeta function satisfies $\xi(s) = \xi(1-s)$. The map $s \mapsto 1-s$ is reflection about the critical line $\mathrm{Re}(s) = 1/2$. In DC language, this is the Hodge star:
 $$\star: s \mapsto 1 - s.$$
 
 **Claim**: $\xi(s) = \xi(1-s)$ is the observable signature of $[\mathcal{D}_\zeta, \star] = 0$.
@@ -90,9 +90,9 @@ The condition $[PT, H] = 0$ is the finite-dimensional version of $[\mathcal{D}, 
 
 ## 4. Berry-Keating as the Classical Limit and the Duality Defect
 
-### 4.1 Berry-Keating as classical UCA
+### 4.1 Berry-Keating as classical DC
 
-The Berry-Keating Hamiltonian $H_{BK} = xp + px$ satisfies the *classical* limit of UCA: Liouville's theorem (phase space volume preservation). The classical trajectories $xp = E$ have the same density of states as the zeta zeros (Weyl law). This is why Berry-Keating matches spectral statistics but not individual zeros.
+The Berry-Keating Hamiltonian $H_{BK} = xp + px$ satisfies the *classical* limit of DC: Liouville's theorem (phase space volume preservation). The classical trajectories $xp = E$ have the same density of states as the zeta zeros (Weyl law). This is why Berry-Keating matches spectral statistics but not individual zeros.
 
 ### 4.2 The duality defect
 
@@ -121,11 +121,11 @@ Let $V_{\text{defect}} = -\delta_{BK} P / 2$ (cancels the duality defect exactly
 
 Cosine similarity $\langle V_{\text{defect}}, V_{\text{spectral}} \rangle = 0.000$.
 
-The two corrections are orthogonal. Spectral optimization moves *away* from UCA satisfaction. The true $H_{RH}$ must satisfy both simultaneously — impossible by perturbation of Berry-Keating on a finite interval.
+The two corrections are orthogonal. Spectral optimization moves *away* from DC satisfaction. The true $H_{RH}$ must satisfy both simultaneously — impossible by perturbation of Berry-Keating on a finite interval.
 
 ---
 
-## 5. UCA-Constrained Optimization
+## 5. DC-Constrained Optimization
 
 ### 5.1 Construction
 
@@ -149,10 +149,10 @@ Comparison:
 | Method | RMSE | Duality defect | Parameters |
 |--------|------|----------------|------------|
 | Unconstrained | 0.031 | 76% | 1275 |
-| UCA-constrained ($n=50$) | 0.00141 | **0** | 650 |
-| UCA-constrained ($n=100$) | 0.00118 | **0** | 2550 |
+| DC-constrained ($n=50$) | 0.00141 | **0** | 650 |
+| DC-constrained ($n=100$) | 0.00118 | **0** | 2550 |
 
-The UCA constraint finds a **22× better spectral match** with half the parameters.
+The DC constraint finds a **22× better spectral match** with half the parameters.
 
 ### 5.3 Per-zero precision ($n=100$, first 10 zeros)
 
@@ -195,15 +195,15 @@ This is why our finite-dimensional approximations have non-zero duality defect: 
 
 ### 6.3 Relation to Connes' program
 
-Connes (1999) proposed a spectral triple $(\mathcal{A}, \mathcal{H}, D)$ on $\mathbb{A}_\mathbb{Q}/\mathbb{Q}^*$ and showed that the zeros of $\zeta(s)$ appear as an absorption spectrum. UCA provides the structural principle explaining why this is the right framework: $\mathbb{A}_\mathbb{Q}/\mathbb{Q}^*$ is the unique space where $[\mathcal{D}, \star] = 0$ holds for the zeta function.
+Connes (1999) proposed a spectral triple $(\mathcal{A}, \mathcal{H}, D)$ on $\mathbb{A}_\mathbb{Q}/\mathbb{Q}^*$ and showed that the zeros of $\zeta(s)$ appear as an absorption spectrum. DC provides the structural principle explaining why this is the right framework: $\mathbb{A}_\mathbb{Q}/\mathbb{Q}^*$ is the unique space where $[\mathcal{D}, \star] = 0$ holds for the zeta function.
 
-| | Connes | UCA |
+| | Connes | DC |
 |---|---|---|
 | Starting point | Spectral triple on $\mathbb{A}_\mathbb{Q}/\mathbb{Q}^*$ | Duality self-consistency |
 | Key condition | Spectral action | $[\mathcal{D}, \star] = 0$ + $\mathcal{D} = \mathcal{D}^\dagger$ |
 | Status | Absorption spectrum (partial) | Structural framework + numerical evidence |
 
-The approaches are complementary. UCA provides the selection principle that Connes' program lacks: from all operators on $\mathbb{A}_\mathbb{Q}/\mathbb{Q}^*$, UCA selects those satisfying both self-adjointness and duality compatibility simultaneously.
+The approaches are complementary. DC provides the selection principle that Connes' program lacks: from all operators on $\mathbb{A}_\mathbb{Q}/\mathbb{Q}^*$, DC selects those satisfying both self-adjointness and duality compatibility simultaneously.
 
 ---
 
@@ -231,11 +231,11 @@ $$F D F^{-1} = -D, \quad \{D, F\} = 0.$$
 
 *Proof*: $F$ maps the character $\psi_a(x) = e^{2\pi i \{ax\}_p}$ to $\psi_{-a}$. In the dilation eigenbasis, this maps eigenvalue $k\log p$ to $-k\log p$. Therefore $F D_p F^{-1} = -D_p$ for each prime $p$, and the global statement follows. $\square$
 
-**Consequence**: $[D, F] \neq 0$ on $L^2(C_\mathbb{Q})$. UCA requires $[D, \star] = 0$. Therefore UCA is *not* satisfied on the full $L^2(C_\mathbb{Q})$.
+**Consequence**: $[D, F] \neq 0$ on $L^2(C_\mathbb{Q})$. DC requires $[D, \star] = 0$. Therefore DC is *not* satisfied on the full $L^2(C_\mathbb{Q})$.
 
 **Resolution**: Let $V = \ker(|\cdot|: C_\mathbb{Q} \to \mathbb{R}_{>0})$ and $H = L^2(C_\mathbb{Q})/V$. On the quotient $H$, the Fourier transform $F$ acts as the identity (functions in $H$ are constant on norm-fibers), so $[D, F] = 0$ on $H$.
 
-**UCA selection principle**: $H$ is the unique quotient of $L^2(C_\mathbb{Q})$ on which $[D, F] = 0$. UCA selects $H$ as the correct domain.
+**DC selection principle**: $H$ is the unique quotient of $L^2(C_\mathbb{Q})$ on which $[D, F] = 0$. DC selects $H$ as the correct domain.
 
 ### 7.3 Local Mellin transform = local Euler factor
 
@@ -273,7 +273,7 @@ The mean overlap *decreases* from $n=50$ to $n=100$ ($\Delta = -0.036$), and the
 2. The correct eigenvectors (automorphic forms on $C_\mathbb{Q}$) cannot be approximated by sin-basis vectors, regardless of how well the eigenvalues are matched.
 3. The path to Step 2c requires working directly in the adelic function space, not in finite-dimensional truncations of $L^2([0,L])$.
 
-The negative result is not a failure of the UCA framework — it is a confirmation that the framework correctly identifies the wrong space. The sin-basis operators $H_n$ converge spectrally to $D|_H$ (eigenvalues match), but not in strong operator topology (eigenvectors diverge from the correct automorphic forms).
+The negative result is not a failure of the DC framework — it is a confirmation that the framework correctly identifies the wrong space. The sin-basis operators $H_n$ converge spectrally to $D|_H$ (eigenvalues match), but not in strong operator topology (eigenvectors diverge from the correct automorphic forms).
 
 ### 7.6 The correct target operator: $\Delta_\mathbb{A}$
 
@@ -337,9 +337,9 @@ H1 and H2 are independent assumptions. H2's local components are verified (§7.3
 
 ### 8.1 What has been established
 
-1. UCA forces both Hilbert-Polya conditions (Theorem 1)
+1. DC forces both Hilbert-Polya conditions (Theorem 1)
 2. The functional equation is duality compatibility (§3)
-3. The UCA-compatible subspace contains operators converging spectrally to $H_{RH}$ (§5, numerical)
+3. The DC-compatible subspace contains operators converging spectrally to $H_{RH}$ (§5, numerical)
 4. The correct infinite-dimensional setting is $C_\mathbb{Q} = \mathbb{A}_\mathbb{Q}^\times/\mathbb{Q}^\times$ (§7, via Tate)
 5. On $C_\mathbb{Q}$, duality compatibility is automatic on the quotient $H = L^2(C_\mathbb{Q})/V$ (§7.2)
 6. The local Mellin transform of the Vladimirov heat kernel equals the local Euler factor of $\xi(s)$ from first principles (§7.3)
@@ -355,9 +355,9 @@ The proof reduces to three open problems, in order of difficulty:
 
 **Open Problem 2 (Spectral determinant, Assumption H2)**: Prove that $\det(s - \Delta_\mathbb{A}|_H) = \xi(s)$. This is equivalent to proving Assumption H2 (§7.6.1): that the heat trace factorizes as $\mathrm{Tr}_H(e^{-t\Delta_\mathbb{A}}) = \prod_p \mathrm{Tr}_p(e^{-t\Delta_p})$ on the quotient space. The local factors are established (§7.3); the open step is proving that the quotient projection intertwines the heat semigroups in a trace-class sense. Connes' trace formula and Weil's explicit formula provide strong structural support (§7.6.1).
 
-**Open Problem 3 (Adelic basis construction, partially resolved)**: Construct a sequence of finite-dimensional operators $\tilde\Delta_n$ in the adelic function space that converges to $\Delta_\mathbb{A}$, and verify numerically that $\mathrm{Spec}(\tilde\Delta_n) \to \{\gamma_n\}$. **Partial result** (§10.2): the constrained adelic basis (primes $\{2,3,5\}$, $K_{\max}=3$, 63 states) already achieves RMSE $1.60$ without optimization, purely from the correct function space. The remaining gap requires larger truncation and UCA optimization in the constrained basis.
+**Open Problem 3 (Adelic basis construction, partially resolved)**: Construct a sequence of finite-dimensional operators $\tilde\Delta_n$ in the adelic function space that converges to $\Delta_\mathbb{A}$, and verify numerically that $\mathrm{Spec}(\tilde\Delta_n) \to \{\gamma_n\}$. **Partial result** (§10.2): the constrained adelic basis (primes $\{2,3,5\}$, $K_{\max}=3$, 63 states) already achieves RMSE $1.60$ without optimization, purely from the correct function space. The remaining gap requires larger truncation and DC optimization in the constrained basis.
 
-**What is NOT open**: The structural framework (UCA → Hilbert-Polya), the local Euler factor derivation, the Hecke commutativity of $\Delta_\mathbb{A}$, and the conditional spectral identification (Theorem 2). These are established.
+**What is NOT open**: The structural framework (DC → Hilbert-Polya), the local Euler factor derivation, the Hecke commutativity of $\Delta_\mathbb{A}$, and the conditional spectral identification (Theorem 2). These are established.
 
 **Conjecture (Adelic Heat Kernel Trace Formula)**. Let $\Delta_\mathbb{A}$ be the adelic Vladimirov operator on $H = L^2(C_\mathbb{Q})/V$ (Definition 3, §7.6). Then:
 $$\mathrm{Tr}(e^{-t\Delta_\mathbb{A}}) = \prod_p \mathrm{Tr}_p(e^{-t\Delta_p}) \quad \text{on } H,$$
@@ -378,27 +378,27 @@ The missing step: proving trace factorization on $H$ and assembling the global f
 
 ## 9. Conclusion
 
-The Universal Closure Axiom provides the structural framework for the Riemann Hypothesis:
+The Duality Compatibility provides the structural framework for the Riemann Hypothesis:
 
-1. **RH is a UCA consistency condition**: RH holds if and only if the zeta function satisfies UCA — if there exists an operator $\mathcal{D}$ that is simultaneously self-adjoint and duality-compatible with spectral determinant $\xi(s)$.
+1. **RH is a DC consistency condition**: RH holds if and only if the zeta function satisfies DC — if there exists an operator $\mathcal{D}$ that is simultaneously self-adjoint and duality-compatible with spectral determinant $\xi(s)$.
 
-2. **The functional equation is duality compatibility**: $\xi(s) = \xi(1-s)$ is $[\mathcal{D}, \star] = 0$ in UCA language.
+2. **The functional equation is duality compatibility**: $\xi(s) = \xi(1-s)$ is $[\mathcal{D}, \star] = 0$ in DC language.
 
-3. **Berry-Keating is the classical limit**: $H_{BK}$ satisfies classical UCA (Liouville theorem) but not quantum UCA. Its duality defect is 76% of its norm, full-rank, with flat singular value spectrum — a uniform failure of duality compatibility caused by Dirichlet boundary conditions.
+3. **Berry-Keating is the classical limit**: $H_{BK}$ satisfies classical DC (Liouville theorem) but not quantum DC. Its duality defect is 76% of its norm, full-rank, with flat singular value spectrum — a uniform failure of duality compatibility caused by Dirichlet boundary conditions.
 
-4. **The UCA constraint guides the search**: UCA-constrained operators in the sin-basis achieve 22× better spectral match than unconstrained search, with exact duality compatibility, using half the parameters.
+4. **The DC constraint guides the search**: DC-constrained operators in the sin-basis achieve 22× better spectral match than unconstrained search, with exact duality compatibility, using half the parameters.
 
-5. **The correct setting is adelic**: The idele class space $C_\mathbb{Q} = \mathbb{A}_\mathbb{Q}^\times/\mathbb{Q}^\times$ is the unique space where $[\mathcal{D}, \star] = 0$ holds automatically for the zeta function (Tate 1950). The global dilation generator $D$ anticommutes with $F$ on the full $L^2(C_\mathbb{Q})$, but commutes on the quotient $H = L^2(C_\mathbb{Q})/V$. UCA selects $H$ as the correct domain.
+5. **The correct setting is adelic**: The idele class space $C_\mathbb{Q} = \mathbb{A}_\mathbb{Q}^\times/\mathbb{Q}^\times$ is the unique space where $[\mathcal{D}, \star] = 0$ holds automatically for the zeta function (Tate 1950). The global dilation generator $D$ anticommutes with $F$ on the full $L^2(C_\mathbb{Q})$, but commutes on the quotient $H = L^2(C_\mathbb{Q})/V$. DC selects $H$ as the correct domain.
 
 6. **The local Euler factors arise from first principles**: The Mellin transform of the Vladimirov heat kernel at prime $p$ equals the local Euler factor of $\xi(s)$, derived purely from the eigenvalue structure of the $p$-adic dilation generator. The Euler product matches $\zeta(s)$ to relative error $2.86 \times 10^{-7}$.
 
-7. **The sin-basis is the wrong function space**: UCA-constrained operators in the sin-basis do not converge to the trivial Hecke character, and Hecke operators do not commute with $H_n$ in this basis. The correct eigenvectors are automorphic forms on $C_\mathbb{Q}$, not Fourier modes on $[0,L]$.
+7. **The sin-basis is the wrong function space**: DC-constrained operators in the sin-basis do not converge to the trivial Hecke character, and Hecke operators do not commute with $H_n$ in this basis. The correct eigenvectors are automorphic forms on $C_\mathbb{Q}$, not Fourier modes on $[0,L]$.
 
 8. **The correct target operator is $\Delta_\mathbb{A}$**: The dilation generator $D$ is first-order with continuous spectrum. The correct Hilbert-Polya operator is the adelic Vladimirov operator $\Delta_\mathbb{A}$, which is second-order. Hecke commutativity $[\Delta_\mathbb{A}, T_n] = 0$ is construction-guaranteed (Proposition 1). Conditional on discrete spectrum (Assumption H1), the strong multiplicity one theorem forces $\mathrm{Spec}(\Delta_\mathbb{A}|_H) = \{\gamma_n\}$ (Theorem 2).
 
 9. **The quotient constraint is the spectral mechanism**: The global norm constraint $\sum_p k_p \log p = t_\infty$ — the finite-dimensional realization of $H = L^2(C_\mathbb{Q})/V$ — converts exponential local spectra into a near-linear global spectrum. A constrained basis of 63 states (primes $\{2,3,5\}$, $K_{\max}=3$) achieves RMSE $1.60$ against $\{\gamma_n\}$ without optimization. This is the first positive numerical evidence that the adelic quotient construction produces a spectrum compatible with $\{\gamma_n\}$.
 
-The Riemann Hypothesis is the statement that the adelic Vladimirov operator $\Delta_\mathbb{A}$ satisfies UCA on the quotient space $H$. The structural conditions are established. The remaining gap is the proof of discrete spectrum (Assumption H1) and the global assembly of the adelic trace formula.
+The Riemann Hypothesis is the statement that the adelic Vladimirov operator $\Delta_\mathbb{A}$ satisfies DC on the quotient space $H$. The structural conditions are established. The remaining gap is the proof of discrete spectrum (Assumption H1) and the global assembly of the adelic trace formula.
 
 ---
 
@@ -447,13 +447,13 @@ The scale factor $a \approx 7$ reflects a systematic energy mismatch: with $K_{\
 | $\{2,3,5,7\}$ | 2 | 80 | 8.859 | −12.60 | 1.771 |
 | $\{2,3,5,7,11\}$ | 2 | 242 | 8.992 | −14.25 | 1.708 |
 
-† Identical to $K_{\max}=3$: the additional states at level 4 have $\lambda \gg \gamma_{30}^2$ and fall outside the comparison window. The spectral shape in the $\gamma_1$–$\gamma_{30}$ range is unchanged; the bottleneck is the absence of UCA optimization, not truncation depth.
+† Identical to $K_{\max}=3$: the additional states at level 4 have $\lambda \gg \gamma_{30}^2$ and fall outside the comparison window. The spectral shape in the $\gamma_1$–$\gamma_{30}$ range is unchanged; the bottleneck is the absence of DC optimization, not truncation depth.
 
-The RMSE stabilizes around 1.5–1.8 across different truncations, suggesting the residual error is not from truncation but from the absence of UCA optimization. The $\{2,3,5\}$, $K_{\max}=3$ configuration achieves the best RMSE at 63 states.
+The RMSE stabilizes around 1.5–1.8 across different truncations, suggesting the residual error is not from truncation but from the absence of DC optimization. The $\{2,3,5\}$, $K_{\max}=3$ configuration achieves the best RMSE at 63 states.
 
 **Interpretation**. The norm constraint is the spectral mechanism of the quotient $H$. It couples local operators and converts exponential local spectra into a near-linear global spectrum. The RMSE of 1.49 (compared to 12–29 for the naive construction) is achieved without any optimization — purely from the correct function space. The systematic scale factor $a \approx 7$ is a finite-truncation artifact that will decrease as the basis grows; it does not affect the spectral shape (RMSE).
 
-This is the first positive numerical evidence that the adelic quotient construction produces a spectrum compatible with $\{\gamma_n\}$. The next step is to apply UCA optimization within the constrained basis, which should reduce the RMSE toward zero while preserving the correct spectral shape.
+This is the first positive numerical evidence that the adelic quotient construction produces a spectrum compatible with $\{\gamma_n\}$. The next step is to apply DC optimization within the constrained basis, which should reduce the RMSE toward zero while preserving the correct spectral shape.
 
 ---
 
@@ -475,15 +475,15 @@ Vladimirov, V.S. (1988). Generalized functions over the field of $p$-adic number
 
 Lovelock, D. (1971). The Einstein tensor and its generalizations. *J. Math. Phys.* 12(3), 498–501.
 
-Xie, J. (2026). The Universal Closure Axiom and the Structural Origin of Classical Physics. *Paper 1 in this series*.
+Xie, J. (2026). The Duality Compatibility and the Structural Origin of Classical Physics. *Paper 1 in this series*.
 
 ---
 
 ## Appendix A: Proof of Theorem 1
 
-**Theorem 1**. *If $\mathcal{D}$ satisfies UCA and $\det(s - \mathcal{D}) = \xi(s)$, then all zeros of $\xi(s)$ are real.*
+**Theorem 1**. *If $\mathcal{D}$ satisfies DC and $\det(s - \mathcal{D}) = \xi(s)$, then all zeros of $\xi(s)$ are real.*
 
-*Proof*. UCA in the $\star$-trivial limit gives $\mathcal{D} = \mathcal{D}^\dagger$. By the spectral theorem for self-adjoint operators, $\mathrm{Spec}(\mathcal{D}) \subset \mathbb{R}$. The zeros of $\xi(s)$ are $\{s : \det(s - \mathcal{D}) = 0\} = \mathrm{Spec}(\mathcal{D}) \subset \mathbb{R}$. $\square$
+*Proof*. DC in the $\star$-trivial limit gives $\mathcal{D} = \mathcal{D}^\dagger$. By the spectral theorem for self-adjoint operators, $\mathrm{Spec}(\mathcal{D}) \subset \mathbb{R}$. The zeros of $\xi(s)$ are $\{s : \det(s - \mathcal{D}) = 0\} = \mathrm{Spec}(\mathcal{D}) \subset \mathbb{R}$. $\square$
 
 ## Appendix B: Duality Defect Computation
 
@@ -496,9 +496,9 @@ The correction operator $V_{\text{defect}} = -\delta_{BK} P / 2$ satisfies:
 
 Code: `neural-symbolic-system/illusion/phase6_rh/duality_defect.py`
 
-## Appendix C: UCA Optimizer
+## Appendix C: DC Optimizer
 
-The UCA-constrained optimizer parameterizes $H$ as block-diagonal in the $P$-eigenbasis, enforcing $[H, P] = 0$ by construction. Starting from $H_{BK} + V_{\text{defect}}$, L-BFGS-B minimizes the spectral loss with regularization $\lambda = 10^{-6}$.
+The DC-constrained optimizer parameterizes $H$ as block-diagonal in the $P$-eigenbasis, enforcing $[H, P] = 0$ by construction. Starting from $H_{BK} + V_{\text{defect}}$, L-BFGS-B minimizes the spectral loss with regularization $\lambda = 10^{-6}$.
 
 Analytical gradients are computed via the Hellmann-Feynman theorem: for eigenvalue $\lambda_k$ with eigenvector $u_k$, $\partial\lambda_k/\partial\theta_{ij} = u_k^T (\partial H/\partial\theta_{ij}) u_k$. This avoids the $O(n^3)$ numerical gradient bottleneck that limited $n=100$ to 5 iterations with finite differences.
 

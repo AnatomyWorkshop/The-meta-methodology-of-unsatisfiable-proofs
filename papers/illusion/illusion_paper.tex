@@ -101,6 +101,8 @@ L1 & Object model: simulates the computational model under analysis \\
 
 L2 cannot access L1's internal structure directly. L3 monitors whether L2's candidates have slipped into L1's decidability range. The architecture is invariant across all domains; only L1 and the transform registry are swapped.
 
+This invariance is itself a result: the same L2 and L3 code runs unmodified across five mathematically unrelated domains. The SRS framework's four-component structure $(M, f, P, \alpha)$ maps directly onto a software architecture without domain-specific heuristics --- evidence that the abstraction captures genuine shared structure rather than post-hoc labeling.
+
 \subsection{Notation}
 
 We introduce three operators that compress recurring proof-theoretic statements:
@@ -222,6 +224,8 @@ field\_reduction ($q=2$) & $+0.105$ & $+0.087$ & $\downarrow$ & UNSAFE \\
 \end{itemize}
 
 The scaling behavior confirms L3: the SAFE candidate strengthens with $n$ (signal grows as the model's limitation becomes more pronounced), while the UNSAFE candidate weakens (the artifact diminishes as problem size increases). Symbolically: $\alpha_{\mathrm{restrict}}(n) \to \infty$ while $\alpha_{\mathrm{field}} \leq 1$ regardless of $n$.
+
+This pattern constitutes a falsifiable prediction: in any domain, SAFE candidates should show strengthening $\Dcollapse$ with problem size, while UNSAFE candidates should show weakening or constant signal. If a candidate classified SAFE exhibits weakening signal at larger $n$, the classification should be revisited.
 
 %% ============================================================
 \section{Unknown Domains: Proof Complexity}
@@ -363,6 +367,10 @@ field\_reduction & $+0.105$ & UNSAFE & Yes (decidable within model) \\
 The difference in $\Dcollapse$ is $0.001$ --- well within sampling variance. With $n_{\mathrm{trials}} = 5$ and 20 circuits per trial, the standard error of the mean is approximately $\pm 0.012$ for both transforms; the difference is not statistically significant ($p > 0.9$ under a two-sample $t$-test). Any system relying solely on statistical signal would accept both or reject both. L3's domain axioms provide the only separation: variable restriction preserves the polynomial family's complexity class (SAFE), while field reduction modifies the arithmetic foundation (UNSAFE).
 
 This is the core argument for the three-layer architecture: statistical measurement identifies \emph{where} to look; domain knowledge determines \emph{what counts}.
+
+\subsection{Metric-level precision}
+
+The framework's diagnostic resolution extends beyond ``which transform is effective'' to ``at which metric dimension is it effective.'' The same structural operation --- Extended Frege abbreviation (cross-branch caching) --- produces $\Dcollapse = 0$ at the depth metric and $\Dcollapse = +1.000$ at the size metric (\S\ref{sec:unknown}). No rule in L3 encodes this contrast; it emerges from L2's blind measurement across two metric configurations of the same proof system. This localizes the open problem to the exact dimension where it lives --- a precision that pure classification (SAFE/UNSAFE/UNKNOWN) does not capture.
 
 \subsection{Pattern summary}
 
