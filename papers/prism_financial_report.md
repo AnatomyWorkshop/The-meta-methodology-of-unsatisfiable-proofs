@@ -197,48 +197,170 @@ structurally cannot.
 
 ---
 
-## Next Direction
+## Phase 2: Sparse Network Experiments (2026-05-18)
 
-The failure is domain-specific, not method-specific. Prism fails on
-dense correlation networks because:
-1. The Fiedler vector is unstable (dominated by market factor)
-2. The commutator distributes uniformly (no concentration)
-3. The defect is redundant with inverse VIX (α ≤ 1)
+Following the financial death sentence, we tested Prism on sparse
+topological networks where the Fiedler vector should reflect genuine
+structure rather than noise.
 
-These problems do NOT apply to sparse topological networks where:
-- Adjacency is binary (connected or not), not continuous correlation
-- Topology is fixed (roads, pipes, wires), not rolling-window estimated
-- The Fiedler vector reflects genuine graph structure, not noisy PCA
-- Local metrics (degree, betweenness) provably miss spectral properties
+### 9. Sparse Benchmark v1: Criticality Detection (9 networks)
 
-**Candidate domains for next phase:**
-- Transportation networks (road/rail topology, fixed structure)
-- Energy distribution (pipeline networks, grid topology)
-- Industrial supply chains (sparse, directed, with bottlenecks)
-- Biological metabolism (enzyme networks, pathway structure)
+**Hypothesis:** Per-node defect identifies critical nodes (whose removal
+most degrades algebraic connectivity) in sparse networks.
 
-The key requirement: the network must have FIXED TOPOLOGY with genuine
-sparsity, not a correlation matrix estimated from time series.
+**Networks tested:** Karate Club, Florentine Families, Les Miserables,
+Dolphins, Barbell, Grid 6x6, Tree, Watts-Strogatz, Barabasi-Albert.
 
----
+**Result:** Prism wins 0/9 networks. Betweenness centrality dominates.
 
-## Lessons
+| Network | rho(Prism) | rho(Betweenness) | rho(Degree) |
+|---------|-----------|-----------------|-------------|
+| Karate Club | +0.512 | +0.801 | +0.817 |
+| Florentine | +0.311 | +0.855 | +0.726 |
+| Les Mis | +0.390 | +0.757 | +0.804 |
+| Dolphins | +0.555 | +0.765 | +0.646 |
+| Grid 6x6 | +0.251 | +0.368 | +0.182 |
+| Tree | -0.029 | +0.786 | +0.817 |
+| Watts-Strogatz | +0.374 | +0.715 | +0.226 |
+| Barabasi-Albert | +0.557 | +0.852 | +0.808 |
 
-1. Always test the null hypothesis first. "Does this add information
-   beyond the simplest existing metric?" should be experiment #1.
-
-2. Dense correlation networks are hostile to spectral methods. The
-   second eigenvector is noise when all pairwise correlations are high.
-
-3. The SRS framework correctly diagnosed the failure: α ≤ 1 means the
-   metric is decidable within the model. We should have applied this
-   test before running 8 experiments.
-
-4. A theoretically grounded metric can still fail empirically if the
-   domain violates the method's structural assumptions.
+**Verdict:** Per-node defect does NOT identify engineering-critical nodes
+better than betweenness centrality. Not a domain problem — a method problem.
 
 ---
 
-*Report date: 2026-05-18*
-*Experiments: 8 conducted, 0 produced actionable financial signals*
-*Status: Financial product direction closed. Sparse network direction open.*
+### 10. Sparse Benchmark v2: What Does Prism Actually Measure?
+
+**Question:** Prism's rho was 0.3-0.55 on most networks — it measures
+SOMETHING. What ground truth does it correlate with best?
+
+**Ground truths tested:**
+- Delta algebraic connectivity (betweenness wins)
+- Fiedler cut proximity (Prism wins 4/5, mean |rho| = 0.534)
+- Cross-cut edges (Prism wins 3/5)
+- Spectral gap sensitivity (betweenness wins)
+- Community boundary (betweenness wins)
+- Pairing distance (Prism wins 3/5)
+
+**Finding:** Prism best correlates with FIEDLER CUT PROXIMITY — how
+close a node is to the spectral bisection boundary. This is tautological:
+Prism is computed from the Fiedler vector, so it naturally correlates
+with Fiedler-derived properties.
+
+---
+
+### 11. Sparse Benchmark v3: Boundary Detection
+
+**Hypothesis (reframed):** Prism identifies community boundary nodes
+(structural fault lines) rather than critical nodes.
+
+**Result on planted partition models:**
+- SBM (4x15): Prism rho = +0.268, Betweenness rho = +0.601
+- SBM (3x20): Prism rho = -0.049, Betweenness rho = +0.479
+
+**Verdict:** Even at boundary detection (its supposed niche),
+betweenness still outperforms Prism on ground-truth community boundaries.
+
+---
+
+### 12. Global Defect vs Community Separation
+
+**Test:** Sweep inter-community edge probability from 0 to p_in.
+
+**Result:** Global defect is NON-MONOTONIC with community separation:
+- p_out=0.02: defect = 0.54 (clear communities)
+- p_out=0.05: defect = 0.65 (PEAK — maximum tension)
+- p_out=0.30: defect = 0.35 (no communities, random graph)
+
+Defect peaks at intermediate separation — when the network is most
+"conflicted" about its partition. It does not simply measure community
+clarity (modularity does that monotonically).
+
+---
+
+## Final Assessment
+
+### What Prism's per-node decomposition actually measures:
+
+It measures proximity to the Fiedler spectral bisection. This is:
+1. Tautological (derived from the same eigenvector)
+2. Inferior to betweenness for criticality detection
+3. Inferior to betweenness for boundary detection
+4. Not independently useful as a product
+
+### What the global defect measures:
+
+It measures the tension between graph topology (L) and spectral duality
+structure (P). It peaks when the network has community structure that
+is neither perfectly separated nor fully blurred. This is a genuine
+structural property, but:
+- In dense networks: redundant with inverse VIX
+- In sparse networks: non-monotonic with modularity, unclear product use
+
+### Structural dead end diagnosis:
+
+The Fiedler duality operator P (pair rank k with rank n+1-k) does not
+correspond to any known engineering or physical concept of "criticality,"
+"load-bearing," or "boundary." It is a mathematical construction that
+produces a well-defined metric, but that metric does not map to actionable
+real-world properties in any tested domain.
+
+---
+
+## What Survives (Revised)
+
+1. **The mathematical definition.** delta(L,P) is well-defined and
+   computable. It is a legitimate structural metric.
+
+2. **The Karate Club result.** 100% community detection accuracy.
+   This works because Karate Club's community structure happens to
+   align perfectly with the Fiedler bisection.
+
+3. **The 2017 finding.** One compelling historical episode.
+
+4. **The theoretical paper.** Stands as a contribution to spectral
+   graph theory. Does not claim practical utility.
+
+5. **The non-monotonic modularity relationship.** Intellectually
+   interesting: defect peaks at maximum structural tension. Potentially
+   publishable as a theoretical observation.
+
+---
+
+## What Does Not Survive (Revised)
+
+- Any per-node attribution product (sparse OR dense networks)
+- Criticality detection (betweenness wins everywhere)
+- Boundary detection (betweenness wins on ground truth)
+- Infrastructure monitoring (no correspondence to load-bearing)
+- Supply chain bottleneck identification
+- Any product requiring per-node defect to mean something actionable
+
+---
+
+## Lessons (Updated)
+
+1. Always test against the simplest baseline first. Betweenness
+   centrality is the null hypothesis for node importance.
+
+2. A metric derived from eigenvector X will tautologically correlate
+   with properties of eigenvector X. This is not a finding.
+
+3. The failure is now confirmed as METHOD-level, not domain-level.
+   The Fiedler duality operator does not correspond to engineering
+   criticality in ANY tested network topology.
+
+4. The only remaining value is the GLOBAL scalar defect, and only
+   in contexts where "structural tension" (non-monotonic with
+   modularity) is itself the quantity of interest.
+
+5. SRS diagnosis confirmed: alpha <= 1 across all domains tested.
+   The metric is decidable within simpler frameworks (betweenness,
+   modularity) that already exist.
+
+---
+
+*Report date: 2026-05-18 (updated with sparse network results)*
+*Experiments: 12 conducted across dense and sparse networks*
+*Status: Per-node product direction closed. Global defect: theoretical
+interest only. No viable product direction identified.*
