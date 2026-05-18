@@ -19,6 +19,10 @@ illusion/phase*/results/*.json
 # Private plans (publish after completion)
 private/
 
+# Archive (local only, not pushed)
+archive/
+inbox/archived/
+
 # Editor
 .vscode/
 .idea/

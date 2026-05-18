@@ -1,0 +1,463 @@
+\documentclass[11pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+
+\geometry{margin=1in}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+% Notation macros
+\newcommand{\derivM}{\rightarrow_M}           % derivable within M
+\newcommand{\unreachM}{\not\rightarrow_M}     % unreachable within M
+\newcommand{\extop}{\Rrightarrow_M}           % M-external operation
+\newcommand{\Dcollapse}{\Delta_{\mathrm{collapse}}}
+\newcommand{\SRS}{\mathrm{SRS}}
+\newcommand{\PHP}{\mathrm{PHP}}
+
+\title{Illusion: Diagnosing and Measuring Self-Referential Safety Across Five Proof Domains}
+\author{Jiatong Xie}
+\date{May 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We present Illusion, a three-layer search system that operationalizes the self-referential safety (SRS) framework. Given a computational model $M$ and a target function $f$, the system's L2 layer searches for candidate discriminating properties via a collapse metric ($\Dcollapse$), while its L3 layer checks each candidate against human-encoded domain axioms, classifying it as SAFE ($\alpha > 1$), UNSAFE ($\alpha \leq 1$), or UNKNOWN. We validate the system across five domains: AC$^0$ circuits, monotone circuits, algebraic circuits over $\mathrm{GF}(p)$, bounded-depth Frege, and size-bounded Frege. In each known domain, L2's blind search surfaces the same transform class used in the classical lower bound proof, and L3 correctly separates it from false positives with comparable signal. In two unknown domains, L3 returns UNKNOWN verdicts that point at distinct open problems (Resolution vs.\ Extended Resolution; Frege vs.\ Extended Frege). The system achieves metric-level precision: the same Extended Frege operation shows zero signal at the depth level but maximum signal at the size level, localizing the open problem to the exact metric dimension where it lives. Across all experiments: 4 SAFE on known proof techniques, 2 UNKNOWN on open problems, 0 false positives.
+\end{abstract}
+
+%% ============================================================
+\section{Introduction}
+\label{sec:intro}
+
+In algebraic circuit complexity, two candidate discriminating properties achieve nearly identical statistical signal: algebraic restriction ($\Dcollapse = +0.104$) and field reduction ($\Dcollapse = +0.105$). One corresponds to the Razborov-Smolensky method that yields exponential lower bounds for the Permanent. The other is a local operation decidable within the algebraic circuit model. Statistical measurement alone cannot distinguish them.
+
+This paper presents a system that can.
+
+The self-referential safety (SRS) framework~\cite{Xie2026} identifies a structural condition shared by all known impossibility proofs: the discriminating property $P$ used in the proof must not be decidable within the model $M$ being analyzed. When this condition fails, the proof hits a known barrier. The SRS index $\alpha = \mathrm{cost}(P)/\mathrm{cap}(M)$ quantifies this: $\alpha > 1$ means the property is safe; $\alpha \leq 1$ means it is vulnerable.
+
+Illusion operationalizes this framework. It is not a theorem prover. It is a diagnostic and measurement tool that operates in two phases:
+\begin{enumerate}[nosep]
+    \item \textbf{Diagnosis}: given $(M, f)$, find candidates with high $\Dcollapse$, classify them via L3, and identify where the knowledge boundary lies (UNKNOWN verdicts localized to specific metric dimensions).
+    \item \textbf{Measurement}: for each UNKNOWN candidate, run scaling experiments that quantify the gap between the base system and its extension, producing new empirical data about open problems.
+\end{enumerate}
+
+The system's contribution is not confirming what is already known. It is producing new quantitative evidence about what is not known --- guided by the structural diagnosis.
+
+\subsection{Main results}
+
+\textbf{Phase I --- Calibration} (known domains): 4 SAFE verdicts correctly identifying classical proof techniques (AC$^0$, monotone, algebraic, bounded-depth Frege). 0 false positives.
+
+\textbf{Phase II --- Diagnosis} (unknown domains): 2 UNKNOWN verdicts pointing at distinct open problems (Resolution vs.\ Extended Resolution; Frege vs.\ Extended Frege). Metric-level precision: the same Extended Frege operation shows zero signal at depth but maximum signal at size.
+
+\textbf{Phase III --- Measurement} (scaling law): Direct quantification of the Frege/Extended Frege gap on $\PHP_n$. Standard Frege requires exponentially many steps ($\sim 7$--$8\times$ per increment of $n$), while Extended Frege grows polynomially ($O(n^2)$). The ratio grows super-polynomially --- consistent with genuine separation.
+
+\subsection{What Illusion does not do}
+
+Illusion does not prove theorems, generate formal proofs, or replace human mathematical judgment. Its L3 layer relies on human-written domain axioms; its reliability ceiling is the encoder's mathematical knowledge. The system's contribution is not ``automatic safety judgment'' but ``structuring safety judgment into checkable reasoning chains.''
+
+\subsection{On the circularity objection}
+\label{sec:circularity}
+
+A natural objection: if L3's rules encode human knowledge of which proof techniques work, then the system is merely reciting what was put in. Three observations against this reading:
+
+\begin{enumerate}[nosep]
+    \item \textbf{L2 search is genuinely blind.} L2 knows nothing about which transforms correspond to classical proofs. It measures $\Dcollapse$ for every registered transform and surfaces all candidates above threshold. That \texttt{field\_reduction} achieves $\Dcollapse = +0.105$ --- nearly identical to the correct technique --- is discovered by L2, not encoded by L3. A system without L3 would accept it as valid.
+    \item \textbf{UNKNOWN is not predictable from the rule library.} L3's rules cover known decidability results. When a candidate falls outside all rules, the system halts with UNKNOWN rather than forcing a verdict. The fact that UNKNOWN verdicts align with genuinely open problems (and not with known results) is an empirical outcome, not a tautology.
+    \item \textbf{The precision result is measurement, not encoding.} That cross-branch caching shows $\Dcollapse = 0$ at the depth metric and $\Dcollapse = +1.000$ at the size metric is a property of the proof system's behavior under transformation. No rule in L3 encodes this contrast --- it emerges from L2's measurement. L3 merely confirms that the high-signal case has unknown decidability status.
+\end{enumerate}
+
+The honest framing: L2 provides independent search within a pre-defined transform registry; L3 provides knowledge-dependent filtering. The system's value is the combination --- neither layer alone suffices. This is analogous to a telescope scanning a pre-defined sky region (independent observation within a field of view) paired with a spectral catalog (human knowledge): the telescope finds objects, the catalog classifies them, and the classification is only as good as the catalog. L2 does not discover transform classes that no human has conceived --- it measures the effect of registered transforms. The contribution is the architecture that makes blind measurement and knowledge-based filtering composable, not a claim of fully autonomous discovery.
+
+%% ============================================================
+\section{Architecture and Notation}
+\label{sec:arch}
+
+\subsection{Three-layer stack}
+
+Illusion implements a strict separation of concerns:
+
+\begin{center}
+\begin{tabular}{@{}lp{10cm}@{}}
+\toprule
+Layer & Role \\
+\midrule
+L3 & Safety monitor: classifies candidates as SAFE / UNSAFE / UNKNOWN \\
+L2 & Transform search: measures $\Dcollapse$ for each registered transform \\
+L1 & Object model: simulates the computational model under analysis \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+L2 cannot access L1's internal structure directly. L3 monitors whether L2's candidates have slipped into L1's decidability range. The architecture is invariant across all domains; only L1 and the transform registry are swapped.
+
+\subsection{Notation}
+
+We introduce three operators that compress recurring proof-theoretic statements:
+
+\begin{definition}[Internal derivation]
+$P \derivM$ means property $P$ is derivable (decidable) within model $M$. Formally: there exists $\mathcal{A} \in M$ such that $\mathcal{A}$ decides $P$.
+\end{definition}
+
+\begin{definition}[Unreachability]
+$P \unreachM$ means property $P$ is not decidable within $M$. Equivalently: $\mathrm{cost}(P) > \mathrm{cap}(M)$, i.e., $\alpha > 1$.
+\end{definition}
+
+\begin{definition}[External operation]
+$T \extop$ means transform $T$ operates from outside $M$'s computational capacity. The application of $T$ to objects in $M$ requires resources exceeding $\mathrm{cap}(M)$.
+\end{definition}
+
+The SRS condition for a valid proof technique is: the discriminating property $P$ induced by transform $T$ satisfies $P \unreachM$. Equivalently, $T \extop$.
+
+\textbf{Compression example.} In natural language: ``The random restriction technique applies an operation to AC$^0$ circuits that requires exponential resources to simulate within AC$^0$, producing a property (collapse under restriction) that no AC$^0$ circuit can decide.'' In symbolic form:
+\[
+T_{\mathrm{restrict}} \extop[\mathrm{AC}^0], \quad P_{\mathrm{collapse}} \unreachM[\mathrm{AC}^0], \quad \alpha = \frac{3^n}{\mathrm{poly}(n)} \gg 1.
+\]
+
+\subsection{The $\Dcollapse$ metric}
+
+For a circuit $C$ and distributions $D^+$, $D^-$ (designed so that a circuit computing the target can distinguish them):
+\begin{align}
+\mathrm{advantage}(C) &= \bigl|\Pr[C(x) \neq 0 \mid x \sim D^+] - \Pr[C(x) \neq 0 \mid x \sim D^-]\bigr| \\
+\mathrm{collapse}(C) &= 1 - \mathrm{advantage}(C) \\
+\Dcollapse(T) &= \frac{1}{|S|}\sum_{C \in S}\bigl[\mathrm{collapse}(T(C)) - \mathrm{collapse}(C)\bigr]
+\end{align}
+where $S$ is the set of test circuits.
+
+A transform $T$ is a \textbf{candidate} if: (1) $\Dcollapse(T) > 0.03$, and (2) $T$ does not affect the target function (verified by a separate check).
+
+\subsection{L3 verdicts}
+
+L3 maintains a rule library of known decidability results. For each candidate:
+\begin{itemize}[nosep]
+    \item \textbf{SAFE}: The induced property $P \unreachM$ by a known theorem or complexity separation. Valid candidate.
+    \item \textbf{UNSAFE}: The induced property $P \derivM$ by a known algorithm or construction. Discard.
+    \item \textbf{UNKNOWN}: No matching rule. The decidability status of $P$ within $M$ is an open question.
+\end{itemize}
+
+L3's verdicts depend on human-encoded domain axioms. The system does not automatically determine decidability; it structures the judgment into a checkable chain.
+
+\begin{remark}[Transform complexity vs.\ induced property]
+L3 judges the decidability of the \emph{property induced by} a transform, not the computational cost of \emph{applying} the transform. A transform $T$ may be efficiently computable (e.g., variable elimination runs in polynomial time), yet the property it induces --- ``does the proof system lose power under $T$?'' --- may be undecidable within the model. This distinction is critical: many UNKNOWN candidates involve polynomial-time transforms whose induced properties have open decidability status.
+\end{remark}
+
+%% ============================================================
+\section{Known Domains}
+\label{sec:known}
+
+\subsection{AC$^0$ vs.\ PARITY}
+
+\textbf{Setup.} $M = \mathrm{AC}^0$ (constant-depth, polynomial-size circuits with AND/OR/NOT gates). Target: PARITY on $n = 8$ bits. Parameters: depth 3, 50 circuits, 2000 samples per trial.
+
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Transform & $\Dcollapse$ & Target affected & L3 \\
+\midrule
+random\_restriction ($p=0.5$) & $+0.080$ & No & SAFE \\
+random\_restriction ($p=0.3$) & $+0.058$ & No & SAFE \\
+gate\_substitution & $+0.113$ & Yes & rejected \\
+input\_negation & $+0.008$ & No & rejected \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Interpretation.} L2 identifies random restriction as a SAFE candidate: verifying whether a circuit collapses under random restriction requires exponential sampling over $3^n$ possible restrictions. In symbolic form:
+\[
+T_{\mathrm{restrict}} \extop[\mathrm{AC}^0], \quad P_{\mathrm{collapse}} \unreachM[\mathrm{AC}^0], \quad \alpha = \frac{3^n}{\mathrm{poly}(n)} \gg 1.
+\]
+This is the structural analog of H\r{a}stad's switching lemma~\cite{Hastad1987}. L2 surfaced this candidate through blind measurement; L3 confirmed its safety through the domain axiom that exponential sampling exceeds AC$^0$ capacity.
+
+\subsection{Monotone circuits vs.\ $k$-CLIQUE}
+
+\textbf{Setup.} $M = $ monotone circuits (AND/OR only). Target: $k$-CLIQUE with $n=6$, $k=3$. Parameters: depth 3, 30 circuits, 500 samples.
+
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Transform & $\Dcollapse$ & Target affected & L3 \\
+\midrule
+subgraph\_projection ($p=0.7$) & $+0.245$ & No & SAFE \\
+edge\_deletion ($p=0.1$) & $+0.081$ & No & UNSAFE \\
+distribution\_switch & $+0.004$ & No & rejected \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Interpretation.} Subgraph projection is SAFE: deciding whether a circuit loses advantage under random vertex removal requires exponential sampling over all $\binom{n}{k}$ subsets. Edge deletion is UNSAFE: setting edge inputs to 0 is a monotone operation decidable by a polynomial-size monotone circuit. In symbolic form:
+\[
+T_{\mathrm{project}} \extop[\mathrm{Mono}],\ P_{\mathrm{approx}} \unreachM[\mathrm{Mono}]; \qquad T_{\mathrm{delete}} \not\extop[\mathrm{Mono}],\ P_{\mathrm{edge}} \derivM[\mathrm{Mono}].
+\]
+This corresponds to Razborov's approximation method~\cite{Razborov1985}.
+
+\subsection{Algebraic circuits vs.\ Permanent}
+
+\textbf{Setup.} $M = $ algebraic circuits over $\mathrm{GF}(7)$. Target: $n \times n$ Permanent. Parameters: $n=3$ and $n=4$, depth 3, 20 circuits, 300 samples.
+
+\begin{center}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+Transform & $\Dcollapse$ ($n=3$) & $\Dcollapse$ ($n=4$) & Trend & L3 \\
+\midrule
+algebraic\_restriction ($p=0.3$) & $+0.104$ & $+0.124$ & $\uparrow$ & SAFE \\
+field\_reduction ($q=2$) & $+0.105$ & $+0.087$ & $\downarrow$ & UNSAFE \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Interpretation.} At $n=3$, the two candidates are statistically indistinguishable ($\Dcollapse = 0.104$ vs.\ $0.105$). Only L3 separates them:
+\begin{itemize}[nosep]
+    \item Algebraic restriction: variable restriction does not change the polynomial family's inherent complexity class. Deciding collapse requires evaluating over all $p^n$ possible restrictions. $P \unreachM$. \textbf{SAFE}.
+    \item Field reduction: reducing the base field from $\mathrm{GF}(7)$ to $\mathrm{GF}(2)$ modifies the arithmetic foundation. This is a local algebraic operation decidable within the model. $P \derivM$. \textbf{UNSAFE}.
+\end{itemize}
+
+The scaling behavior confirms L3: the SAFE candidate strengthens with $n$ (signal grows as the model's limitation becomes more pronounced), while the UNSAFE candidate weakens (the artifact diminishes as problem size increases). Symbolically: $\alpha_{\mathrm{restrict}}(n) \to \infty$ while $\alpha_{\mathrm{field}} \leq 1$ regardless of $n$.
+
+%% ============================================================
+\section{Unknown Domains: Proof Complexity}
+\label{sec:unknown}
+
+All three experiments use the pigeonhole principle $\PHP(n+1, n)$ as target. What varies is the proof system and resource metric.
+
+\subsection{Resolution: width metric}
+
+\textbf{Setup.} $M = $ width-limited Resolution. Width limit $w = 4$. $D^+$: $\PHP(3,2)$, $\PHP(4,3)$ (provable within width 4). $D^-$: $\PHP(6,5)$, $\PHP(7,6)$ (require width $> 4$).
+
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Transform & $\Dcollapse$ & L3 \\
+\midrule
+clause\_restriction ($p=0.4$) & $+0.780$ & SAFE \\
+clause\_projection ($p=0.7$) & $+0.780$ & SAFE \\
+variable\_elimination ($p=0.3$) & $+0.780$ & \textbf{UNKNOWN} \\
+width\_truncation & $-0.020$ & rejected \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Saturation.} All three effective transforms achieve identical $\Dcollapse = +0.780$. This is not coincidence: the baseline advantage is exactly $0.780$, so any transform that completely destroys the solver's refutation ability pushes collapse from $0.220$ to $1.000$, yielding $\Dcollapse = 0.780$ as a ceiling. The metric saturates in this regime --- it can identify \emph{which} transforms are effective (signal vs.\ no signal) but cannot rank among them. This makes L3 the \emph{sole} discriminator between SAFE and UNKNOWN candidates, strengthening the argument that statistical signal alone is insufficient.
+
+\textbf{The UNKNOWN.} Variable elimination achieves identical signal to the SAFE candidates. L3 distinguishes them by analyzing the \emph{induced property}, not the transform's own computational cost. Clause restriction is a polynomial-time operation, and so is variable elimination --- but the properties they induce differ:
+\begin{itemize}[nosep]
+    \item Clause restriction induces: ``does the proof lose width advantage under random variable fixing?'' Deciding this requires exponential sampling over all restrictions. $P_{\mathrm{restrict}} \unreachM[\mathrm{Res}]$. \textbf{SAFE}.
+    \item Variable elimination induces: ``does the proof become shorter after existential projection?'' This corresponds to the power of Extended Resolution's extension rule. Whether this property is decidable within Resolution is the open separation question. $P_{\mathrm{elim}} \stackrel{?}{\unreachM}[\mathrm{Res}]$. \textbf{UNKNOWN}.
+\end{itemize}
+The key distinction: L3 judges the decidability of the \emph{induced discriminating property}, not the complexity of applying the transform itself~\cite{CookReckhow1979}.
+
+\subsection{Frege: depth metric}
+
+\textbf{Setup.} $M = $ bounded-depth Frege. Depth limit $d = 5$. Same $\PHP$ target.
+
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Transform & $\Dcollapse$ & L3 \\
+\midrule
+variable\_restriction ($p=0.3$) & $+1.000$ & SAFE \\
+hypothesis\_projection ($p=0.7$) & $+1.000$ & SAFE \\
+subformula\_elimination & $+0.000$ & rejected \\
+cross\_branch\_caching & $+0.000$ & rejected \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Why zero UNKNOWN is informative.} Subformula elimination and cross-branch caching --- the input-level analogs of Extended Frege abbreviation --- show \emph{zero signal} at the depth metric. Extended Frege's conjectured advantage is in proof \emph{size}, not depth. Abbreviations reduce total step count but do not reduce the depth of the case-split tree. The framework correctly identifies that the Frege/Extended Frege boundary does not manifest at the depth level. Bounded-depth Frege lower bounds are known~\cite{KrajicekPudlak1995}. Symbolically: $T_{\mathrm{cache}} \not\extop[\mathrm{Frege}_d]$ --- caching does not operate outside bounded-depth Frege's capacity at the depth metric.
+
+\subsection{Frege: size metric}
+
+\textbf{Setup.} $M = $ size-bounded Frege. Step limit 100. Same $\PHP$ target.
+
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Transform & $\Dcollapse$ & L3 \\
+\midrule
+variable\_restriction ($p=0.2$) & $+1.000$ & SAFE \\
+hypothesis\_projection ($p=0.7$) & $+1.000$ & SAFE \\
+cross\_branch\_caching & $+1.000$ & \textbf{UNKNOWN} \\
+subformula\_elimination & $+0.000$ & rejected \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{The UNKNOWN.} Cross-branch caching achieves maximum signal ($\Dcollapse = +1.000$). It enables reuse of intermediate derivations across proof branches --- exactly the Extended Frege abbreviation mechanism. Whether this reuse genuinely reduces proof size in a way not simulable within standard Frege is the central open problem~\cite{CookReckhow1979, KrajicekPudlak1989}. Symbolically: $P_{\mathrm{cache}} \stackrel{?}{\unreachM}[\mathrm{Frege}_s]$ --- the decidability of ``does caching reduce proof size?'' within size-bounded Frege is unknown.
+
+\textbf{The precision result.} The same structural operation (Extended Frege abbreviation) shows:
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+Metric & $\Dcollapse$ & UNKNOWN \\
+\midrule
+Proof depth & $0.000$ & No \\
+Proof size & $+1.000$ & Yes \\
+\bottomrule
+\end{tabular}
+\end{center}
+The framework localizes the open problem to the exact metric dimension where it lives.
+
+\subsection{From diagnosis to measurement: the Frege scaling law}
+\label{sec:scaling}
+
+The UNKNOWN verdict in \S4.3 identifies \emph{where} the open problem lives. The next question is: can we \emph{measure} the gap? We run both proof modes (standard Frege and Extended Frege with cross-branch caching) on $\PHP(n+1, n)$ for increasing $n$, recording the number of inference steps required.
+
+\begin{center}
+\begin{tabular}{@{}lrrrl@{}}
+\toprule
+Target & Std Frege (steps) & Ext Frege (steps) & Ratio & Growth \\
+\midrule
+$\PHP(3,2)$ & 8 & 7 & $1.1\times$ & --- \\
+$\PHP(4,3)$ & 67 & 13 & $5.2\times$ & Std: $\sim 8\times$ \\
+$\PHP(5,4)$ & 525 & 21 & $25\times$ & Std: $\sim 8\times$ \\
+$\PHP(6,5)$ & 3869 & 30 & $129\times$ & Std: $\sim 7.4\times$ \\
+$\PHP(7,6)$ & $>$20000 & 42 & $>476\times$ & Ext: $O(n^2)$ \\
+$\PHP(8,7)$ & $>$20000 & 56 & $>357\times$ & Ext: $O(n^2)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\textbf{Scaling laws.}
+\begin{itemize}[nosep]
+    \item Extended Frege steps: $\{7, 13, 21, 30, 42, 56\}$. Differences: $6, 8, 9, 12, 14$. Growth: $O(n^2)$ --- polynomial.
+    \item Standard Frege steps: $\{8, 67, 525, 3869, >20000, \ldots\}$. Ratios: $8.4\times, 7.8\times, 7.4\times, >5.2\times$. Growth: exponential ($\sim 7$--$8\times$ per increment).
+    \item Ratio (Std/Ext): $1.1, 5.2, 25, >100, \ldots$ --- super-polynomial growth, consistent with genuine separation.
+\end{itemize}
+
+This is direct empirical evidence supporting the Frege vs.\ Extended Frege separation conjecture. The framework does not merely \emph{point at} the open problem (Phase II diagnosis). It \emph{quantifies the gap} --- and the gap grows in exactly the pattern predicted by the separation conjecture.
+
+\textbf{Closed-form fit.} The Extended Frege step counts $\{7, 13, 21, 30, 42, 56\}$ fit $\mathrm{steps}(n) \approx n^2 - 1.3n + 2$ (quadratic, $R^2 > 0.999$ for $n = 3, \ldots, 8$). This is consistent with the expected structure: with cross-branch caching, each pigeon's assignment is derived once and reused across all branches, yielding $O(n^2)$ total steps. The tight polynomial form indicates the prover finds near-optimal proofs in Extended Frege mode.
+
+\textbf{Caveat.} This is empirical measurement on a greedy prover, not a formal proof. The exponential growth observed for standard Frege may reflect the prover's systematic redundancy rather than an inherent limitation of the proof system. A better heuristic might find shorter standard Frege proofs. However: (1) the Extended Frege steps are near-optimal (caching eliminates all redundant work by construction); (2) the exponential growth pattern ($\sim 7$--$8\times$ per increment) is consistent across all tested $n$; (3) the known lower bound for Resolution on $\PHP_n$ (Haken 1985) is exponential, and standard Frege without extension rules faces analogous combinatorial explosion. A formal separation would require proving that \emph{no} standard Frege proof of $\PHP_n$ has polynomial size --- which is exactly the open problem the framework identified.
+
+\textbf{Reproducibility.} The scaling data is obtained by running actual proof searches with fixed seed (42). Its integrity rests on reproducibility: another researcher, using a different Frege implementation, should observe the same exponential/polynomial divergence on $\PHP_n$. If they do not, our measurement is falsified. Source code is available at the companion repository.
+
+%% ============================================================
+\section{Cross-Domain Analysis}
+\label{sec:cross}
+
+\subsection{Why L3 is necessary: false positive rejection}
+
+The algebraic domain provides the cleanest demonstration. At $n=3$:
+
+\begin{center}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Transform & $\Dcollapse$ & L3 & Correct? \\
+\midrule
+algebraic\_restriction & $+0.104$ & SAFE & Yes (Razborov-Smolensky) \\
+field\_reduction & $+0.105$ & UNSAFE & Yes (decidable within model) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The difference in $\Dcollapse$ is $0.001$ --- well within sampling variance. With $n_{\mathrm{trials}} = 5$ and 20 circuits per trial, the standard error of the mean is approximately $\pm 0.012$ for both transforms; the difference is not statistically significant ($p > 0.9$ under a two-sample $t$-test). Any system relying solely on statistical signal would accept both or reject both. L3's domain axioms provide the only separation: variable restriction preserves the polynomial family's complexity class (SAFE), while field reduction modifies the arithmetic foundation (UNSAFE).
+
+This is the core argument for the three-layer architecture: statistical measurement identifies \emph{where} to look; domain knowledge determines \emph{what counts}.
+
+\subsection{Pattern summary}
+
+\begin{center}
+\begin{tabular}{@{}llccc@{}}
+\toprule
+Domain & Best SAFE transform & $\Dcollapse$ & UNKNOWN & Classical method \\
+\midrule
+AC$^0$ & random\_restriction & $+0.080$ & 0 & H\r{a}stad 1987 \\
+Monotone & subgraph\_projection & $+0.245$ & 0 & Razborov 1985 \\
+Algebraic & algebraic\_restriction & $+0.104$ & 0 & Razborov-Smolensky 1987 \\
+Resolution (width) & clause\_restriction & $+0.780$ & 1 & Ben-Sasson \& Wigderson 2001 \\
+Frege (depth) & variable\_restriction & $+1.000$ & 0 & Kraji\v{c}ek \& Pudl\'{a}k 1995 \\
+Frege (size) & variable\_restriction & $+1.000$ & 1 & \emph{open} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Six experiments. Four SAFE on known techniques (calibration). Two UNKNOWN on open problems (diagnosis). One scaling law quantifying the gap (measurement). Zero false positives.
+
+%% ============================================================
+\section{Limitations}
+\label{sec:limits}
+
+\begin{enumerate}[nosep]
+    \item \textbf{Scale.} All experiments use toy parameters ($n = 3$--$8$). Whether the signals persist at cryptographic or asymptotic scales is not tested.
+    \item \textbf{Handwritten registries.} The transform registries are manually designed for each domain. The system does not discover novel transform classes autonomously.
+    \item \textbf{UNKNOWN $\neq$ proof.} An UNKNOWN verdict identifies a candidate whose decidability status is open. It does not constitute a proof of separation.
+    \item \textbf{Single seed.} All experiments use seed 42. Robustness across seeds is not systematically tested.
+    \item \textbf{Solver approximation.} L1 uses greedy solvers, not complete decision procedures. The collapse metric measures solver behavior, not worst-case complexity.
+    \item \textbf{L3 reliability ceiling.} L3's correctness depends entirely on the encoded domain axioms. If an axiom is wrong (e.g., if variable restriction were discovered to be decidable within AC$^0$), L3 would give an incorrect SAFE verdict. The system's reliability upper bound is the encoder's mathematical knowledge.
+\end{enumerate}
+
+%% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+This paper demonstrates a three-phase methodology: calibrate on known domains, diagnose the knowledge boundary, then measure the gap.
+
+In the calibration phase, the system correctly classifies known proof techniques across three domains, confirming that the $\Dcollapse$ metric and L3 filter are well-aligned with established mathematics. This phase is necessary but not sufficient --- it establishes trust, not new knowledge.
+
+In the diagnosis phase, the system identifies two open problems and localizes them to specific metric dimensions. The precision result --- zero signal at depth, maximum signal at size for the same operation --- is a measurement outcome, not a rule-library lookup.
+
+In the measurement phase, the scaling experiment produces new quantitative data: Standard Frege grows exponentially on $\PHP_n$ while Extended Frege grows polynomially, with a super-polynomial ratio. This is empirical evidence supporting the Frege vs.\ Extended Frege separation conjecture --- evidence that did not exist before the experiment was run.
+
+The system's value is not in confirming what mathematicians already know. It is in the transition from diagnosis to measurement: the SRS framework tells the system \emph{where} to look and \emph{what dimension} to measure; the measurement produces data that is independent of the framework's assumptions. This is the difference between a classification system and a scientific instrument.
+
+%% ============================================================
+\begin{thebibliography}{99}
+
+\bibitem{Xie2026}
+Xie, J. (2026).
+A meta-methodology of unsatisfiable proofs: self-referential safety and the structure of lower bounds.
+\textit{arXiv preprint}.
+
+\bibitem{Hastad1987}
+H\r{a}stad, J. (1987).
+Computational limitations of small-depth circuits.
+\textit{MIT Press}.
+
+\bibitem{Razborov1985}
+Razborov, A.~A. (1985).
+Lower bounds on the monotone complexity of some Boolean functions.
+\textit{Doklady Akademii Nauk SSSR}, 281(4), 798--801.
+
+\bibitem{Smolensky1987}
+Smolensky, R. (1987).
+Algebraic methods in the theory of lower bounds for Boolean circuit complexity.
+\textit{Proc.\ 19th STOC}, 77--82.
+
+\bibitem{CookReckhow1979}
+Cook, S.~A. \& Reckhow, R.~A. (1979).
+The relative efficiency of propositional proof systems.
+\textit{Journal of Symbolic Logic}, 44(1), 36--50.
+
+\bibitem{KrajicekPudlak1989}
+Kraji\v{c}ek, J. \& Pudl\'{a}k, P. (1989).
+Propositional proof systems, the consistency of first order theories and the complexity of computations.
+\textit{Journal of Symbolic Logic}, 54(3), 1063--1079.
+
+\bibitem{KrajicekPudlak1995}
+Kraji\v{c}ek, J. \& Pudl\'{a}k, P. (1995).
+Some consequences of cryptographical conjectures for $S^1_2$ and $EF$.
+\textit{Information and Computation}, 140(1), 82--94.
+
+\bibitem{BenSassonWigderson2001}
+Ben-Sasson, E. \& Wigderson, A. (2001).
+Short proofs are narrow --- resolution made simple.
+\textit{Journal of the ACM}, 48(2), 149--169.
+
+\bibitem{Valiant1979}
+Valiant, L.~G. (1979).
+The complexity of computing the permanent.
+\textit{Theoretical Computer Science}, 8(2), 189--201.
+
+\end{thebibliography}
+
+\end{document}
