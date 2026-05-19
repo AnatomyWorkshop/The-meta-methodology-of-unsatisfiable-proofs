@@ -51,20 +51,6 @@ Routes research tasks to optimal AI models with adversarial iteration, cost trac
 
 ---
 
-## Research
-
-**Universal Closure Axiom:** `D · phi = star · D† · star · phi`
-
-A system's internal evolution must equal its image under duality-conjugated constraint.
-
-- Paper 1: UCA + Classical Physics (DOI: 10.13140/RG.2.2.11627.91685)
-- Paper 4: UCA + Riemann Hypothesis
-- Paper 5: UCA + BSD Conjecture
-
-All papers on [ResearchGate](https://www.researchgate.net/).
-
----
-
 ## Structure
 
 ```
